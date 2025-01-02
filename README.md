@@ -1,4 +1,4 @@
-# High-Performance Stock Data Pipeline in C++
+# TradePulse
 
 ## Project Overview
 This project implements a high-performance data pipeline for processing real-time stock market data. Using **C++**, **Apache Kafka**, and **MySQL**, the system captures, processes, and stores stock data efficiently with the following goals:
@@ -106,79 +106,87 @@ Run the Kafka consumer to read data from Kafka and store it in MySQL:
 ./kafka_consumer
 ```
 
-## File Details
+## Functional Details
 
-### 1. `data_cleaning.cpp`
-- Reads the raw `stockData.csv`.
-- Standardizes date format to `YYYY-MM-DD`.
-- Replaces zero volumes with `N/A`.
-- Saves cleaned data to `cleaned_stockData.csv`.
+### Data Cleaning (`data_cleaning.cpp`)
+- **Purpose**: Prepares raw stock data for further processing by standardizing formats and ensuring data integrity.
+- **Key Features**:
+  - **Date Standardization**: Converts dates from `DD/MM/YY` format to ISO 8601 format (`YYYY-MM-DD`).
+  - **Volume Correction**: Replaces `0` values in the `Volume` column with `N/A` to avoid misleading results.
+  - **Missing Data Handling**: Removes rows with missing values to ensure data completeness.
+  - **Output**: Saves the cleaned data to a new file, `cleaned_stockData.csv`.
 
-### 2. `kafka_producer.cpp`
-- Reads `cleaned_stockData.csv`.
-- Publishes each record to the Kafka topic `stock_topic`.
+### Kafka Producer (`kafka_producer.cpp`)
+- **Purpose**: Sends cleaned stock data to a Kafka topic for real-time processing.
+- **Key Features**:
+  - **File Reading**: Reads each row of the cleaned CSV file.
+  - **Message Publishing**: Publishes each row as a JSON string to the Kafka topic `stock_topic`.
+  - **Error Handling**: Ensures messages are successfully delivered and logs errors if they occur.
+  - **Scalability**: Supports high-throughput publishing by batching messages (optional optimization).
 
-### 3. `kafka_consumer.cpp`
-- Consumes data from `stock_topic`.
-- Parses the data and inserts it into the `StockPrices` table in MySQL.
+### Kafka Consumer (`kafka_consumer.cpp`)
+- **Purpose**: Consumes stock data from a Kafka topic and inserts it into a MySQL database.
+- **Key Features**:
+  - **Message Consumption**: Reads messages from the Kafka topic `stock_topic` in real time.
+  - **Data Parsing**: Parses each message (CSV format) into individual fields.
+  - **Database Insertion**: Inserts the parsed data into the `StockPrices` table in MySQL.
+  - **Error Handling**: Handles Kafka or MySQL connection issues and retries operations as needed.
 
-### 4. `schema.sql`
-- Creates a MySQL database `StockMarketDB` and a table `StockPrices` with the following schema:
+### MySQL Database Schema (`schema.sql`)
+- **Purpose**: Defines the structure of the `StockPrices` table to store processed stock data.
+- **Key Features**:
+  - **Fields**:
+    - `Index`: Stock index or ticker symbol (e.g., `AAPL`).
+    - `Date`: The date of the stock data in `YYYY-MM-DD` format.
+    - `Open`, `High`, `Low`, `Close`, `AdjClose`: Stock prices for the day.
+    - `Volume`: Number of shares traded, stored as a string to handle potential `N/A` values.
+    - `CloseUSD`: Closing price converted to USD.
+  - **Primary Key**: `ID` ensures unique identification of each record.
 
-```sql
-CREATE DATABASE StockMarketDB;
-
-USE StockMarketDB;
-
-CREATE TABLE StockPrices (
-    ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `Index` VARCHAR(10) NOT NULL,
-    `Date` DATE NOT NULL,
-    Open DECIMAL(10, 2) NOT NULL,
-    High DECIMAL(10, 2) NOT NULL,
-    Low DECIMAL(10, 2) NOT NULL,
-    Close DECIMAL(10, 2) NOT NULL,
-    AdjClose DECIMAL(10, 2) NOT NULL,
-    Volume VARCHAR(20),
-    CloseUSD DECIMAL(10, 2) NOT NULL
-);
-```
-
-### 5. `Makefile`
-- Automates the compilation of all C++ files.
-- Usage:
-  ```bash
-  make         # Build all executables
-  make clean   # Remove compiled files
-  ```
+### Makefile
+- **Purpose**: Automates the compilation of project components.
+- **Key Features**:
+  - **Targets**:
+    - `data_cleaning`: Compiles the data cleaning script.
+    - `kafka_producer`: Compiles the Kafka producer script.
+    - `kafka_consumer`: Compiles the Kafka consumer script.
+  - **Clean**: Removes compiled executables to allow for fresh builds.
 
 ## Testing
-1. **Kafka Producer**:
-   - Ensure messages are being published to the Kafka topic by using:
-     ```bash
-     bin/kafka-console-consumer.sh --topic stock_topic --from-beginning --bootstrap-server localhost:9092
-     ```
 
-2. **Kafka Consumer**:
-   - Verify data is being inserted into MySQL by running:
-     ```sql
-     SELECT * FROM StockPrices;
-     ```
+### Kafka Producer
+1. Start Kafka console consumer to verify message publishing:
+   ```bash
+   bin/kafka-console-consumer.sh --topic stock_topic --from-beginning --bootstrap-server localhost:9092
+   ```
+2. Check if messages from `kafka_producer` are visible in the Kafka topic.
+
+### Kafka Consumer
+1. Run `kafka_consumer` to consume messages and insert them into MySQL.
+2. Query the database:
+   ```sql
+   SELECT * FROM StockPrices;
+   ```
+3. Verify the data matches the cleaned stock data.
 
 ## Troubleshooting
 1. **Kafka Connection Errors**:
-   - Verify Kafka is running and accessible on `localhost:9092`.
+   - Ensure Kafka broker is running and accessible on `localhost:9092`.
+   - Verify network configurations if running Kafka on a remote server.
 
-2. **MySQL Errors**:
-   - Check database credentials and ensure the `StockMarketDB` schema exists.
+2. **MySQL Connection Errors**:
+   - Check database credentials in `kafka_consumer.cpp`.
+   - Ensure the database server is running and the schema is correctly applied.
 
 3. **Compilation Issues**:
-   - Ensure all required libraries (e.g., `librdkafka`, `libmysqlcppconn`) are installed and accessible.
+   - Ensure `librdkafka` and `libmysqlcppconn` are installed and linked correctly.
+   - Verify that the `Makefile` paths to libraries are accurate.
 
 ## Future Enhancements
-- Add multi-threading to improve consumer performance.
-- Introduce data validation checks during cleaning.
-- Support additional data sources (e.g., WebSocket APIs).
+- Add multi-threading to the Kafka consumer to increase processing speed.
+- Include data validation logic to handle corrupted or malformed records.
+- Integrate additional data sources (e.g., WebSocket APIs for real-time stock data).
+- Optimize database writes using batch insertion techniques.
 
 ---
 
