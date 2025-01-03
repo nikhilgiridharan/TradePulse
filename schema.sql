@@ -1,0 +1,16 @@
+CREATE DATABASE StockMarketDB;
+
+USE StockMarketDB;
+
+CREATE TABLE StockPrices (
+    ID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `Index` VARCHAR(10) NOT NULL,
+    `Date` DATE NOT NULL,
+    Open DECIMAL(10, 2) NOT NULL,
+    High DECIMAL(10, 2) NOT NULL,
+    Low DECIMAL(10, 2) NOT NULL,
+    Close DECIMAL(10, 2) NOT NULL,
+    AdjClose DECIMAL(10, 2) NOT NULL,
+    Volume VARCHAR(20),
+    CloseUSD DECIMAL(10, 2) NOT NULL
+);
