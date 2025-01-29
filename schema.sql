@@ -1,16 +1,14 @@
-CREATE DATABASE StockMarketDB;
+CREATE KEYSPACE stockmarketdb WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 
-USE StockMarketDB;
-
-CREATE TABLE StockPrices (
-    ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `Index` VARCHAR(10) NOT NULL,
-    `Date` DATE NOT NULL,
-    Open DECIMAL(10, 2) NOT NULL,
-    High DECIMAL(10, 2) NOT NULL,
-    Low DECIMAL(10, 2) NOT NULL,
-    Close DECIMAL(10, 2) NOT NULL,
-    AdjClose DECIMAL(10, 2) NOT NULL,
-    Volume VARCHAR(20),
-    CloseUSD DECIMAL(10, 2) NOT NULL
+CREATE TABLE stockmarketdb.stockprices (
+    index text,
+    date text,
+    open double,
+    high double,
+    low double,
+    close double,
+    adj_close double,
+    volume text,
+    close_usd double,
+    PRIMARY KEY (index, date)
 );
