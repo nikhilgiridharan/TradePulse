@@ -1,11 +1,7 @@
 # TradePulse
 
 ## Project Overview
-This project implements a high-performance data pipeline for processing real-time stock market data. Using **Python**, **Apache Kafka**, and **Cassandra**, the system captures, processes, and stores stock data efficiently with the following goals:
-
-- **Throughput**: Handle 500,000 events/second.
-- **Latency**: Sub-100 milliseconds.
-- **Uptime**: 99%.
+This project implements a high-performance data pipeline for processing real-time stock market data. Using **Python**, **Apache Kafka**, and **Cassandra**, the system captures, processes, and stores stock data efficiently:
 
 ## Features
 1. **Data Cleaning**: Preprocess raw stock data (e.g., standardizing dates, handling missing values).
