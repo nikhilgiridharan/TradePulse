@@ -1,0 +1,47 @@
+# Stream processing — Faust for exactly-once Kafka consumption; confluent-kafka for producer
+faust-streaming==0.10.14
+confluent-kafka==2.3.0
+
+# AWS SDK — DynamoDB, S3, SQS, CloudWatch
+boto3==1.34.0
+botocore==1.34.0
+
+# API layer — FastAPI for REST, uvicorn ASGI server, cache and rate limiting
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+fastapi-cache2==0.2.1
+slowapi==0.1.9
+
+# Data processing — pandas for aggregations; pyarrow for Parquet; numpy for anomaly features
+pandas==2.1.4
+pyarrow==14.0.2
+numpy==1.26.3
+
+# Machine learning — Isolation Forest for anomaly detection; joblib for model serialization
+scikit-learn==1.4.0
+joblib==1.3.2
+
+# Data validation — Pydantic for schema validation and settings
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Polygon.io client — WebSocket and REST for market data
+polygon-api-client==1.13.3
+
+# Utilities — dotenv for .env loading; tenacity for retries; structlog for structured logging
+python-dotenv==1.0.0
+tenacity==8.2.3
+structlog==24.1.0
+
+# Testing — pytest, async support, mocks, AWS mocking, HTTP client
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-mock==3.12.0
+moto[dynamodb,s3,sqs]==4.2.14
+httpx==0.26.0
+fakeredis==2.20.0
+
+# Code quality — style, formatting, type checking
+flake8==7.0.0
+black==24.1.1
+mypy==1.8.0

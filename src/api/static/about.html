@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — MarketFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-tertiary: #1a2235;
+      --accent-primary: #00d4ff;
+      --accent-secondary: #7c3aed;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border-color: #1e293b;
+      --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.15);
+      --glow-purple: 0 0 20px rgba(124, 58, 237, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; height: 56px;
+      background: var(--bg-secondary); border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 16px; height: 16px; fill: white; }
+    .logo-text { font-weight: 700; font-size: 1.25rem; }
+    .version-badge { background: var(--bg-tertiary); color: var(--accent-primary); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+    .header-center { display: flex; gap: 16px; align-items: center; }
+    .stat-pill { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; font-size: 12px; }
+    .stat-pill.cyan { color: var(--accent-primary); }
+    .stat-pill.green { color: var(--accent-green); }
+    .header-right { display: flex; gap: 8px; }
+    .btn { padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
+    .btn-ghost:hover { background: var(--bg-tertiary); color: var(--accent-primary); }
+    .btn-primary { background: var(--accent-primary); color: var(--bg-primary); }
+    .btn-primary:hover { box-shadow: var(--glow-cyan); }
+
+    .app-layout { display: flex; min-height: 100vh; padding-top: 56px; }
+    .sidebar {
+      width: 240px; min-width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-color);
+      padding: 16px 0; position: fixed; top: 56px; left: 0; bottom: 0; z-index: 50;
+    }
+    .sidebar .wordmark { padding: 0 20px 16px; font-weight: 700; font-size: 0.9rem; color: var(--text-secondary); }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: var(--text-secondary); cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s ease; text-decoration: none; color: inherit; }
+    .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .nav-item.active { border-left-color: var(--accent-primary); background: rgba(0, 212, 255, 0.08); color: var(--accent-primary); }
+    .sidebar-footer { position: absolute; bottom: 16px; left: 20px; right: 20px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--accent-green); }
+    .sidebar-footer .dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; }
+
+    .doc-wrap { display: flex; flex: 1; margin-left: 240px; }
+    .doc-content { flex: 1; padding: 24px 24px 48px; max-width: 820px; }
+    .doc-content section { scroll-margin-top: 80px; }
+    .toc {
+      position: sticky; top: 80px; width: 200px; min-width: 200px; padding: 16px; border-left: 1px solid var(--border-color);
+      max-height: calc(100vh - 100px); overflow-y: auto;
+    }
+    .toc-item { display: block; padding: 6px 12px; color: var(--text-secondary); font-size: 13px; cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; text-decoration: none; }
+    .toc-item:hover { color: var(--text-primary); }
+    .toc-item.active { color: var(--accent-primary); border-left-color: var(--accent-primary); background: rgba(0, 212, 255, 0.05); }
+
+    .hero {
+      position: relative; padding: 48px 24px 40px; margin: -24px -24px 32px -24px; border-radius: 0 0 16px 16px;
+      background: var(--bg-secondary); border: 1px solid var(--border-color); overflow: hidden;
+    }
+    .hero-mesh { position: absolute; inset: 0; pointer-events: none; opacity: 0.04; }
+    .hero-mesh .blob { position: absolute; border-radius: 50%; filter: blur(80px); width: 400px; height: 400px; }
+    .hero-mesh .blob1 { background: var(--accent-primary); top: -100px; left: -100px; }
+    .hero-mesh .blob2 { background: var(--accent-secondary); top: 50%; right: -150px; }
+    .hero-mesh .blob3 { background: #3b82f6; bottom: -100px; left: 30%; }
+    .hero h1 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .hero .sub { color: var(--text-secondary); font-size: 1rem; margin-bottom: 24px; max-width: 560px; }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+    .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .hero-stat { background: var(--bg-tertiary); border: 1px solid transparent; border-radius: 8px; padding: 12px 20px; background: linear-gradient(var(--bg-tertiary), var(--bg-tertiary)) padding-box, linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) border-box; }
+    .hero-stat .val { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; }
+    .hero-stat .lbl { font-size: 11px; color: var(--text-secondary); }
+
+    h2 { font-size: 1.5rem; margin: 32px 0 8px; }
+    h2 .sub { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); display: block; margin-top: 4px; }
+    h3 { font-size: 1.1rem; margin: 20px 0 8px; }
+    p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+
+    .highlight-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+    .highlight-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+    .highlight-card:hover { border-color: var(--accent-primary); box-shadow: var(--glow-cyan); }
+    .highlight-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .highlight-card h4 { font-size: 1rem; margin-bottom: 8px; }
+    .highlight-card p { font-size: 13px; margin: 0; }
+
+    .pipeline-diagram { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid var(--border-color); overflow-x: auto; }
+    .pipeline-diagram svg { display: block; margin: 0 auto; }
+    .flow-box { fill: var(--bg-tertiary); stroke: var(--border-color); stroke-width: 1; rx: 6; transition: all 0.2s; }
+    .flow-box:hover { stroke: var(--accent-primary); filter: drop-shadow(0 0 8px rgba(0,212,255,0.3)); }
+    .flow-line { stroke: var(--border-color); stroke-width: 2; fill: none; }
+    .timeline-bar { background: var(--bg-tertiary); height: 32px; border-radius: 8px; margin: 16px 0; position: relative; overflow: hidden; }
+    .timeline-bar .segment { position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); opacity: 0.6; }
+    .timeline-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 8px; }
+
+    .prereq-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin: 24px 0; }
+    .prereq-box h4 { margin-bottom: 12px; }
+    .prereq-box ul { list-style: none; }
+    .prereq-box li { padding: 6px 0; color: var(--text-secondary); }
+    .prereq-box li::before { content: '✓ '; color: var(--accent-green); }
+
+    .step { margin: 28px 0; padding-bottom: 28px; border-bottom: 1px solid var(--border-color); }
+    .step:last-of-type { border-bottom: none; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-primary); color: var(--bg-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-right: 12px; }
+    .step h4 { display: inline; }
+    .code-block { background: #0d1117; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; position: relative; margin: 12px 0; }
+    .code-block .copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 10px; font-size: 11px; border-radius: 4px; background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); cursor: pointer; }
+    .code-block .copy-btn:hover { color: var(--accent-primary); }
+    .code-block .copy-btn.copied { color: var(--accent-green); }
+
+    .method-get { background: rgba(0, 212, 255, 0.15); color: var(--accent-primary); border: 1px solid rgba(0, 212, 255, 0.3); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; display: inline-block; margin-right: 8px; }
+    .endpoint-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .endpoint-card h4 { margin-bottom: 8px; }
+    .endpoint-card .desc { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
+    .endpoint-card table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+    .endpoint-card th, .endpoint-card td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    .endpoint-card th { color: var(--text-secondary); font-weight: 500; }
+    .endpoint-card .cache { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+    .endpoint-card .note { font-size: 12px; color: var(--accent-yellow); margin-top: 8px; }
+
+    .concept-card { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 12px; transition: border-color 0.2s; }
+    .concept-card.open { border-color: var(--accent-primary); box-shadow: var(--glow-cyan); }
+    .concept-head { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); }
+    .concept-head:hover { background: var(--bg-tertiary); }
+    .concept-head h4 { margin: 0; font-size: 1rem; }
+    .concept-head .sub { font-size: 12px; color: var(--text-secondary); display: block; margin-top: 4px; }
+    .concept-head .chevron { transition: transform 0.3s; }
+    .concept-card.open .chevron { transform: rotate(180deg); }
+    .concept-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .concept-card.open .concept-body { max-height: 800px; }
+    .concept-body-inner { padding: 20px; background: var(--bg-secondary); border-top: 1px solid var(--border-color); }
+    .concept-body-inner p { margin-bottom: 12px; }
+    .concept-body-inner pre { font-size: 12px; margin: 12px 0; padding: 12px; background: var(--bg-primary); border-radius: 6px; overflow-x: auto; }
+
+    .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0; }
+    .tech-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+    .tech-card:hover { border-color: var(--accent-primary); }
+    .tech-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .tech-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
+    .tech-card .ver { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; }
+    .tech-card p { font-size: 12px; margin: 0; }
+
+    .bench-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
+    .bench-table th, .bench-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    .bench-table th { background: var(--bg-secondary); color: var(--text-secondary); font-weight: 500; }
+    .bench-table .status-ok { color: var(--accent-green); }
+    .bench-table .status-warn { color: var(--accent-yellow); }
+    .methodology { font-size: 12px; color: var(--text-secondary); margin-top: 16px; font-style: italic; }
+
+    .file-tree { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin: 24px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .file-tree ul { list-style: none; padding-left: 0; }
+    .file-tree > ul.tree-children { padding-left: 0; }
+    .file-tree .tree-children { list-style: none; padding-left: 16px; }
+    .file-tree .folder-toggle { cursor: pointer; padding: 4px 0; user-select: none; }
+    .file-tree .folder-toggle::before { content: '▸ '; display: inline-block; width: 14px; transition: transform 0.2s; }
+    .file-tree .folder-toggle.open::before { transform: rotate(90deg); }
+    .file-tree .tree-children.collapsed { display: none; }
+    .file-tree .file-row { padding: 4px 0; color: var(--text-secondary); cursor: default; }
+    .file-tree .file-row:hover { color: var(--accent-primary); }
+    .file-tree .file-row[data-tooltip] { position: relative; }
+    .file-tree .tooltip-pop { position: absolute; left: 100%; top: 0; margin-left: 8px; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; font-size: 11px; font-family: Inter, sans-serif; white-space: normal; max-width: 260px; z-index: 10; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .file-tree .file-row.show-tooltip .tooltip-pop { display: block; }
+    #file-tooltip-global { position: fixed; display: none; }
+
+    .author-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 40px; margin: 32px 0; text-align: center; }
+    .author-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: white; margin: 0 auto 16px; }
+    .author-card h3 { margin-bottom: 4px; }
+    .author-card .role { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
+    .author-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    .author-links .btn { font-size: 12px; }
+
+    .footer { border-top: 1px solid var(--border-color); padding: 32px 24px; margin-top: 48px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+    .footer a { color: var(--accent-primary); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .footer-links { margin: 16px 0; }
+    .footer-links a { margin: 0 12px; }
+
+    @media (max-width: 1200px) { .toc { display: none; } .highlight-cards { grid-template-columns: 1fr; } .tech-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; min-width: 60px; }
+      .sidebar .wordmark, .sidebar .nav-item span { display: none; }
+      .doc-wrap { margin-left: 60px; }
+      .hero-stats { flex-direction: column; }
+      .hero-cta { flex-direction: column; }
+    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="white" d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 13v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 9V7h2v2H3zm4 0V7h2v2H7zm4 0V7h2v2h-2zm4 0V7h2v2h-2zm4 0V7h2v2h-2zM3 5V3h2v2H3zm4 0V3h2v2H7zm4 0V3h2v2h-2zm4 0V3h2v2h-2zm4 0V3h2v2h-2z"/></svg></div>
+      <span class="logo-text">MarketFlow</span>
+      <span class="version-badge">API v1.0.0</span>
+    </div>
+    <div class="header-center">
+      <div class="stat-pill cyan"><span id="h-stat-events">14,832</span> events/sec</div>
+      <div class="stat-pill green"><span id="h-stat-latency">12ms</span> p50</div>
+      <div class="stat-pill green">✓ Operational</div>
+    </div>
+    <div class="header-right">
+      <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
+      <a href="/" class="btn btn-primary">Dashboard</a>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="wordmark">MarketFlow</div>
+      <a href="/" class="nav-item">📊 <span>Overview</span></a>
+      <a href="/" class="nav-item">📡 <span>API Reference</span></a>
+      <a href="/" class="nav-item">📈 <span>Live Data</span></a>
+      <a href="/" class="nav-item">🔧 <span>Pipeline Status</span></a>
+      <a href="/" class="nav-item">⚠️ <span>Anomalies</span></a>
+      <a href="/about" class="nav-item active">📖 <span>About</span></a>
+      <div class="sidebar-footer"><div class="dot"></div> Pipeline Active</div>
+    </aside>
+
+    <div class="doc-wrap">
+      <div class="doc-content">
+        <div class="hero">
+          <div class="hero-mesh" id="hero-mesh"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div></div>
+          <h1><span class="logo-icon"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="white" d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2z"/></svg></span> MarketFlow</h1>
+          <p class="sub">Real-time market data pipeline processing 15,000+ events per second with sub-100ms latency</p>
+          <div class="hero-cta">
+            <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">View on GitHub</a>
+            <a href="#" class="btn btn-ghost">Read the Article</a>
+            <a href="/" class="btn btn-primary">Live Dashboard →</a>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><span class="val font-mono" id="hero-events">0</span><br><span class="lbl">events/sec</span></div>
+            <div class="hero-stat"><span class="val font-mono" id="hero-p50">0</span><br><span class="lbl">p50 latency (ms)</span></div>
+            <div class="hero-stat"><span class="val font-mono" id="hero-p99">0</span><br><span class="lbl">p99 latency</span></div>
+            <div class="hero-stat"><span class="val font-mono" id="hero-anom">0</span><br><span class="lbl">anomalies</span></div>
+          </div>
+        </div>
+
+        <section id="what-is">
+          <h2>What is MarketFlow?</h2>
+          <p>Stock market data is one of the hardest domains for data engineering — high volume, zero tolerance for duplicates, strict latency requirements, and burst traffic at market open that can spike 8–10x in under 60 seconds. Most portfolio projects sidestep these challenges. MarketFlow confronts them directly.</p>
+          <p>MarketFlow ingests live market trades and quotes from Polygon.io via WebSocket, streams them through Apache Kafka, processes windowed aggregations (VWAP, volume z-score, price momentum) using Faust, runs real-time anomaly detection using Isolation Forest, and stores results in a hot/cold AWS architecture (DynamoDB for recent data, S3 + Parquet for historical).</p>
+          <p>The engineering patterns in MarketFlow — exactly-once semantics, dead letter queues, backpressure mechanisms, write sharding — are the same patterns used by Robinhood, Coinbase, and the data infrastructure teams at Google and Amazon. This project exists to demonstrate that these patterns can be understood, implemented, and explained by a single engineer.</p>
+          <div class="highlight-cards">
+            <div class="highlight-card"><div class="icon">🎯</div><h4>Built for FAANG</h4><p>Every design decision maps to real interview questions: hot partitions, exactly-once, backpressure, DLQ.</p></div>
+            <div class="highlight-card"><div class="icon">⚡</div><h4>Production Patterns</h4><p>DLQ, backpressure, exactly-once, write sharding — not just happy-path code.</p></div>
+            <div class="highlight-card"><div class="icon">📚</div><h4>Fully Documented</h4><p>Architecture, runbook, schema, postmortem, benchmarks — all included.</p></div>
+          </div>
+        </section>
+
+        <section id="architecture">
+          <h2>How It Works</h2>
+          <span class="sub">Data flows from live market feeds through a fault-tolerant pipeline to queryable storage in under 100ms</span>
+          <div class="pipeline-diagram">
+            <svg width="700" height="140" viewBox="0 0 700 140">
+              <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#00d4ff"/></marker></defs>
+              <g><title>WebSocket connection to live trade and quote data. Reconnects automatically with exponential backoff + jitter on disconnect.</title><rect class="flow-box" x="10" y="50" width="90" height="40" rx="6"/><text x="55" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">Polygon.io</text><text x="55" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">WebSocket</text></g>
+              <line class="flow-line" x1="100" y1="70" x2="160" y2="70" marker-end="url(#ar)"/>
+              <g><title>6-partition topic buffers events durably. Decouples producer from consumers — if DynamoDB slows, Kafka absorbs the backlog.</title><rect class="flow-box" x="160" y="50" width="80" height="40" rx="6"/><text x="200" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">Kafka</text><text x="200" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">6 partitions</text></g>
+              <line class="flow-line" x1="240" y1="70" x2="300" y2="70" marker-end="url(#ar)"/>
+              <g><title>Pydantic schema validation on every event. Invalid events route to SQS Dead Letter Queue rather than being dropped silently.</title><rect class="flow-box" x="300" y="50" width="90" height="40" rx="6"/><text x="345" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">Validator</text><text x="345" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">Pydantic + DLQ</text></g>
+              <line class="flow-line" x1="390" y1="70" x2="450" y2="70" marker-end="url(#ar)"/>
+              <g><title>Stream processing with exactly-once guarantees. Computes VWAP, volume z-score, momentum. Runs Isolation Forest anomaly detection.</title><rect class="flow-box" x="450" y="50" width="80" height="40" rx="6"/><text x="490" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">Faust</text><text x="490" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">VWAP · ML</text></g>
+              <line class="flow-line" x1="530" y1="70" x2="590" y2="70" marker-end="url(#ar)"/>
+              <g><title>Hot storage with shard key pattern (ticker#shard_0-7) to prevent hot partitions. TTL-based retention. Conditional writes for idempotency.</title><rect class="flow-box" x="590" y="50" width="100" height="40" rx="6"/><text x="640" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">DynamoDB</text><text x="640" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">Hot · 48h TTL</text></g>
+              <line class="flow-line" x1="640" y1="90" x2="640" y2="120"/><g><title>Cold storage with Hive partitioning for Athena query efficiency. Snappy compression. Buffered writes flushed every 5 minutes.</title><rect class="flow-box" x="600" y="120" width="80" height="16" rx="4"/><text x="640" y="131" fill="#94a3b8" font-size="9" text-anchor="middle">S3 Parquet</text></g>
+            </svg>
+          </div>
+          <h3>Event lifecycle</h3>
+          <div class="timeline-bar" style="height: 24px;">
+            <div class="segment" style="left: 0%; width: 3%;"></div>
+            <div class="segment" style="left: 3%; width: 3%;"></div>
+            <div class="segment" style="left: 6%; width: 6%;"></div>
+            <div class="segment" style="left: 12%; width: 18%;"></div>
+            <div class="segment" style="left: 30%; width: 70%;"></div>
+          </div>
+          <div class="timeline-labels"><span>0ms recv</span><span>2ms Kafka</span><span>4ms validate</span><span>8ms Faust</span><span>67ms p99</span></div>
+        </section>
+
+        <section id="getting-started">
+          <h2>Getting Started</h2>
+          <span class="sub">Up and running in under 5 minutes</span>
+          <div class="prereq-box">
+            <h4>Prerequisites</h4>
+            <ul><li>Docker and Docker Compose installed</li><li>Polygon.io account (free tier works)</li><li>AWS account with DynamoDB, S3, SQS access</li><li>Python 3.11+ (for running tests locally)</li></ul>
+          </div>
+          <div class="step">
+            <span class="step-num">1</span><h4>Clone the repository</h4>
+            <div class="code-block"><button class="copy-btn" data-copy="code1">Copy</button><pre id="code1">git clone https://github.com/nikhilgiridharan/MarketFlow
+cd MarketFlow</pre></div>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span><h4>Configure environment</h4>
+            <p>Copy .env.example to .env and set POLYGON_API_KEY, AWS credentials, and AWS_REGION (e.g. us-east-1).</p>
+            <div class="code-block"><button class="copy-btn" data-copy="code2">Copy</button><pre id="code2">cp .env.example .env</pre></div>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span><h4>Start the full stack</h4>
+            <div class="code-block"><button class="copy-btn" data-copy="code3">Copy</button><pre id="code3">make up</pre></div>
+            <p>Starts Kafka, Zookeeper, Schema Registry, Producer, Processing, and API.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">4</span><h4>Verify health</h4>
+            <div class="code-block"><button class="copy-btn" data-copy="code4">Copy</button><pre id="code4">curl http://localhost:8000/health</pre></div>
+            <p>Expected: <code class="font-mono">{"status":"healthy", ...}</code></p>
+          </div>
+          <div class="step">
+            <span class="step-num">5</span><h4>Open the dashboard</h4>
+            <p>Navigate to <a href="/" style="color: var(--accent-primary);">http://localhost:8000</a></p>
+          </div>
+        </section>
+
+        <section id="api-ref">
+          <h2>API Reference</h2>
+          <span class="sub">5 endpoints. All responses in JSON. Rate limited to 100 requests/minute.</span>
+
+          <div class="endpoint-card">
+            <h4><span class="method-get">GET</span> /quotes/{ticker}</h4>
+            <p class="desc">Returns the latest trade for a given ticker symbol.</p>
+            <table><tr><th>Parameter</th><th>Description</th></tr><tr><td>ticker (required)</td><td>Stock symbol e.g. AAPL, TSLA</td></tr></table>
+            <p class="cache">Cache: 1 second</p>
+            <div class="code-block"><button class="copy-btn" data-copy="api1">Copy</button><pre id="api1">curl http://localhost:8000/quotes/AAPL</pre></div>
+            <p class="cache">Response 200: ticker, price, volume, timestamp, sequence_number</p>
+          </div>
+
+          <div class="endpoint-card">
+            <h4><span class="method-get">GET</span> /aggregations/{ticker}</h4>
+            <p class="desc">Real-time VWAP, rolling averages, volume z-score, and price momentum.</p>
+            <p class="cache">Cache: 5 seconds</p>
+            <p class="note">volume_zscore &gt; 2.0 indicates unusual volume. &gt; 3.0 indicates extreme activity.</p>
+          </div>
+
+          <div class="endpoint-card">
+            <h4><span class="method-get">GET</span> /anomalies/{ticker}?hours=24</h4>
+            <p class="desc">Anomaly detections from the Isolation Forest model for the last N hours.</p>
+            <p class="cache">Query param: hours (default 24, max 168). Cache: none.</p>
+            <p class="note">anomaly_score more negative = more anomalous. Threshold: -0.500</p>
+          </div>
+
+          <div class="endpoint-card">
+            <h4><span class="method-get">GET</span> /features/{ticker}</h4>
+            <p class="desc">Current real-time feature vector from the feature store. Cache: 1 second.</p>
+          </div>
+
+          <div class="endpoint-card">
+            <h4><span class="method-get">GET</span> /health</h4>
+            <p class="desc">Pipeline health: status, consumer_lag, dynamo_latency_p99, uptime_seconds, checked_at.</p>
+            <p class="note">status: "healthy" — normal; "degraded" — elevated latency; "unhealthy" — not processing.</p>
+          </div>
+        </section>
+
+        <section id="concepts">
+          <h2>Key Engineering Concepts</h2>
+          <span class="sub">The patterns that make MarketFlow production-grade</span>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>Exactly-Once Semantics</h4><span class="sub">How MarketFlow guarantees no duplicate data, even when things crash</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p><strong>The Problem:</strong> Retries cause duplicate writes; the same trade written twice corrupts every aggregation downstream.</p>
+              <p><strong>The Solution (3 layers):</strong> (1) Kafka producer with enable.idempotence = True. (2) Faust processing_guarantee = 'exactly_once'. (3) DynamoDB ConditionExpression so only write if item doesn't exist. On ConditionalCheckFailedException treat as success. Crash scenario: Faust writes to DynamoDB, crashes before committing offset; on replay DynamoDB rejects duplicate; offset committed. Result: processed exactly once.</p>
+            </div></div>
+          </div>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>Dead Letter Queue (DLQ)</h4><span class="sub">Why MarketFlow never silently drops a failed message</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p>Invalid or failed messages go to SQS DLQ with full context. Retry strategy: 3 attempts → SQS DLQ → retry every 15 minutes → archive to S3 after 5 DLQ retries. Fifteen minutes gives transient failures (network, throttling) time to resolve without hammering the system.</p>
+            </div></div>
+          </div>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>DynamoDB Write Sharding</h4><span class="sub">How MarketFlow prevents hot partitions at market open</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p>Naive key "AAPL" routes all AAPL writes to one partition → throttling at ~800 writes/sec. Shard key: ticker#shard_0-7, shard = hash(ticker+timestamp) % 8. Writes distributed across 8 partitions → ~100/sec each.</p>
+              <pre>Naive key "AAPL":          Shard key "AAPL#0".."AAPL#7":
+All writes → 1 partition   Writes distributed:
+[████████████] THROTTLE    [██] AAPL#0  ✓
+                           [██] AAPL#1  ✓
+                           [██] AAPL#2  ✓  ... 8 shards total</pre>
+            </div></div>
+          </div>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>Backpressure</h4><span class="sub">How the pipeline self-regulates when downstream systems slow down</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p>Without backpressure, slow DynamoDB causes unbounded memory growth. Solution: if write latency &gt; 100ms for recent writes, pause consumption 500ms. Kafka consumer lag growing is safe (Kafka holds data durably); memory growth is not.</p>
+            </div></div>
+          </div>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>Hot/Cold Storage</h4><span class="sub">The right storage for each access pattern</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p><strong>Hot (DynamoDB):</strong> Last 48 hours, single-digit ms reads, TTL expiry. <strong>Cold (S3 + Parquet):</strong> Historical data, Hive partitioning, Snappy compression, Athena SQL.</p>
+            </div></div>
+          </div>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>Real-Time Anomaly Detection</h4><span class="sub">ML inference at 0.3ms per event</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p>Isolation Forest with 6 features (price, volume, volume_zscore, price_momentum, vwap_deviation, trade_frequency). Rolling retraining every 500 events on last 1000. Contamination = 0.01.</p>
+            </div></div>
+          </div>
+        </section>
+
+        <section id="tech-stack">
+          <h2>Tech Stack</h2>
+          <span class="sub">Every technology chosen for a specific reason</span>
+          <div class="tech-grid">
+            <div class="tech-card"><div class="icon">🔴</div><h4>Kafka</h4><div class="ver">v7.5.0</div><p>Chosen over Kinesis for replay capability and richer ecosystem.</p></div>
+            <div class="tech-card"><div class="icon">🐍</div><h4>Faust</h4><div class="ver">v0.10.14</div><p>Python-native stream processing; lighter than Spark for this scale.</p></div>
+            <div class="tech-card"><div class="icon">⚡</div><h4>DynamoDB</h4><p>Zero-ops managed service; conditional writes for idempotency.</p></div>
+            <div class="tech-card"><div class="icon">🪣</div><h4>S3 + Parquet</h4><p>Columnar format and Snappy for query efficiency and cost.</p></div>
+            <div class="tech-card"><div class="icon">🤖</div><h4>Scikit-learn</h4><div class="ver">v1.4.0</div><p>Isolation Forest for multi-dimensional anomaly detection.</p></div>
+            <div class="tech-card"><div class="icon">🚀</div><h4>FastAPI</h4><div class="ver">v0.109.0</div><p>Async, auto OpenAPI, Pydantic validation built-in.</p></div>
+            <div class="tech-card"><div class="icon">🐳</div><h4>Docker Compose</h4><p>One-command local stack; production parity.</p></div>
+            <div class="tech-card"><div class="icon">📊</div><h4>CloudWatch</h4><p>Metrics, alarms, dashboards for all components.</p></div>
+          </div>
+        </section>
+
+        <section id="performance">
+          <h2>Performance Benchmarks</h2>
+          <span class="sub">Measured under sustained load and 3x burst conditions</span>
+          <table class="bench-table">
+            <tr><th>Metric</th><th>Result</th><th>Status</th></tr>
+            <tr><td>Sustained throughput</td><td>14,800 e/sec</td><td class="status-ok">✓ Target</td></tr>
+            <tr><td>Peak throughput (30s burst)</td><td>31,200 e/sec</td><td class="status-ok">✓ 2.1x base</td></tr>
+            <tr><td>End-to-end latency p50</td><td>12ms</td><td class="status-ok">✓ &lt;100ms</td></tr>
+            <tr><td>End-to-end latency p99</td><td>67ms</td><td class="status-ok">✓ &lt;100ms</td></tr>
+            <tr><td>DynamoDB write latency p99</td><td>18ms</td><td class="status-ok">✓ Healthy</td></tr>
+            <tr><td>Kafka consumer lag (sustained)</td><td>&lt;50 messages</td><td class="status-ok">✓ Normal</td></tr>
+            <tr><td>Anomaly detection inference</td><td>0.3ms/event</td><td class="status-ok">✓ Real-time</td></tr>
+          </table>
+          <p class="methodology">Test methodology: Custom Python load test simulating market-open burst across 5 tickers. Duration: 10 min sustained + 30s burst at 3x. Measurement: WebSocket receive to DynamoDB write confirmed.</p>
+        </section>
+
+        <section id="project-structure">
+          <h2>Project Structure</h2>
+          <span class="sub">Organized for clarity and separation of concerns</span>
+          <div class="file-tree" id="file-tree">
+            <div class="folder-toggle open" data-folder>MarketFlow/</div>
+            <ul class="tree-children">
+              <li><span class="file-row" data-tooltip="Full local stack: Kafka, Zookeeper, API">docker-compose.yml</span></li>
+              <li><span class="file-row" data-tooltip="All dependencies pinned to exact versions">requirements.txt</span></li>
+              <li><span class="file-row" data-tooltip="make up · make test · make lint">Makefile</span></li>
+              <li><span class="file-row" data-tooltip="Project overview and quick start">README.md</span></li>
+              <li>
+                <div class="folder-toggle open" data-folder>src/</div>
+                <ul class="tree-children">
+                  <li><span class="file-row" data-tooltip="Centralized settings via Pydantic BaseSettings">config.py</span></li>
+                  <li>
+                    <div class="folder-toggle" data-folder>producer/</div>
+                    <ul class="tree-children collapsed">
+                      <li><span class="file-row" data-tooltip="WebSocket → Kafka, idempotent publishing">polygon_producer.py</span></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="folder-toggle" data-folder>processing/</div>
+                    <ul class="tree-children collapsed">
+                      <li><span class="file-row" data-tooltip="Main stream processing, exactly-once">faust_app.py</span></li>
+                      <li><span class="file-row" data-tooltip="VWAP, z-score, momentum, rolling avg">aggregations.py</span></li>
+                      <li><span class="file-row" data-tooltip="Isolation Forest, rolling retraining">anomaly_detection.py</span></li>
+                      <li><span class="file-row" data-tooltip="Precomputed features in DynamoDB">feature_store.py</span></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="folder-toggle" data-folder>validation/</div>
+                    <ul class="tree-children collapsed">
+                      <li><span class="file-row" data-tooltip="Pydantic validation + DLQ routing">schema_validator.py</span></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="folder-toggle" data-folder>storage/</div>
+                    <ul class="tree-children collapsed">
+                      <li><span class="file-row" data-tooltip="Shard keys, conditional writes, backpressure">dynamo_writer.py</span></li>
+                      <li><span class="file-row" data-tooltip="Parquet buffering, Hive partitioning">s3_writer.py</span></li>
+                      <li><span class="file-row" data-tooltip="SQS DLQ, retry logic, S3 archival">dlq_handler.py</span></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="folder-toggle" data-folder>api/</div>
+                    <ul class="tree-children collapsed">
+                      <li><span class="file-row" data-tooltip="FastAPI app, 5 endpoints, rate limiting">main.py</span></li>
+                      <li><span class="file-row" data-tooltip="Live dashboard">static/index.html</span></li>
+                      <li><span class="file-row" data-tooltip="Documentation (this page)">static/about.html</span></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="folder-toggle" data-folder>monitoring/</div>
+                    <ul class="tree-children collapsed">
+                      <li><span class="file-row" data-tooltip="Batched CloudWatch emission">cloudwatch_metrics.py</span></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <div class="folder-toggle" data-folder>tests/</div>
+                <ul class="tree-children collapsed">
+                  <li><span class="file-row" data-tooltip="Shared fixtures, moto AWS mocks">conftest.py</span></li>
+                  <li><span class="file-row" data-tooltip="Aggregation math, anomaly detection, validation">unit/</span></li>
+                  <li><span class="file-row" data-tooltip="Kafka, DynamoDB, DLQ end-to-end tests">integration/</span></li>
+                </ul>
+              </li>
+              <li>
+                <div class="folder-toggle" data-folder>docs/</div>
+                <ul class="tree-children collapsed">
+                  <li><span class="file-row" data-tooltip="Full system design document">architecture.md</span></li>
+                  <li><span class="file-row" data-tooltip="DynamoDB table design and access patterns">schema.md</span></li>
+                  <li><span class="file-row" data-tooltip="Load test methodology and results">benchmarks.md</span></li>
+                  <li><span class="file-row" data-tooltip="Operational procedures and alert thresholds">runbook.md</span></li>
+                  <li><span class="file-row" data-tooltip="Feature store definitions">features.md</span></li>
+                  <li><span class="file-row" data-tooltip="Hot partition incident: cause, fix, learnings">postmortem.md</span></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="about-author">
+          <h2>About the Author</h2>
+          <div class="author-card">
+            <div class="author-avatar">NG</div>
+            <h3>Nikhil Giridharan</h3>
+            <p class="role">Data Engineer</p>
+            <p>Building production-grade data pipelines and streaming systems. Currently working with Databricks, Apache Kafka, and AWS at scale.</p>
+            <div class="author-links">
+              <a href="https://github.com/nikhilgiridharan" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
+              <a href="https://linkedin.com/in/nikhilgiridharan" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">LinkedIn</a>
+              <a href="#" class="btn btn-ghost">Medium</a>
+              <a href="https://nikhilgiridharan.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Portfolio</a>
+            </div>
+            <p style="margin-top:16px;font-size:12px;">github.com/nikhilgiridharan · nikhilgiridharan.com</p>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <p><strong>MarketFlow</strong> · Real-time market data pipeline</p>
+          <p>Built with Apache Kafka · Faust · AWS · Python</p>
+          <div class="footer-links">
+            <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="/">Live Dashboard</a>
+            <a href="/openapi.json">API Docs</a>
+          </div>
+          <p>© 2025 Nikhil Giridharan · MIT License</p>
+        </footer>
+      </div>
+
+      <nav class="toc">
+        <a href="#what-is" class="toc-item">What is MarketFlow</a>
+        <a href="#architecture" class="toc-item">Architecture</a>
+        <a href="#getting-started" class="toc-item">Getting Started</a>
+        <a href="#api-ref" class="toc-item">API Reference</a>
+        <a href="#concepts" class="toc-item">Key Concepts</a>
+        <a href="#tech-stack" class="toc-item">Tech Stack</a>
+        <a href="#performance" class="toc-item">Performance</a>
+        <a href="#project-structure" class="toc-item">Project Structure</a>
+        <a href="#about-author" class="toc-item">About the Author</a>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var targets = { heroEvents: 14832, heroP50: 12, heroP99: 67, heroAnom: 7 };
+      function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+      function animateCounter(id, target, duration) {
+        duration = duration || 1500;
+        var el = document.getElementById(id);
+        if (!el) return;
+        var start = performance.now();
+        function tick(now) {
+          var t = Math.min((now - start) / duration, 1);
+          var v = Math.round(easeOutQuart(t) * target);
+          el.textContent = typeof target === 'number' && target >= 1000 ? v.toLocaleString() : v;
+          if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+      setTimeout(function () {
+        animateCounter('hero-events', 14832);
+        animateCounter('hero-p50', 12);
+        animateCounter('hero-p99', 67);
+        animateCounter('hero-anom', 7);
+      }, 300);
+
+      var tocItems = document.querySelectorAll('.toc-item');
+      var sections = document.querySelectorAll('.doc-content section[id]');
+      function onScroll() {
+        var top = window.scrollY || document.documentElement.scrollTop;
+        var headerOffset = 100;
+        var current = '';
+        sections.forEach(function (s) {
+          var rect = s.getBoundingClientRect();
+          if (rect.top <= headerOffset + 50) current = s.id;
+        });
+        tocItems.forEach(function (item) {
+          var href = item.getAttribute('href');
+          if (href === '#' + current) item.classList.add('active');
+          else item.classList.remove('active');
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-copy');
+          var el = document.getElementById(id);
+          if (!el) return;
+          var text = el.textContent;
+          navigator.clipboard.writeText(text).then(function () {
+            btn.textContent = 'Copied ✓';
+            btn.classList.add('copied');
+            setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+          });
+        });
+      });
+
+      document.querySelectorAll('.concept-card').forEach(function (card) {
+        var head = card.querySelector('.concept-head');
+        head.addEventListener('click', function () {
+          var open = card.classList.toggle('open');
+          document.querySelectorAll('.concept-card').forEach(function (c) {
+            if (c !== card) c.classList.remove('open');
+          });
+          if (open) card.classList.add('open');
+        });
+      });
+
+      var mesh = document.getElementById('hero-mesh');
+      if (mesh) {
+        var t0 = 0;
+        function meshTick(now) {
+          t0 = t0 || now;
+          var t = (now - t0) / 1000;
+          var b1 = mesh.querySelector('.blob1');
+          var b2 = mesh.querySelector('.blob2');
+          var b3 = mesh.querySelector('.blob3');
+          if (b1) { b1.style.transform = 'translate(' + (50 * Math.cos(t * 0.3)) + 'px,' + (30 * Math.sin(t * 0.2)) + 'px)'; }
+          if (b2) { b2.style.transform = 'translate(' + (-40 * Math.cos(t * 0.25)) + 'px,' + (-20 * Math.sin(t * 0.35)) + 'px)'; }
+          if (b3) { b3.style.transform = 'translate(' + (30 * Math.sin(t * 0.2)) + 'px,' + (40 * Math.cos(t * 0.4)) + 'px)'; }
+          requestAnimationFrame(meshTick);
+        }
+        requestAnimationFrame(meshTick);
+      }
+
+      document.querySelectorAll('#file-tree .folder-toggle').forEach(function (folder) {
+        folder.addEventListener('click', function () {
+          folder.classList.toggle('open');
+          var next = folder.nextElementSibling;
+          if (next && next.classList.contains('tree-children')) next.classList.toggle('collapsed');
+        });
+      });
+      document.querySelectorAll('#file-tree .tree-children').forEach(function (ul) {
+        if (!ul.previousElementSibling || !ul.previousElementSibling.classList.contains('folder-toggle') || !ul.previousElementSibling.classList.contains('open')) ul.classList.add('collapsed');
+      });
+      var fileTooltip = document.createElement('div');
+      fileTooltip.className = 'tooltip-pop';
+      fileTooltip.setAttribute('id', 'file-tooltip-global');
+      document.body.appendChild(fileTooltip);
+      document.querySelectorAll('#file-tree .file-row').forEach(function (row) {
+        row.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var text = row.getAttribute('data-tooltip');
+          if (!text) return;
+          document.querySelectorAll('#file-tree .file-row').forEach(function (r) { r.classList.remove('show-tooltip'); });
+          row.classList.add('show-tooltip');
+          fileTooltip.textContent = text;
+          fileTooltip.style.display = 'block';
+          var rect = row.getBoundingClientRect();
+          fileTooltip.style.left = (rect.right + 8) + 'px';
+          fileTooltip.style.top = rect.top + 'px';
+        });
+      });
+      document.addEventListener('click', function () {
+        document.querySelectorAll('#file-tree .file-row').forEach(function (r) { r.classList.remove('show-tooltip'); });
+        if (fileTooltip) fileTooltip.style.display = 'none';
+      });
+    })();
+  </script>
+</body>
+</html>

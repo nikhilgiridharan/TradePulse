@@ -1,0 +1,9 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/ src/
+COPY .env* ./
+ENV PYTHONPATH=/app
+# Faust worker; override KAFKA_BOOTSTRAP_SERVERS in docker-compose for kafka:29092
+CMD ["python", "-m", "src.processing.faust_app"]

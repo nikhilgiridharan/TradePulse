@@ -1,0 +1,51 @@
+name: MarketFlow CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run linting
+        run: |
+          flake8 src/ tests/ --max-line-length=100 --ignore=E501,W503
+
+      - name: Run type checking
+        run: mypy src/ --ignore-missing-imports
+
+      - name: Run unit tests
+        run: pytest tests/unit/ -v --tb=short
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: testing
+          AWS_SECRET_ACCESS_KEY: testing
+
+      - name: Run integration tests
+        run: pytest tests/ -v --tb=short --junitxml=pytest-results.xml
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: testing
+          AWS_SECRET_ACCESS_KEY: testing
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: pytest-results.xml
