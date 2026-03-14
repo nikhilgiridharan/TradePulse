@@ -216,11 +216,46 @@
       margin-bottom: 24px;
       overflow-x: auto;
     }
-    .pipeline-diagram svg { display: block; margin: 0 auto; }
-    .pipeline-box { fill: var(--bg-tertiary); stroke: var(--border-color); stroke-width: 1; rx: 6; }
-    .pipeline-box.active { stroke: var(--accent-primary); filter: drop-shadow(0 0 8px rgba(0,212,255,0.3)); }
-    .pipeline-line { stroke: var(--border-color); stroke-width: 2; fill: none; }
-    .flow-dot { fill: var(--accent-primary); }
+    .pipeline-diagram svg { display: block; margin: 0 auto; width: 100%; height: auto; }
+    .pipeline-box { fill: #111827; stroke-width: 1; rx: 8; transition: filter 0.2s, box-shadow 0.2s; }
+    .pipeline-box.main { stroke: #00d4ff; }
+    .pipeline-box.main:hover { filter: drop-shadow(0 0 12px rgba(0,212,255,0.4)); }
+    .pipeline-box.news { stroke: #7c3aed; }
+    .pipeline-box.news:hover { filter: drop-shadow(0 0 12px rgba(124,58,237,0.4)); }
+    .pipeline-box.dlq { stroke: #ef4444; }
+    .pipeline-box.ml { stroke: #f59e0b; }
+    .pipeline-box.storage { stroke: #10b981; }
+    .pipeline-line { stroke: #00d4ff; stroke-width: 1.5; fill: none; }
+    .pipeline-line.news { stroke: #7c3aed; }
+    .flow-dot { fill: #00d4ff; }
+    .flow-dot.news { fill: #7c3aed; }
+    .join-line { stroke: #94a3b8; stroke-dasharray: 4 4; stroke-width: 1; fill: none; }
+    .overview-bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .overview-widget {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .overview-widget h4 { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .anomaly-preview-row {
+      padding: 10px 12px;
+      border-left: 2px solid rgba(239, 68, 68, 0.5);
+      margin-bottom: 8px;
+      border-radius: 4px;
+      background: var(--bg-tertiary);
+      font-size: 12px;
+    }
+    .anomaly-preview-row .score { font-family: 'JetBrains Mono', monospace; }
+    .health-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+    .health-row:last-child { border-bottom: none; }
+    .health-row .value { font-family: 'JetBrains Mono', monospace; color: var(--accent-green); }
+    .health-dot { display: inline-block; width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; margin-right: 6px; animation: pulse 2s ease-in-out infinite; }
     .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
     .tech-badge {
       background: var(--bg-tertiary);
@@ -299,6 +334,15 @@
     .ticker-pill:hover { border-color: var(--accent-primary); }
     .ticker-pill.active { background: rgba(0,212,255,0.15); border-color: var(--accent-primary); color: var(--accent-primary); }
     .live-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+    .live-data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .live-data-grid .live-panel,
+    .live-data-grid .data-panel { min-height: 160px; }
     .live-panel {
       background: var(--bg-secondary);
       border-radius: 12px;
@@ -409,6 +453,7 @@
     @media (max-width: 1200px) {
       .metric-grid { grid-template-columns: repeat(2, 1fr); }
       .live-panels { grid-template-columns: 1fr; }
+      .live-data-grid { grid-template-columns: 1fr; }
       .component-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 768px) {
@@ -469,27 +514,84 @@
         </div>
         <div class="pipeline-diagram">
           <h3 style="margin-bottom:16px;">Pipeline Architecture</h3>
-          <svg width="800" height="120" viewBox="0 0 800 120">
-            <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--accent-primary)"/></marker></defs>
-            <rect class="pipeline-box active" x="20" y="40" width="90" height="40" rx="6"/>
-            <text x="65" y="65" fill="var(--text-primary)" font-size="11" text-anchor="middle">Polygon.io</text>
-            <line class="pipeline-line" x1="110" y1="60" x2="170" y2="60" marker-end="url(#arrow)"/>
-            <rect class="pipeline-box active" x="170" y="40" width="80" height="40" rx="6"/>
-            <text x="210" y="65" fill="var(--text-primary)" font-size="11" text-anchor="middle">Kafka</text>
-            <line class="pipeline-line" x1="250" y1="60" x2="310" y2="60" marker-end="url(#arrow)"/>
-            <rect class="pipeline-box active" x="310" y="40" width="90" height="40" rx="6"/>
-            <text x="355" y="65" fill="var(--text-primary)" font-size="11" text-anchor="middle">Validation</text>
-            <line class="pipeline-line" x1="400" y1="60" x2="460" y2="60" marker-end="url(#arrow)"/>
-            <rect class="pipeline-box active" x="460" y="40" width="70" height="40" rx="6"/>
-            <text x="495" y="65" fill="var(--text-primary)" font-size="11" text-anchor="middle">Faust</text>
-            <line class="pipeline-line" x1="530" y1="60" x2="590" y2="60" marker-end="url(#arrow)"/>
-            <rect class="pipeline-box active" x="590" y="40" width="90" height="40" rx="6"/>
-            <text x="635" y="65" fill="var(--text-primary)" font-size="11" text-anchor="middle">DynamoDB</text>
-            <line class="pipeline-line" x1="400" y1="80" x2="400" y2="100"/><rect class="pipeline-box" x="350" y="100" width="100" height="16" rx="4"/><text x="400" y="112" fill="var(--text-secondary)" font-size="9" text-anchor="middle">DLQ</text>
-            <rect class="pipeline-box" x="700" y="40" width="80" height="40" rx="6"/><text x="740" y="65" fill="var(--text-primary)" font-size="11" text-anchor="middle">FastAPI</text>
+          <svg viewBox="0 0 820 320" style="min-height:320px;">
+            <defs>
+              <marker id="arrow-main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#00d4ff"/></marker>
+              <marker id="arrow-news" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#7c3aed"/></marker>
+            </defs>
+            <!-- Main stream -->
+            <g class="main-stream">
+              <rect class="pipeline-box main" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 5 tickers</title>
+              <text x="80" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Polygon.io</text>
+              <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <rect class="pipeline-box main" x="152" y="24" width="120" height="44" rx="8"/><title>6 partitions · idempotent producer · exactly-once</title>
+              <text x="212" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Kafka</text>
+              <line class="pipeline-line" x1="272" y1="46" x2="284" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <rect class="pipeline-box main" x="284" y="24" width="120" height="44" rx="8"/><title>Pydantic schema validation · invalid → SQS DLQ</title>
+              <text x="344" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Validation</text>
+              <line class="pipeline-line" x1="404" y1="46" x2="416" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <rect class="pipeline-box main" x="416" y="24" width="120" height="44" rx="8"/><title>Stream processing · VWAP · z-score · momentum · exactly-once</title>
+              <text x="476" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Faust</text>
+              <line class="pipeline-line" x1="536" y1="46" x2="548" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <rect class="pipeline-box main" x="548" y="24" width="120" height="44" rx="8"/><title>Hot storage · ticker#shard key · 48hr TTL · conditional writes</title>
+              <text x="608" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">DynamoDB</text>
+              <line class="pipeline-line" x1="668" y1="46" x2="680" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <rect class="pipeline-box main" x="680" y="24" width="120" height="44" rx="8"/><title>5 endpoints · rate limited · 1s cache · custom dashboard</title>
+              <text x="740" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">FastAPI</text>
+              <!-- DLQ -->
+              <line class="pipeline-line" x1="344" y1="68" x2="344" y2="88" stroke="#ef4444" marker-end="url(#arrow-main)"/>
+              <rect class="pipeline-box dlq" x="294" y="88" width="100" height="36" rx="8"/><title>Failed messages · 3 retries → DLQ · 5 DLQ retries → S3 archive</title>
+              <text x="344" y="111" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">SQS DLQ</text>
+              <!-- Anomaly ML, Feature Store -->
+              <line class="pipeline-line" x1="476" y1="68" x2="476" y2="88" stroke="#f59e0b"/>
+              <rect class="pipeline-box ml" x="416" y="88" width="120" height="44" rx="8"/><title>Isolation Forest · rolling retrain · 0.3ms inference</title>
+              <text x="476" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">Anomaly ML</text>
+              <line class="pipeline-line" x1="476" y1="132" x2="476" y2="148" stroke="#f59e0b"/>
+              <rect class="pipeline-box ml" x="416" y="148" width="120" height="44" rx="8"/><title>Precomputed features · DynamoDB · 7-day TTL</title>
+              <text x="476" y="175" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">Feature Store</text>
+              <!-- S3 Cold -->
+              <line class="pipeline-line" x1="608" y1="68" x2="608" y2="88" stroke="#10b981"/>
+              <rect class="pipeline-box storage" x="548" y="88" width="120" height="44" rx="8"/><title>Cold storage · Hive partitioning · Snappy compression · Athena</title>
+              <text x="608" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">S3 Parquet</text>
+            </g>
+            <!-- Join annotation -->
+            <line class="join-line" x1="476" y1="68" x2="476" y2="232"/>
+            <text x="476" y="152" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="middle">60s join</text>
+            <!-- News stream -->
+            <g class="news-stream">
+              <rect class="pipeline-box news" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
+              <text x="80" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Finnhub API</text>
+              <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <rect class="pipeline-box news" x="152" y="232" width="120" height="44" rx="8"/><title>Separate topic · low frequency · independent scaling</title>
+              <text x="212" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Kafka market.news</text>
+              <line class="pipeline-line news" x1="272" y1="254" x2="284" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <rect class="pipeline-box news" x="284" y="232" width="120" height="44" rx="8"/><title>&lt;1ms inference · compound score -1.0 to +1.0</title>
+              <text x="344" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">VADER Sentiment</text>
+              <line class="pipeline-line news" x1="404" y1="254" x2="416" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <rect class="pipeline-box news" x="416" y="232" width="120" height="44" rx="8"/><title>Joins sentiment + volume z-score · 60s temporal window</title>
+              <text x="476" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Correlator</text>
+              <line class="pipeline-line news" x1="536" y1="254" x2="548" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <rect class="pipeline-box news" x="548" y="232" width="120" height="44" rx="8"/><title>Sentiment store · 30-day TTL · strong correlation flagging</title>
+              <text x="608" y="259" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">DynamoDB market_sentiment</text>
+            </g>
           </svg>
           <div class="tech-badges">
             <span class="tech-badge">Python 3.11</span><span class="tech-badge">Apache Kafka</span><span class="tech-badge">Faust</span><span class="tech-badge">AWS DynamoDB</span><span class="tech-badge">AWS S3</span><span class="tech-badge">AWS SQS</span><span class="tech-badge">Scikit-learn</span><span class="tech-badge">FastAPI</span><span class="tech-badge">Docker</span>
+          </div>
+        </div>
+        <div class="overview-bottom-row">
+          <div class="overview-widget">
+            <h4>Recent Anomalies <a href="#" class="overview-all-link" data-section="anomalies" style="color:var(--accent-primary);font-weight:400;">All →</a></h4>
+            <div class="anomaly-preview-row">⚠ TSLA &nbsp; score: <span class="score">-0.847</span> &nbsp; 14:31:47<br/><span class="muted">volume z-score: +4.1 · strong signal</span></div>
+            <div class="anomaly-preview-row">⚠ NVDA &nbsp; score: <span class="score">-0.731</span> &nbsp; 13:58:22<br/><span class="muted">volume z-score: +3.8 · strong signal</span></div>
+            <div class="anomaly-preview-row">⚠ AAPL &nbsp; score: <span class="score">-0.612</span> &nbsp; 13:22:09<br/><span class="muted">volume z-score: +3.4 · moderate</span></div>
+          </div>
+          <div class="overview-widget">
+            <h4>System Health</h4>
+            <div class="health-row"><div><span class="health-dot"></span>Kafka<br/><span class="muted">6 partitions</span></div><div class="value" id="health-kafka">● Healthy<br/>Lag: <span id="health-kafka-lag">42</span> msgs</div></div>
+            <div class="health-row"><div><span class="health-dot"></span>DynamoDB<br/><span class="muted">4 tables</span></div><div class="value" id="health-dynamo">● Healthy<br/>p99: <span id="health-dynamo-p99">18</span>ms</div></div>
+            <div class="health-row"><div><span class="health-dot"></span>DLQ<br/><span class="muted">2 queues</span></div><div class="value" id="health-dlq">● Empty<br/>Depth: <span id="health-dlq-depth">0</span></div></div>
+            <div class="health-row"><div><span class="health-dot"></span>S3<br/><span class="muted">Cold storage</span></div><div class="value" id="health-s3">● Healthy<br/>Last flush: <span id="health-s3-flush">3m</span> ago</div></div>
           </div>
         </div>
       </section>
@@ -503,6 +605,7 @@
             <div class="endpoint-item" data-path="/anomalies/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/anomalies/{ticker}</span></div>
             <div class="endpoint-item" data-path="/features/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/features/{ticker}</span></div>
             <div class="endpoint-item" data-path="/health" data-method="GET"><span class="method">GET</span><span class="path">/health</span></div>
+            <div class="endpoint-item" data-path="/sentiment/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/sentiment/{ticker}</span></div>
           </div>
           <div class="api-detail">
             <div class="api-card" id="api-detail-card">
@@ -513,7 +616,7 @@
               <p style="font-size:12px;margin:12px 0 8px;"><strong>Response 200</strong></p>
               <pre id="api-response-sample">{
   "ticker": "AAPL",
-  "price": 185.42,
+  "price": 250.12,
   "volume": 1250,
   "timestamp": "2025-02-22T14:32:01.123Z",
   "sequence_number": 8472910
@@ -527,22 +630,22 @@
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Live Data</h1>
         <div class="ticker-pills">
           <span class="ticker-pill active" data-ticker="AAPL">AAPL</span>
-          <span class="ticker-pill" data-ticker="GOOGL">GOOGL</span>
+          <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
           <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
           <span class="ticker-pill" data-ticker="AMZN">AMZN</span>
           <span class="ticker-pill" data-ticker="TSLA">TSLA</span>
         </div>
-        <div class="live-panels">
+        <div class="live-data-grid">
           <div class="live-panel">
             <h4>Latest Quote — <span id="live-ticker">AAPL</span></h4>
-            <div class="price font-mono" id="live-price">$185.42</div>
+            <div class="price font-mono" id="live-price">$250.12</div>
             <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;"><span id="live-change">↑ +0.34%</span> · <span id="live-time">14:32:01</span></div>
-            <div style="font-size:12px;margin-top:8px;">Vol: <span id="live-vol" class="font-mono">1,250</span> · VWAP: $<span id="live-vwap" class="font-mono">184.91</span></div>
+            <div style="font-size:12px;margin-top:8px;">Vol: <span id="live-vol" class="font-mono">1,250</span> · VWAP: $<span id="live-vwap" class="font-mono">249.84</span></div>
           </div>
           <div class="live-panel">
             <h4>Aggregations</h4>
-            <div style="font-size:12px;margin-bottom:4px;">VWAP (1min) <span class="font-mono" id="agg-vwap1">$184.91</span></div>
-            <div style="font-size:12px;margin-bottom:4px;">VWAP (5min) <span class="font-mono" id="agg-vwap5">$184.67</span></div>
+            <div style="font-size:12px;margin-bottom:4px;">VWAP (1min) <span class="font-mono" id="agg-vwap1">$249.84</span></div>
+            <div style="font-size:12px;margin-bottom:4px;">VWAP (5min) <span class="font-mono" id="agg-vwap5">$249.31</span></div>
             <div style="font-size:12px;margin-bottom:4px;">Volume Z-Score <span class="font-mono" id="agg-zscore">+1.84</span></div>
             <div style="font-size:12px;">Momentum <span class="font-mono" id="agg-mom">+0.18%</span></div>
           </div>
@@ -561,7 +664,10 @@
           </div>
         </div>
         <div class="pipeline-diagram">
-          <h4 style="margin-bottom:8px;">Price (last 60s)</h4>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h4 style="margin:0;color:var(--text-secondary);">Price (last 60s)</h4>
+            <span id="sparkline-range" class="muted" style="font-size:12px;font-family:JetBrains Mono,monospace;"></span>
+          </div>
           <canvas id="sparkline-canvas" width="800" height="120"></canvas>
         </div>
       </section>
@@ -586,7 +692,7 @@
         <div class="ticker-pills" id="anomaly-tickers">
           <span class="ticker-pill active" data-filter="All">All</span>
           <span class="ticker-pill" data-filter="AAPL">AAPL</span>
-          <span class="ticker-pill" data-filter="GOOGL">GOOGL</span>
+          <span class="ticker-pill" data-filter="NVDA">NVDA</span>
           <span class="ticker-pill" data-filter="MSFT">MSFT</span>
           <span class="ticker-pill" data-filter="AMZN">AMZN</span>
           <span class="ticker-pill" data-filter="TSLA">TSLA</span>
@@ -619,6 +725,14 @@
       'AMZN':  207.67,
       'TSLA':  238.45,
       'NVDA':  880.35,
+    };
+    // Demo mode aggregations (VWAP, rolling avg) per ticker — realistic ranges.
+    const DEMO_AGG = {
+      'AAPL': { vwap_1min: 249.84, vwap_5min: 249.31, rolling_avg: 249.67, volume_zscore: 1.84, price_momentum: 0.18 },
+      'MSFT': { vwap_1min: 395.21, vwap_5min: 394.87, rolling_avg: 395.09, volume_zscore: 1.84, price_momentum: 0.18 },
+      'AMZN': { vwap_1min: 207.43, vwap_5min: 207.18, rolling_avg: 207.31, volume_zscore: 1.84, price_momentum: 0.18 },
+      'TSLA': { vwap_1min: 238.12, vwap_5min: 237.89, rolling_avg: 238.01, volume_zscore: 1.84, price_momentum: 0.18 },
+      'NVDA': { vwap_1min: 879.82, vwap_5min: 879.21, rolling_avg: 879.54, volume_zscore: 1.84, price_momentum: 0.18 }
     };
     // Demo mode fallback sentiment data.
     // Displayed when the Finnhub news pipeline is not running or returns
@@ -669,7 +783,7 @@
         items: [
           { headline: 'NVIDIA Blackwell GPU shipments to hyperscalers accelerate ahead of schedule', source: 'Bloomberg', published_at: new Date(Date.now() - 7 * 60000).toISOString(), sentiment_score: 0.891, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 4.7, correlation_strength: 'strong' },
           { headline: 'NVIDIA data center revenue on track to double year over year', source: 'WSJ', published_at: new Date(Date.now() - 34 * 60000).toISOString(), sentiment_score: 0.756, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 3.1, correlation_strength: 'strong' },
-          { headline: 'Jensen Huang keynote highlights new robotics and autonomous vehicle push', source: 'CNBC', published_at: new Date(Date.now() - 78 * 60000).toISOString(), sentiment_score: 0.523, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.9, correlation_strength: 'none' }
+          { headline: 'Jensen Huang keynote highlights robotics and autonomous vehicle push', source: 'CNBC', published_at: new Date(Date.now() - 78 * 60000).toISOString(), sentiment_score: 0.523, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.9, correlation_strength: 'none' }
         ]
       }
     };
@@ -682,11 +796,12 @@
       pipelineStatus: {},
       metrics: {},
       endpoints: [
-        { path: '/quotes/{ticker}', method: 'GET', desc: 'Latest trade for a given ticker symbol.', params: [{ name: 'ticker', type: 'string', required: true }], sample: '{"ticker":"AAPL","price":185.42,"volume":1250,"timestamp":"2025-02-22T14:32:01.123Z","sequence_number":8472910}' },
-        { path: '/aggregations/{ticker}', method: 'GET', desc: 'VWAP, rolling averages, momentum.', params: [{ name: 'ticker', type: 'string', required: true }], sample: '{"ticker":"AAPL","vwap_1min":184.91,"vwap_5min":184.67,"volume_zscore":1.84,"price_momentum":0.18}' },
+        { path: '/quotes/{ticker}', method: 'GET', desc: 'Latest trade for a given ticker symbol.', params: [{ name: 'ticker', type: 'string', required: true }], sample: '{"ticker":"AAPL","price":250.12,"volume":1250,"timestamp":"2025-02-22T14:32:01.123Z","sequence_number":8472910}' },
+        { path: '/aggregations/{ticker}', method: 'GET', desc: 'VWAP, rolling averages, momentum.', params: [{ name: 'ticker', type: 'string', required: true }], sample: '{"ticker":"AAPL","vwap_1min":249.84,"vwap_5min":249.31,"volume_zscore":1.84,"price_momentum":0.18}' },
         { path: '/anomalies/{ticker}', method: 'GET', desc: 'Recent anomaly detections.', params: [{ name: 'ticker', type: 'string' }, { name: 'hours', type: 'number' }], sample: '{"ticker":"AAPL","anomalies":[{"timestamp":"2025-02-22T14:31:47Z","anomaly_score":-0.847}]}' },
-        { path: '/features/{ticker}', method: 'GET', desc: 'Real-time feature vector.', params: [{ name: 'ticker', type: 'string' }], sample: '{"ticker":"AAPL","vwap_5min":184.67,"volume_zscore":1.84,"price_momentum_1min":0.18,"trade_frequency":47}' },
-        { path: '/health', method: 'GET', desc: 'Pipeline health status.', params: [], sample: '{"status":"healthy","uptime_seconds":3600,"consumer_lag":42}' }
+        { path: '/features/{ticker}', method: 'GET', desc: 'Real-time feature vector.', params: [{ name: 'ticker', type: 'string' }], sample: '{"ticker":"AAPL","vwap_5min":249.31,"volume_zscore":1.84,"price_momentum_1min":0.18,"trade_frequency":47}' },
+        { path: '/health', method: 'GET', desc: 'Pipeline health status.', params: [], sample: '{"status":"healthy","uptime_seconds":3600,"consumer_lag":42}' },
+        { path: '/sentiment/{ticker}', method: 'GET', desc: 'Returns news sentiment analysis with market correlation data. Shows which headlines coincided with unusual volume activity — the output of the two-stream news + market data join.', params: [{ name: 'ticker', type: 'string', required: true }, { name: 'hours', type: 'integer', required: false }], sample: '{"ticker":"NVDA","hours":4,"count":4,"summary":{"positive":4,"negative":0,"neutral":0,"strong_correlations":2},"items":[{"article_id":"9182736","ticker":"NVDA","headline":"NVIDIA Blackwell GPU shipments accelerate ahead of schedule","source":"Bloomberg","published_at":"2025-02-22T14:31:55Z","sentiment_score":0.891,"sentiment_label":"positive","correlated_anomaly":true,"volume_zscore_at_publish":4.7,"correlation_strength":"strong","analyzed_at":"2025-02-22T14:31:55.412Z"}]}', paramsDetail: 'ticker  string   required  Stock symbol (AAPL, NVDA, MSFT, AMZN, TSLA)\nhours  integer  optional  Lookback window in hours (default 24, max 168)', exampleReq: 'curl http://localhost:8000/sentiment/NVDA?hours=4', responseLabel: 'Cache: none', responseNote: 'Note: correlation_strength: strong | moderate | weak | none. strong = |sentiment| >= 0.5 AND volume z-score >= 3.0. These are the highest-signal events in the system.' }
       ]
     };
 
@@ -694,7 +809,7 @@
       return prev + (Math.random() - 0.5) * 0.2 + (Math.random() > 0.5 ? drift : -drift);
     }
     function demoQuote(ticker) {
-      const base = { AAPL: 185, GOOGL: 140, MSFT: 380, AMZN: 175, TSLA: 245 }[ticker] || 100;
+      const base = { AAPL: 250.12, NVDA: 880.35, MSFT: 395.55, AMZN: 207.67, TSLA: 238.45 }[ticker] || 100;
       if (!state.lastPrice[ticker]) state.lastPrice[ticker] = base;
       state.lastPrice[ticker] = rnd(state.lastPrice[ticker]);
       const vol = Math.random() > 0.9 ? Math.floor(2000 + Math.random() * 8000) : Math.floor(500 + Math.random() * 1500);
@@ -774,35 +889,67 @@
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
+      const pad = 8;
+      const plotW = w - 2 * pad;
+      const plotH = h - 2 * pad;
       const min = Math.min(...priceArray);
       const max = Math.max(...priceArray);
       const range = max - min || 1;
-      const pad = 10;
+      const yPadPct = 0.02;
+      const yMin = min - range * yPadPct;
+      const yMax = max + range * yPadPct;
+      const yRange = yMax - yMin || 1;
       ctx.fillStyle = '#0a0e1a';
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = '#1e293b';
+      // Grid lines at 25%, 50%, 75%
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.lineWidth = 0.5;
       for (let i = 1; i < 4; i++) {
-        const y = pad + (h - 2 * pad) * (1 - i / 4);
+        const y = pad + plotH * (1 - i / 4);
         ctx.beginPath();
         ctx.moveTo(pad, y);
         ctx.lineTo(w - pad, y);
         ctx.stroke();
       }
+      // Smooth line with bezier (quadratic between points)
+      const pts = priceArray.map((p, i) => ({
+        x: pad + plotW * (i / (priceArray.length - 1 || 1)),
+        y: h - pad - ((p - yMin) / yRange) * plotH
+      }));
       ctx.strokeStyle = color || '#00d4ff';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      priceArray.forEach((p, i) => {
-        const x = pad + (w - 2 * pad) * (i / (priceArray.length - 1 || 1));
-        const y = h - pad - ((p - min) / range) * (h - 2 * pad);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const prev = pts[i - 1];
+        const curr = pts[i];
+        const cpx = (prev.x + curr.x) / 2;
+        const cpy = (prev.y + curr.y) / 2;
+        ctx.quadraticCurveTo(cpx, cpy, curr.x, curr.y);
+      }
       ctx.stroke();
-      ctx.fillStyle = color ? color.replace(')', ', 0.2)').replace('rgb', 'rgba') : 'rgba(0,212,255,0.2)';
-      ctx.lineTo(w - pad, h - pad);
-      ctx.lineTo(pad, h - pad);
+      // Gradient fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, 'rgba(0, 212, 255, 0.15)');
+      gradient.addColorStop(0.6, 'rgba(0, 212, 255, 0.05)');
+      gradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const prev = pts[i - 1];
+        const curr = pts[i];
+        const cpx = (prev.x + curr.x) / 2;
+        const cpy = (prev.y + curr.y) / 2;
+        ctx.quadraticCurveTo(cpx, cpy, curr.x, curr.y);
+      }
+      ctx.lineTo(pts[pts.length - 1].x, h - pad);
+      ctx.lineTo(pts[0].x, h - pad);
       ctx.closePath();
+      ctx.fillStyle = gradient;
       ctx.fill();
+      // Price range label
+      const rangeEl = document.getElementById('sparkline-range');
+      if (rangeEl) rangeEl.textContent = '$' + min.toFixed(2) + ' — $' + max.toFixed(2);
     }
 
     function flashPrice(el, direction) {
@@ -823,9 +970,14 @@
       const ep = state.endpoints.find(e => e.path === path);
       if (!ep) return;
       const card = document.getElementById('api-detail-card');
-      const params = ep.params.map(p => p.name + ' — ' + p.type + (p.required ? ', required' : '')).join('\n');
-      card.innerHTML = '<h3>' + ep.method + ' ' + ep.path + ' <span class="try-btn" data-path="' + ep.path + '">Try it ▶</span></h3><p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">' + ep.desc + '</p><p style="font-size:12px;margin-bottom:8px;"><strong>Parameters</strong></p><p style="font-size:12px;color:var(--text-secondary);">' + params + '</p><p style="font-size:12px;margin:12px 0 8px;"><strong>Response 200</strong></p><pre id="api-response-sample">' + ep.sample + '</pre>';
-      card.querySelector('.try-btn').addEventListener('click', () => openTryPanel(ep.path));
+      const paramsHtml = ep.paramsDetail != null ? ('<p style="font-size:12px;margin-bottom:8px;"><strong>Parameters</strong></p><p style="font-size:12px;color:var(--text-secondary);white-space:pre-wrap;">' + ep.paramsDetail + '</p>') : ('<p style="font-size:12px;margin-bottom:8px;"><strong>Parameters</strong></p><p style="font-size:12px;color:var(--text-secondary);">' + ep.params.map(p => p.name + ' — ' + p.type + (p.required ? ', required' : '')).join('\n') + '</p>');
+      let body = '<h3>' + ep.method + ' ' + ep.path + ' <span class="try-btn" data-path="' + ep.path + '">Try it ▶</span></h3><p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">' + ep.desc + '</p>' + paramsHtml;
+      if (ep.exampleReq) body += '<p style="font-size:12px;margin:12px 0 8px;"><strong>Example Request</strong></p><pre style="background:var(--bg-primary);padding:12px;border-radius:6px;font-size:12px;font-family:JetBrains Mono,monospace;">' + ep.exampleReq + '</pre>';
+      body += '<p style="font-size:12px;margin:12px 0 8px;"><strong>Response 200 OK' + (ep.responseLabel ? ' — ' + ep.responseLabel : '') + '</strong></p><pre id="api-response-sample">' + ep.sample + '</pre>';
+      if (ep.responseNote) body += '<p style="font-size:11px;color:var(--text-secondary);margin-top:8px;">' + ep.responseNote + '</p>';
+      card.innerHTML = body;
+      const tb = card.querySelector('.try-btn');
+      if (tb) tb.addEventListener('click', () => openTryPanel(ep.path));
     }
 
     function openTryPanel(path) {
@@ -867,8 +1019,19 @@
       if (price && prev && price !== prev) flashPrice(priceEl, price > prev ? 'up' : 'down');
       priceEl.textContent = '$' + (price ? price.toFixed(2) : '—');
       document.getElementById('live-vol').textContent = (state.metrics.volume || 0).toLocaleString();
-      document.getElementById('live-vwap').textContent = (state.metrics.vwap || price * 0.998).toFixed(2);
+      document.getElementById('live-vwap').textContent = (state.metrics.vwap != null ? state.metrics.vwap : (price * 0.998)).toFixed(2);
       document.getElementById('live-time').textContent = new Date().toTimeString().slice(0, 8);
+      const agg = state.metrics.agg;
+      if (agg) {
+        const v1 = document.getElementById('agg-vwap1');
+        const v5 = document.getElementById('agg-vwap5');
+        const zs = document.getElementById('agg-zscore');
+        const mom = document.getElementById('agg-mom');
+        if (v1) v1.textContent = '$' + (agg.vwap_1min != null ? agg.vwap_1min : '').toString();
+        if (v5) v5.textContent = '$' + (agg.vwap_5min != null ? agg.vwap_5min : '').toString();
+        if (zs) zs.textContent = (agg.volume_zscore != null ? (agg.volume_zscore >= 0 ? '+' : '') + agg.volume_zscore : '—');
+        if (mom) mom.textContent = (agg.price_momentum != null ? (agg.price_momentum >= 0 ? '+' : '') + agg.price_momentum + '%' : '—');
+      }
       if (!state.priceHistory[t]) state.priceHistory[t] = [];
       state.priceHistory[t].push(price || prev);
       if (state.priceHistory[t].length > 60) state.priceHistory[t].shift();
@@ -891,7 +1054,8 @@
         const q = demoQuote(t);
         state.lastPrice[t] = q.price;
         state.metrics.volume = q.volume;
-        state.metrics.vwap = q.price * 0.998;
+        state.metrics.agg = DEMO_AGG[t] || DEMO_AGG['AAPL'];
+        state.metrics.vwap = state.metrics.agg.vwap_1min;
         document.getElementById('stat-events-val').textContent = Number(state.metrics.events).toLocaleString();
         document.getElementById('stat-latency-val').textContent = state.metrics.latency + 'ms';
         document.getElementById('stat-status-val').textContent = 'All Systems Operational';
@@ -1042,6 +1206,20 @@
       });
     });
 
+    document.querySelectorAll('.overview-all-link').forEach(el => {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        const section = this.getAttribute('data-section');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const navItem = document.querySelector('.nav-item[data-section="' + section + '"]');
+        if (navItem) navItem.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        const sectionEl = document.getElementById('section-' + section);
+        if (sectionEl) sectionEl.classList.add('active');
+        state.activeSection = section;
+      });
+    });
+
     document.querySelectorAll('.ticker-pill').forEach(el => {
       el.addEventListener('click', function () {
         if (this.closest('#anomaly-feed')) return;
@@ -1078,6 +1256,19 @@
     // (same pattern as other panels — don't wait for first 30s interval)
     pollSentiment(state.activeTicker);
     setInterval(() => { if (state.activeSection === 'pipeline') poll(); }, 30000);
+    // System Health widget: simulated variation every 10s
+    function updateHealthWidget() {
+      const lagEl = document.getElementById('health-kafka-lag');
+      const p99El = document.getElementById('health-dynamo-p99');
+      const depthEl = document.getElementById('health-dlq-depth');
+      const flushEl = document.getElementById('health-s3-flush');
+      if (lagEl) lagEl.textContent = Math.max(0, 42 + Math.floor((Math.random() - 0.5) * 20));
+      if (p99El) p99El.textContent = Math.max(12, 18 + Math.floor((Math.random() - 0.5) * 12));
+      if (depthEl) depthEl.textContent = '0';
+      if (flushEl) flushEl.textContent = (2 + Math.floor(Math.random() * 4)) + 'm';
+    }
+    updateHealthWidget();
+    setInterval(updateHealthWidget, 10000);
   </script>
 </body>
 </html>
