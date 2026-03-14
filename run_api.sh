@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run MarketFlow API locally (no Docker). Requires .env in project root.
+# Run TradePulse API locally (no Docker). Requires .env in project root.
 set -e
 cd "$(dirname "$0")"
 export PYTHONPATH=.

@@ -1,4 +1,4 @@
-name: MarketFlow CI
+name: TradePulse CI
 
 on:
   push:

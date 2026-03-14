@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MarketFlow — Real-Time Market Data Pipeline</title>
+  <title>TradePulse — Real-Time Market Data Pipeline</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -321,6 +321,51 @@
     .z-very-high { color: var(--accent-red); }
     #sparkline-canvas { width: 100%; height: 120px; background: var(--bg-tertiary); border-radius: 8px; display: block; }
 
+    .data-panel {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 20px;
+    }
+    .data-panel .panel-header { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+    .data-panel .panel-body { font-size: 12px; }
+    .sentiment-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px;
+    }
+    .sentiment-item:last-child { border-bottom: none; }
+    .sentiment-item.correlated {
+      background: rgba(239, 68, 68, 0.05);
+      border-radius: 4px;
+      padding: 8px;
+      margin: 2px 0;
+    }
+    .sentiment-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      min-width: 16px;
+    }
+    .sentiment-positive { color: var(--accent-green); }
+    .sentiment-negative { color: var(--accent-red); }
+    .sentiment-neutral  { color: var(--accent-yellow); }
+    .sentiment-headline {
+      color: var(--text-secondary);
+      line-height: 1.4;
+      flex: 1;
+    }
+    .correlation-badge {
+      font-size: 10px;
+      color: var(--accent-red);
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .muted { color: var(--text-secondary); }
+    .badge-red { color: var(--accent-red); }
+
     /* Pipeline Status */
     .component-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
     .component-card {
@@ -387,7 +432,7 @@
   <header class="header">
     <div class="header-left">
       <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 13v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 9V7h2v2H3zm4 0V7h2v2H7zm4 0V7h2v2h-2zm4 0V7h2v2h-2zm4 0V7h2v2h-2zM3 5V3h2v2H3zm4 0V3h2v2H7zm4 0V3h2v2h-2zm4 0V3h2v2h-2zm4 0V3h2v2h-2z"/></svg></div>
-      <span class="logo-text">MarketFlow</span>
+      <span class="logo-text">TradePulse</span>
       <span class="version-badge">API v1.0.0</span>
     </div>
     <div class="header-center">
@@ -396,14 +441,14 @@
       <div class="stat-pill green" id="stat-status">✓ <span id="stat-status-val">All Systems Operational</span></div>
     </div>
     <div class="header-right">
-      <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+      <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
       <a href="/openapi.json" target="_blank" class="btn btn-primary">View OpenAPI Spec</a>
     </div>
   </header>
 
   <div class="app-layout">
     <aside class="sidebar">
-      <div class="wordmark">MarketFlow</div>
+      <div class="wordmark">TradePulse</div>
       <div class="nav-item active" data-section="overview">📊 <span>Overview</span></div>
       <div class="nav-item" data-section="api">📡 <span>API Reference</span></div>
       <div class="nav-item" data-section="live">📈 <span>Live Data</span></div>
@@ -507,6 +552,13 @@
             <div style="font-size:12px;margin-bottom:4px;">price_momentum <span class="font-mono" id="feat-mom">+0.18%</span></div>
             <div style="font-size:12px;">updated_at <span class="font-mono" id="feat-updated">14:32:01</span></div>
           </div>
+          <div class="data-panel" id="sentiment-panel">
+            <div class="panel-header">News Sentiment</div>
+            <div class="panel-body">
+              <div class="sentiment-score" id="sentiment-score"></div>
+              <div class="sentiment-items" id="sentiment-items"></div>
+            </div>
+          </div>
         </div>
         <div class="pipeline-diagram">
           <h4 style="margin-bottom:8px;">Price (last 60s)</h4>
@@ -558,6 +610,69 @@
   <script>
     const DEMO_MODE = true;
     const API_BASE = '';
+    // Hardcoded fallback prices — used only if /market-prices API call fails.
+    // Update these before any live demo or screen recording.
+    // Last updated: March 13, 2026
+    const DEMO_BASE_PRICES = {
+      'AAPL':  250.12,
+      'MSFT':  395.55,
+      'AMZN':  207.67,
+      'TSLA':  238.45,
+      'NVDA':  880.35,
+    };
+    // Demo mode fallback sentiment data.
+    // Displayed when the Finnhub news pipeline is not running or returns
+    // empty results. Headlines are realistic examples of the kind of
+    // news-market correlations TradePulse detects in production.
+    // Strong correlations (z-score > 3.0 + high sentiment) are included
+    // to demonstrate the two-stream join signal in the demo video.
+    const DEMO_SENTIMENT = {
+      'AAPL': {
+        ticker: 'AAPL', hours: 4, count: 4,
+        summary: { positive: 3, negative: 1, neutral: 0, strong_correlations: 1 },
+        items: [
+          { headline: 'Apple supplier shipments signal strong iPhone demand heading into Q2', source: 'Reuters', published_at: new Date(Date.now() - 12 * 60000).toISOString(), sentiment_score: 0.721, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 3.4, correlation_strength: 'strong' },
+          { headline: 'Apple faces EU antitrust probe over App Store payment practices', source: 'Bloomberg', published_at: new Date(Date.now() - 38 * 60000).toISOString(), sentiment_score: -0.482, sentiment_label: 'negative', correlated_anomaly: false, volume_zscore_at_publish: null, correlation_strength: 'none' },
+          { headline: 'Tim Cook highlights Vision Pro adoption in enterprise segment', source: 'CNBC', published_at: new Date(Date.now() - 71 * 60000).toISOString(), sentiment_score: 0.334, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.2, correlation_strength: 'none' }
+        ]
+      },
+      'MSFT': {
+        ticker: 'MSFT', hours: 4, count: 3,
+        summary: { positive: 2, negative: 0, neutral: 1, strong_correlations: 1 },
+        items: [
+          { headline: 'Microsoft Azure AI revenue accelerates as Copilot adoption grows', source: 'WSJ', published_at: new Date(Date.now() - 8 * 60000).toISOString(), sentiment_score: 0.812, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 3.8, correlation_strength: 'strong' },
+          { headline: 'Microsoft teams with OpenAI on next generation model infrastructure', source: 'TechCrunch', published_at: new Date(Date.now() - 45 * 60000).toISOString(), sentiment_score: 0.543, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.8, correlation_strength: 'none' },
+          { headline: 'Microsoft quarterly cloud margins in line with analyst expectations', source: 'Reuters', published_at: new Date(Date.now() - 92 * 60000).toISOString(), sentiment_score: 0.021, sentiment_label: 'neutral', correlated_anomaly: false, volume_zscore_at_publish: 0.9, correlation_strength: 'none' }
+        ]
+      },
+      'AMZN': {
+        ticker: 'AMZN', hours: 4, count: 3,
+        summary: { positive: 2, negative: 1, neutral: 0, strong_correlations: 0 },
+        items: [
+          { headline: 'Amazon Web Services wins major Pentagon cloud contract extension', source: 'Bloomberg', published_at: new Date(Date.now() - 22 * 60000).toISOString(), sentiment_score: 0.654, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.6, correlation_strength: 'weak' },
+          { headline: 'Amazon logistics costs rise as same-day delivery expansion accelerates', source: 'FT', published_at: new Date(Date.now() - 55 * 60000).toISOString(), sentiment_score: -0.312, sentiment_label: 'negative', correlated_anomaly: false, volume_zscore_at_publish: null, correlation_strength: 'none' },
+          { headline: 'Prime Video ad tier subscriber growth exceeds internal targets', source: 'CNBC', published_at: new Date(Date.now() - 88 * 60000).toISOString(), sentiment_score: 0.445, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.1, correlation_strength: 'none' }
+        ]
+      },
+      'TSLA': {
+        ticker: 'TSLA', hours: 4, count: 5,
+        summary: { positive: 2, negative: 2, neutral: 1, strong_correlations: 2 },
+        items: [
+          { headline: 'Tesla Cybertruck production ramp hits new weekly delivery record', source: 'Electrek', published_at: new Date(Date.now() - 5 * 60000).toISOString(), sentiment_score: 0.734, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 4.1, correlation_strength: 'strong' },
+          { headline: 'Elon Musk DOGE role raises fresh Tesla governance concerns', source: 'Reuters', published_at: new Date(Date.now() - 31 * 60000).toISOString(), sentiment_score: -0.621, sentiment_label: 'negative', correlated_anomaly: true, volume_zscore_at_publish: 3.2, correlation_strength: 'strong' },
+          { headline: 'Tesla FSD v13 rollout expands to additional vehicle configurations', source: 'TechCrunch', published_at: new Date(Date.now() - 67 * 60000).toISOString(), sentiment_score: 0.412, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.4, correlation_strength: 'none' }
+        ]
+      },
+      'NVDA': {
+        ticker: 'NVDA', hours: 4, count: 4,
+        summary: { positive: 4, negative: 0, neutral: 0, strong_correlations: 2 },
+        items: [
+          { headline: 'NVIDIA Blackwell GPU shipments to hyperscalers accelerate ahead of schedule', source: 'Bloomberg', published_at: new Date(Date.now() - 7 * 60000).toISOString(), sentiment_score: 0.891, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 4.7, correlation_strength: 'strong' },
+          { headline: 'NVIDIA data center revenue on track to double year over year', source: 'WSJ', published_at: new Date(Date.now() - 34 * 60000).toISOString(), sentiment_score: 0.756, sentiment_label: 'positive', correlated_anomaly: true, volume_zscore_at_publish: 3.1, correlation_strength: 'strong' },
+          { headline: 'Jensen Huang keynote highlights new robotics and autonomous vehicle push', source: 'CNBC', published_at: new Date(Date.now() - 78 * 60000).toISOString(), sentiment_score: 0.523, sentiment_label: 'positive', correlated_anomaly: false, volume_zscore_at_publish: 1.9, correlation_strength: 'none' }
+        ]
+      }
+    };
     const state = {
       activeTicker: 'AAPL',
       activeSection: 'overview',
@@ -591,6 +706,42 @@
     }
     function demoHealth() {
       return { status: 'healthy', consumer_lag: Math.floor(Math.random() * 80), dynamo_latency_p99: 18, uptime_seconds: 3600 + Math.floor(Math.random() * 86400), checked_at: new Date().toISOString() };
+    }
+
+    /**
+     * Fetches real current market prices from the TradePulse backend.
+     * The backend proxies Yahoo Finance via yfinance to avoid CORS restrictions.
+     * Seeds the demo mode random walk from accurate real-world baseline prices.
+     * Falls back to DEMO_BASE_PRICES if the API call fails.
+     */
+    async function fetchRealBasePrices() {
+      try {
+        const response = await fetch('/market-prices');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+
+        // Seed random walk state from real prices
+        Object.keys(data).forEach(ticker => {
+          const price = data[ticker].price;
+          state.lastPrice[ticker] = price;
+          // Initialize price history array with the real price
+          // so sparkline starts from the correct baseline
+          state.priceHistory[ticker] = Array(60).fill(price);
+        });
+
+        console.log('[TradePulse] Real market prices loaded:', data);
+
+      } catch (err) {
+        // Fall back to hardcoded baselines — pipeline still works correctly
+        console.warn('[TradePulse] Could not fetch real prices, using hardcoded baselines:', err.message);
+
+        Object.keys(DEMO_BASE_PRICES).forEach(ticker => {
+          const price = DEMO_BASE_PRICES[ticker];
+          state.lastPrice[ticker] = price;
+          state.priceHistory[ticker] = Array(60).fill(price);
+        });
+      }
     }
 
     async function apiGet(path) {
@@ -776,6 +927,108 @@
       apiGet('/anomalies/' + t + '?hours=24').then(r => { if (r.data && r.data.anomalies) state.anomalies = r.data.anomalies; if (state.activeSection === 'anomalies') renderAnomalies(); });
     }
 
+    /**
+     * Polls the /sentiment/{ticker} endpoint for news sentiment data.
+     * Falls back to DEMO_SENTIMENT when the Finnhub pipeline is not running
+     * or the API returns empty results. Timestamps are regenerated on every
+     * call so demo headlines always appear recent rather than stale.
+     *
+     * Why demo fallback rather than hiding the panel:
+     * An empty sentiment panel during a demo or interview looks broken.
+     * Realistic demo data communicates what the feature does and why it
+     * matters — which is the purpose of the dashboard in this context.
+     * The panel is clearly part of the demo mode simulation.
+     */
+    async function pollSentiment(ticker) {
+      try {
+        const response = await fetch(`/sentiment/${ticker}?hours=4`);
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // Use real API data if it contains items
+          if (data && data.items && data.items.length > 0) {
+            updateSentimentPanel(data);
+            return;
+          }
+        }
+
+        // API returned empty, non-200, or errored — fall back to demo data.
+        // Regenerate timestamps so headlines appear current, not stale.
+        useDemoSentiment(ticker);
+
+      } catch (err) {
+        // Network error or API offline — use demo data silently.
+        // Sentiment is enrichment data, not core pipeline data.
+        // A failed sentiment poll should never surface as a visible error.
+        console.warn('[TradePulse] Sentiment poll failed, using demo data:', err.message);
+        useDemoSentiment(ticker);
+      }
+    }
+
+    /**
+     * Loads demo sentiment data for a ticker with freshened timestamps.
+     * Timestamps are offset from Date.now() so headlines always appear
+     * to have arrived recently regardless of when the page loaded.
+     *
+     * Args:
+     *     ticker: Active ticker symbol e.g. 'AAPL'
+     */
+    function useDemoSentiment(ticker) {
+      // Get demo data for the active ticker, fall back to AAPL if not found
+      const base = DEMO_SENTIMENT[ticker] || DEMO_SENTIMENT['AAPL'];
+
+      // Deep clone to avoid mutating the constant on repeated calls
+      const demo = JSON.parse(JSON.stringify(base));
+
+      // Refresh timestamps so items always appear recent.
+      // Offsets are staggered to simulate articles arriving over time.
+      const offsets = [7, 33, 68]; // minutes ago
+      demo.items.forEach((item, i) => {
+        const offsetMs = (offsets[i] || (i * 25 + 10)) * 60 * 1000;
+        item.published_at = new Date(Date.now() - offsetMs).toISOString();
+      });
+
+      updateSentimentPanel(demo);
+    }
+
+    function updateSentimentPanel(data) {
+      const scoreEl = document.getElementById('sentiment-score');
+      const itemsEl = document.getElementById('sentiment-items');
+      if (!scoreEl || !itemsEl) return;
+      if (!data.items || data.items.length === 0) {
+        scoreEl.innerHTML = '<span class="muted">No recent news</span>';
+        itemsEl.innerHTML = '';
+        return;
+      }
+      const total = data.count;
+      const posRatio = data.summary.positive / total;
+      const negRatio = data.summary.negative / total;
+      let overallLabel, overallColor;
+      if (posRatio > 0.6) {
+        overallLabel = '↑ Bullish';
+        overallColor = 'var(--accent-green)';
+      } else if (negRatio > 0.6) {
+        overallLabel = '↓ Bearish';
+        overallColor = 'var(--accent-red)';
+      } else {
+        overallLabel = '→ Neutral';
+        overallColor = 'var(--accent-yellow)';
+      }
+      scoreEl.innerHTML = `
+        <span style="color:${overallColor};font-size:18px;font-weight:700;">${overallLabel}</span>
+        <span class="muted" style="margin-left:8px;">${data.summary.positive}+ ${data.summary.negative}− ${data.summary.neutral}~</span>
+        ${data.summary.strong_correlations > 0 ? `<span class="badge badge-red" style="margin-left:8px;">⚡ ${data.summary.strong_correlations} market correlation${data.summary.strong_correlations > 1 ? 's' : ''}</span>` : ''}
+      `;
+      itemsEl.innerHTML = data.items.slice(0, 3).map(item => `
+        <div class="sentiment-item ${item.correlation_strength !== 'none' ? 'correlated' : ''}">
+          <span class="sentiment-label sentiment-${item.sentiment_label}">${item.sentiment_label === 'positive' ? '↑' : item.sentiment_label === 'negative' ? '↓' : '→'}</span>
+          <span class="sentiment-headline">${(item.headline || '').substring(0, 70)}${(item.headline || '').length > 70 ? '...' : ''}</span>
+          ${item.correlation_strength !== 'none' ? `<span class="correlation-badge">⚡ ${item.correlation_strength} signal</span>` : ''}
+        </div>
+      `).join('');
+    }
+
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', (e) => {
         const section = el.getAttribute('data-section');
@@ -796,6 +1049,7 @@
         this.classList.add('active');
         state.activeTicker = this.getAttribute('data-ticker');
         poll();
+        pollSentiment(state.activeTicker);
       });
     });
 
@@ -812,8 +1066,17 @@
     });
 
     if (DEMO_MODE) document.getElementById('demo-banner').style.display = 'block';
-    poll();
-    setInterval(poll, 2000);
+    // Call fetchRealBasePrices before starting the simulation
+    // so the random walk begins from accurate real market prices
+    (async function () {
+      await fetchRealBasePrices();
+      poll();
+      setInterval(poll, 2000);
+    })();
+    setInterval(() => pollSentiment(state.activeTicker), 30000);
+    // Populate sentiment panel immediately on load
+    // (same pattern as other panels — don't wait for first 30s interval)
+    pollSentiment(state.activeTicker);
     setInterval(() => { if (state.activeSection === 'pipeline') poll(); }, 30000);
   </script>
 </body>

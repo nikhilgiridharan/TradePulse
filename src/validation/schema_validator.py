@@ -1,5 +1,5 @@
 """
-Schema validation layer for MarketFlow market events.
+Schema validation layer for TradePulse market events.
 
 Validates raw JSON messages from Kafka against a Pydantic model. Invalid messages
 are never raised as exceptions — we return (event, None) or (None, error) so the

@@ -17,7 +17,7 @@ def mock_settings():
         s.aws.secret_access_key = "testing"
         s.sqs.dlq_url = "unused"
         s.sqs.validation_dlq_url = "unused"
-        s.s3.bucket_name = "test-marketflow-data"
+        s.s3.bucket_name = "test-tradepulse-data"
         s.s3.prefix_dead_letters = "dead-letters"
         s.pipeline.dlq_max_retries = 3
         s.cloudwatch_enabled = False

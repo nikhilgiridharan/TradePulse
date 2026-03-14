@@ -1,5 +1,5 @@
 """
-Dead Letter Queue (DLQ) system for MarketFlow.
+Dead Letter Queue (DLQ) system for TradePulse.
 
 Failed messages are sent to SQS DLQ with full context. A processor long-polls
 SQS, retries reprocessing, and archives to S3 after DLQ_MAX_RETRIES. Retry

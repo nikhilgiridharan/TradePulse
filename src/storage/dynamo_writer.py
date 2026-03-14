@@ -1,5 +1,5 @@
 """
-Production DynamoDB writer for MarketFlow.
+Production DynamoDB writer for TradePulse.
 
 Handles trades, aggregations, anomalies, and feature store with sharded partition
 keys to avoid hot partitions. Uses conditional writes for exactly-once semantics;

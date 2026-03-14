@@ -1,4 +1,4 @@
-# MarketFlow Infrastructure Setup
+# TradePulse Infrastructure Setup
 
 ## DynamoDB Tables
 
@@ -11,17 +11,17 @@ Create in AWS Console or IaC (Terraform/CloudFormation):
 
 ## S3
 
-- Bucket: e.g. `marketflow-data`. Prefixes: `trades/`, `anomalies/`, `dead-letters/`.
+- Bucket: e.g. `tradepulse-data`. Prefixes: `trades/`, `anomalies/`, `dead-letters/`.
 - Optional: lifecycle rules to move old trades to Glacier.
 
 ## SQS
 
-- Queues: `marketflow-dlq`, `marketflow-validation-dlq`. Visibility timeout recommended 900 seconds (15 min) for retry interval.
+- Queues: `tradepulse-dlq`, `tradepulse-validation-dlq`. Visibility timeout recommended 900 seconds (15 min) for retry interval.
 - Dead-letter: after 5 receives, move to S3 via Lambda or custom consumer (see dlq_handler).
 
 ## Glue
 
-- Database: `marketflow`. Table: `trades` with columns (ticker, price, volume, timestamp, event_type); partition keys year, month, day, hour; location s3://marketflow-data/trades/.
+- Database: `tradepulse`. Table: `trades` with columns (ticker, price, volume, timestamp, event_type); partition keys year, month, day, hour; location s3://tradepulse-data/trades/.
 
 ## IAM
 
@@ -30,7 +30,7 @@ Minimum permissions for app role:
 - DynamoDB: PutItem, GetItem, Query, BatchWriteItem on the four tables.
 - S3: PutObject, GetObject on the bucket/prefixes.
 - SQS: SendMessage, ReceiveMessage, DeleteMessage, GetQueueAttributes on the two queues.
-- CloudWatch: PutMetricData in namespace MarketFlow/Production.
+- CloudWatch: PutMetricData in namespace TradePulse/Production.
 - Glue: BatchCreatePartition (for S3 partition registration).
 
 ## Kafka

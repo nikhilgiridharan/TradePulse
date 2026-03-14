@@ -1,4 +1,4 @@
-# MarketFlow Runbook
+# TradePulse Runbook
 
 ## Deployment
 
@@ -7,7 +7,7 @@
 1. **AWS**: Create DynamoDB tables (see schema.md), S3 bucket, SQS queues (main DLQ, validation DLQ). Create IAM user/role with access.
 2. **Kafka**: Create topics `market.trades`, `market.trades.dlq`, `market.aggregations`, `market.anomalies` (or rely on auto-create with 6 partitions).
 3. **Env**: Copy `.env.example` to `.env`, set `POLYGON_API_KEY`, `KAFKA_BOOTSTRAP_SERVERS`, AWS credentials, table names, SQS URLs.
-4. **Docker**: `docker-compose up -d`. Order: Zookeeper → Kafka (wait healthy) → Schema Registry → marketflow-producer → marketflow-processing → marketflow-api.
+4. **Docker**: `docker-compose up -d`. Order: Zookeeper → Kafka (wait healthy) → Schema Registry → tradepulse-producer → tradepulse-processing → tradepulse-api.
 5. **Verify**: `GET http://localhost:8000/health`, `GET http://localhost:8000/docs`.
 
 ### Startup sequence

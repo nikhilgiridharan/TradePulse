@@ -1,4 +1,4 @@
-# MarketFlow full stack: Zookeeper, Kafka, Schema Registry, producer, processing, API.
+# TradePulse full stack: Zookeeper, Kafka, Schema Registry, producer, processing, API.
 # Named volumes persist Kafka/Zookeeper data so offsets and topics survive restarts.
 
 services:
@@ -53,7 +53,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
 
   # Producer: separate service for independent scaling and failure domain.
-  marketflow-producer:
+  tradepulse-producer:
     build:
       context: .
       dockerfile: Dockerfile.producer
@@ -65,15 +65,30 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     restart: on-failure
 
+  # News producer: polls Finnhub every 60s, publishes to market.news.
+  # Separate service so news producer crash does not affect equity ingestion.
+  tradepulse-news-producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.producer
+    command: python -m src.producer.news_producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    restart: on-failure
+
   # Faust processing: consumes trades, validates, aggregates, anomalies, writes DynamoDB.
-  marketflow-processing:
+  tradepulse-processing:
     build:
       context: .
       dockerfile: Dockerfile.processing
     depends_on:
       kafka:
         condition: service_healthy
-      marketflow-producer:
+      tradepulse-producer:
         condition: service_started
     env_file: .env
     environment:
@@ -81,14 +96,14 @@ services:
     restart: on-failure
 
   # API: depends on processing so aggregations are populated before serving.
-  marketflow-api:
+  tradepulse-api:
     build:
       context: .
       dockerfile: Dockerfile.api
     ports:
       - "8000:8000"
     depends_on:
-      marketflow-processing:
+      tradepulse-processing:
         condition: service_started
     env_file: .env
     restart: unless-stopped

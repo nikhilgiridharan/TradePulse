@@ -1,4 +1,4 @@
-# MarketFlow Setup
+# TradePulse Setup
 
 ## Prerequisites
 
@@ -9,8 +9,8 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/nikhilgiridharan/MarketFlow
-cd MarketFlow
+git clone https://github.com/nikhilgiridharan/TradePulse
+cd TradePulse
 cp .env.example .env
 # Edit .env: POLYGON_API_KEY, KAFKA_BOOTSTRAP_SERVERS (use kafka:29092 if running in Docker), AWS_*, SQS_*, table names
 make up

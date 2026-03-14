@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# MarketFlow – run the full stack locally with Docker Compose.
+# TradePulse – run the full stack locally with Docker Compose.
 # Usage: ./run_local.sh
 # Requires: Docker and Docker Compose (or "docker compose" plugin).
 
@@ -27,7 +27,7 @@ if [[ ! -f .env ]]; then
   echo "Edit .env to set POLYGON_API_KEY and AWS_* if you need full functionality."
 fi
 
-echo "Starting MarketFlow stack (Zookeeper, Kafka, Schema Registry, App)..."
+echo "Starting TradePulse stack (Zookeeper, Kafka, Schema Registry, App)..."
 $COMPOSE up -d --build
 
 echo ""

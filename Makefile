@@ -1,10 +1,10 @@
-# MarketFlow development commands
+# TradePulse development commands
 # Run 'make help' to see all available commands
 
 .PHONY: help up down logs test lint format clean
 
 help:
-	@echo "MarketFlow Development Commands"
+	@echo "TradePulse Development Commands"
 	@echo "================================"
 	@echo "make up       - Start full stack with Docker Compose"
 	@echo "make down     - Stop all services"
@@ -18,7 +18,7 @@ up:
 	docker-compose up --build -d
 	@echo "Waiting for services to be healthy..."
 	@sleep 10
-	@echo "MarketFlow is running. Dashboard at http://localhost:8000"
+	@echo "TradePulse is running. Dashboard at http://localhost:8000"
 
 down:
 	docker-compose down

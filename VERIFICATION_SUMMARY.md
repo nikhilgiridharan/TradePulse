@@ -1,4 +1,4 @@
-# MarketFlow Verification Summary
+# TradePulse Verification Summary
 
 ## File Summary
 
@@ -91,7 +91,7 @@
 
 4. **Polygon WebSocket** — Producer uses `polygon-api-client` (WebSocketClient, STOCKS_CLUSTER). If the package API differs (e.g. subscribe format), adjust `polygon_producer.py`.
 
-5. **Glue** — S3Writer registers partitions with Glue (`batch_create_partition`). Assumes a Glue database `marketflow` and table `trades`. Create these or disable/adapt the call if you don’t use Glue.
+5. **Glue** — S3Writer registers partitions with Glue (`batch_create_partition`). Assumes a Glue database `tradepulse` and table `trades`. Create these or disable/adapt the call if you don’t use Glue.
 
 ---
 

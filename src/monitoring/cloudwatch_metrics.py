@@ -1,4 +1,4 @@
-"""Reusable CloudWatch metrics client for MarketFlow.
+"""Reusable CloudWatch metrics client for TradePulse.
 
 Buffers metric data points and flushes in batches (CloudWatch PutMetricData
 accepts up to 20 metrics per request). A background thread flushes every 10
@@ -48,7 +48,7 @@ logger = structlog.get_logger(__name__)
 # Dimensions for all metrics — filter in CloudWatch by Environment=production, etc.
 DEFAULT_DIMENSIONS = {
     "Environment": os.getenv("ENVIRONMENT", "development"),
-    "Service": "MarketFlow",
+    "Service": "TradePulse",
 }
 
 # Max metrics per PutMetricData request (AWS limit)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About — MarketFlow</title>
+  <title>About — TradePulse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -209,7 +209,7 @@
   <header class="header">
     <div class="header-left">
       <div class="logo-icon"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="white" d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 13v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 9V7h2v2H3zm4 0V7h2v2H7zm4 0V7h2v2h-2zm4 0V7h2v2h-2zm4 0V7h2v2h-2zM3 5V3h2v2H3zm4 0V3h2v2H7zm4 0V3h2v2h-2zm4 0V3h2v2h-2zm4 0V3h2v2h-2z"/></svg></div>
-      <span class="logo-text">MarketFlow</span>
+      <span class="logo-text">TradePulse</span>
       <span class="version-badge">API v1.0.0</span>
     </div>
     <div class="header-center">
@@ -218,14 +218,14 @@
       <div class="stat-pill green">✓ Operational</div>
     </div>
     <div class="header-right">
-      <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
+      <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
       <a href="/" class="btn btn-primary">Dashboard</a>
     </div>
   </header>
 
   <div class="app-layout">
     <aside class="sidebar">
-      <div class="wordmark">MarketFlow</div>
+      <div class="wordmark">TradePulse</div>
       <a href="/" class="nav-item">📊 <span>Overview</span></a>
       <a href="/" class="nav-item">📡 <span>API Reference</span></a>
       <a href="/" class="nav-item">📈 <span>Live Data</span></a>
@@ -239,10 +239,10 @@
       <div class="doc-content">
         <div class="hero">
           <div class="hero-mesh" id="hero-mesh"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div></div>
-          <h1><span class="logo-icon"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="white" d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2z"/></svg></span> MarketFlow</h1>
+          <h1><span class="logo-icon"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="white" d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2z"/></svg></span> TradePulse</h1>
           <p class="sub">Real-time market data pipeline processing 15,000+ events per second with sub-100ms latency</p>
           <div class="hero-cta">
-            <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">View on GitHub</a>
+            <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">View on GitHub</a>
             <a href="#" class="btn btn-ghost">Read the Article</a>
             <a href="/" class="btn btn-primary">Live Dashboard →</a>
           </div>
@@ -255,10 +255,10 @@
         </div>
 
         <section id="what-is">
-          <h2>What is MarketFlow?</h2>
-          <p>Stock market data is one of the hardest domains for data engineering — high volume, zero tolerance for duplicates, strict latency requirements, and burst traffic at market open that can spike 8–10x in under 60 seconds. Most portfolio projects sidestep these challenges. MarketFlow confronts them directly.</p>
-          <p>MarketFlow ingests live market trades and quotes from Polygon.io via WebSocket, streams them through Apache Kafka, processes windowed aggregations (VWAP, volume z-score, price momentum) using Faust, runs real-time anomaly detection using Isolation Forest, and stores results in a hot/cold AWS architecture (DynamoDB for recent data, S3 + Parquet for historical).</p>
-          <p>The engineering patterns in MarketFlow — exactly-once semantics, dead letter queues, backpressure mechanisms, write sharding — are the same patterns used by Robinhood, Coinbase, and the data infrastructure teams at Google and Amazon. This project exists to demonstrate that these patterns can be understood, implemented, and explained by a single engineer.</p>
+          <h2>What is TradePulse?</h2>
+          <p>Stock market data is one of the hardest domains for data engineering — high volume, zero tolerance for duplicates, strict latency requirements, and burst traffic at market open that can spike 8–10x in under 60 seconds. Most portfolio projects sidestep these challenges. TradePulse confronts them directly.</p>
+          <p>TradePulse ingests live market trades and quotes from Polygon.io via WebSocket, streams them through Apache Kafka, processes windowed aggregations (VWAP, volume z-score, price momentum) using Faust, runs real-time anomaly detection using Isolation Forest, and stores results in a hot/cold AWS architecture (DynamoDB for recent data, S3 + Parquet for historical). A second stream ingests real-time news headlines from Finnhub, scores each headline using VADER sentiment analysis in under 1ms, and correlates sentiment with volume z-score using a 60-second temporal join — surfacing high-confidence news-driven market events in real time.</p>
+          <p>The engineering patterns in TradePulse — exactly-once semantics, dead letter queues, backpressure mechanisms, write sharding — are the same patterns used by Robinhood, Coinbase, and the data infrastructure teams at Google and Amazon. This project exists to demonstrate that these patterns can be understood, implemented, and explained by a single engineer.</p>
           <div class="highlight-cards">
             <div class="highlight-card"><div class="icon">🎯</div><h4>Built for FAANG</h4><p>Every design decision maps to real interview questions: hot partitions, exactly-once, backpressure, DLQ.</p></div>
             <div class="highlight-card"><div class="icon">⚡</div><h4>Production Patterns</h4><p>DLQ, backpressure, exactly-once, write sharding — not just happy-path code.</p></div>
@@ -270,6 +270,7 @@
           <h2>How It Works</h2>
           <span class="sub">Data flows from live market feeds through a fault-tolerant pipeline to queryable storage in under 100ms</span>
           <div class="pipeline-diagram">
+            <p style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">Main stream: trades</p>
             <svg width="700" height="140" viewBox="0 0 700 140">
               <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#00d4ff"/></marker></defs>
               <g><title>WebSocket connection to live trade and quote data. Reconnects automatically with exponential backoff + jitter on disconnect.</title><rect class="flow-box" x="10" y="50" width="90" height="40" rx="6"/><text x="55" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">Polygon.io</text><text x="55" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">WebSocket</text></g>
@@ -282,6 +283,19 @@
               <line class="flow-line" x1="530" y1="70" x2="590" y2="70" marker-end="url(#ar)"/>
               <g><title>Hot storage with shard key pattern (ticker#shard_0-7) to prevent hot partitions. TTL-based retention. Conditional writes for idempotency.</title><rect class="flow-box" x="590" y="50" width="100" height="40" rx="6"/><text x="640" y="75" fill="#f1f5f9" font-size="11" text-anchor="middle">DynamoDB</text><text x="640" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">Hot · 48h TTL</text></g>
               <line class="flow-line" x1="640" y1="90" x2="640" y2="120"/><g><title>Cold storage with Hive partitioning for Athena query efficiency. Snappy compression. Buffered writes flushed every 5 minutes.</title><rect class="flow-box" x="600" y="120" width="80" height="16" rx="4"/><text x="640" y="131" fill="#94a3b8" font-size="9" text-anchor="middle">S3 Parquet</text></g>
+            </svg>
+            <p style="font-size:11px;color:var(--text-secondary);margin:16px 0 8px;">News stream: sentiment + correlation (join on ticker + 60s window)</p>
+            <svg width="700" height="100" viewBox="0 0 700 100">
+              <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#7c3aed"/></marker></defs>
+              <g><title>Polls Finnhub REST API every 60 seconds per ticker. Deduplicates articles using a bounded seen-IDs set. Publishes to market.news Kafka topic partitioned by ticker.</title><rect class="flow-box" x="10" y="30" width="90" height="40" rx="6"/><text x="55" y="55" fill="#f1f5f9" font-size="11" text-anchor="middle">Finnhub API</text><text x="55" y="68" fill="#94a3b8" font-size="9" text-anchor="middle">60s poll</text></g>
+              <line class="flow-line" x1="100" y1="50" x2="160" y2="50" marker-end="url(#ar2)"/>
+              <g><rect class="flow-box" x="160" y="30" width="80" height="40" rx="6"/><text x="200" y="55" fill="#f1f5f9" font-size="11" text-anchor="middle">Kafka</text><text x="200" y="68" fill="#94a3b8" font-size="9" text-anchor="middle">market.news</text></g>
+              <line class="flow-line" x1="240" y1="50" x2="300" y2="50" marker-end="url(#ar2)"/>
+              <g><title>VADER rule-based sentiment analysis scores each headline in &lt;1ms. Chosen over FinBERT for stream latency — 1ms vs 200-400ms. Compound score range: -1.0 (bearish) to +1.0 (bullish).</title><rect class="flow-box" x="300" y="30" width="90" height="40" rx="6"/><text x="345" y="55" fill="#f1f5f9" font-size="11" text-anchor="middle">VADER Sentiment</text><text x="345" y="68" fill="#94a3b8" font-size="9" text-anchor="middle">&lt;1ms/headline</text></g>
+              <line class="flow-line" x1="390" y1="50" x2="450" y2="50" marker-end="url(#ar2)"/>
+              <g><title>Joins news sentiment with volume z-score using a 60-second temporal window. Strong correlation = high-magnitude sentiment + z-score &gt; 3.0 within 60 seconds. This is the signal that matters.</title><rect class="flow-box" x="450" y="30" width="80" height="40" rx="6"/><text x="490" y="55" fill="#f1f5f9" font-size="11" text-anchor="middle">Correlator</text><text x="490" y="68" fill="#94a3b8" font-size="9" text-anchor="middle">60s window</text></g>
+              <line class="flow-line" x1="530" y1="50" x2="590" y2="50" marker-end="url(#ar2)"/>
+              <g><rect class="flow-box" x="590" y="30" width="100" height="40" rx="6"/><text x="640" y="55" fill="#f1f5f9" font-size="11" text-anchor="middle">DynamoDB</text><text x="640" y="68" fill="#94a3b8" font-size="9" text-anchor="middle">market_sentiment</text></g>
             </svg>
           </div>
           <h3>Event lifecycle</h3>
@@ -304,8 +318,8 @@
           </div>
           <div class="step">
             <span class="step-num">1</span><h4>Clone the repository</h4>
-            <div class="code-block"><button class="copy-btn" data-copy="code1">Copy</button><pre id="code1">git clone https://github.com/nikhilgiridharan/MarketFlow
-cd MarketFlow</pre></div>
+            <div class="code-block"><button class="copy-btn" data-copy="code1">Copy</button><pre id="code1">git clone https://github.com/nikhilgiridharan/TradePulse
+cd TradePulse</pre></div>
           </div>
           <div class="step">
             <span class="step-num">2</span><h4>Configure environment</h4>
@@ -330,7 +344,7 @@ cd MarketFlow</pre></div>
 
         <section id="api-ref">
           <h2>API Reference</h2>
-          <span class="sub">5 endpoints. All responses in JSON. Rate limited to 100 requests/minute.</span>
+          <span class="sub">6 endpoints. All responses in JSON. Rate limited to 100 requests/minute.</span>
 
           <div class="endpoint-card">
             <h4><span class="method-get">GET</span> /quotes/{ticker}</h4>
@@ -365,14 +379,23 @@ cd MarketFlow</pre></div>
             <p class="desc">Pipeline health: status, consumer_lag, dynamo_latency_p99, uptime_seconds, checked_at.</p>
             <p class="note">status: "healthy" — normal; "degraded" — elevated latency; "unhealthy" — not processing.</p>
           </div>
+
+          <div class="endpoint-card">
+            <h4><span class="method-get">GET</span> /sentiment/{ticker}?hours=24</h4>
+            <p class="desc">Returns recent news sentiment analysis with market correlation data. Shows which headlines coincided with unusual volume activity — the output of the two-stream join.</p>
+            <table><tr><th>Parameter</th><th>Description</th></tr><tr><td>ticker (required)</td><td>Stock symbol (AAPL, MSFT, AMZN, TSLA, NVDA)</td></tr><tr><td>hours (optional)</td><td>Lookback window in hours (default 24, max 168)</td></tr></table>
+            <p class="cache">Cache: none (always fresh)</p>
+            <div class="code-block"><button class="copy-btn" data-copy="api-sentiment">Copy</button><pre id="api-sentiment">curl http://localhost:8000/sentiment/NVDA?hours=4</pre></div>
+            <p class="note">correlation_strength values: strong | moderate | weak | none. Strong correlations are the highest-signal events in the system.</p>
+          </div>
         </section>
 
         <section id="concepts">
           <h2>Key Engineering Concepts</h2>
-          <span class="sub">The patterns that make MarketFlow production-grade</span>
+          <span class="sub">The patterns that make TradePulse production-grade</span>
 
           <div class="concept-card" data-concept>
-            <div class="concept-head"><div><h4>Exactly-Once Semantics</h4><span class="sub">How MarketFlow guarantees no duplicate data, even when things crash</span></div><span class="chevron">▼</span></div>
+            <div class="concept-head"><div><h4>Exactly-Once Semantics</h4><span class="sub">How TradePulse guarantees no duplicate data, even when things crash</span></div><span class="chevron">▼</span></div>
             <div class="concept-body"><div class="concept-body-inner">
               <p><strong>The Problem:</strong> Retries cause duplicate writes; the same trade written twice corrupts every aggregation downstream.</p>
               <p><strong>The Solution (3 layers):</strong> (1) Kafka producer with enable.idempotence = True. (2) Faust processing_guarantee = 'exactly_once'. (3) DynamoDB ConditionExpression so only write if item doesn't exist. On ConditionalCheckFailedException treat as success. Crash scenario: Faust writes to DynamoDB, crashes before committing offset; on replay DynamoDB rejects duplicate; offset committed. Result: processed exactly once.</p>
@@ -380,14 +403,14 @@ cd MarketFlow</pre></div>
           </div>
 
           <div class="concept-card" data-concept>
-            <div class="concept-head"><div><h4>Dead Letter Queue (DLQ)</h4><span class="sub">Why MarketFlow never silently drops a failed message</span></div><span class="chevron">▼</span></div>
+            <div class="concept-head"><div><h4>Dead Letter Queue (DLQ)</h4><span class="sub">Why TradePulse never silently drops a failed message</span></div><span class="chevron">▼</span></div>
             <div class="concept-body"><div class="concept-body-inner">
               <p>Invalid or failed messages go to SQS DLQ with full context. Retry strategy: 3 attempts → SQS DLQ → retry every 15 minutes → archive to S3 after 5 DLQ retries. Fifteen minutes gives transient failures (network, throttling) time to resolve without hammering the system.</p>
             </div></div>
           </div>
 
           <div class="concept-card" data-concept>
-            <div class="concept-head"><div><h4>DynamoDB Write Sharding</h4><span class="sub">How MarketFlow prevents hot partitions at market open</span></div><span class="chevron">▼</span></div>
+            <div class="concept-head"><div><h4>DynamoDB Write Sharding</h4><span class="sub">How TradePulse prevents hot partitions at market open</span></div><span class="chevron">▼</span></div>
             <div class="concept-body"><div class="concept-body-inner">
               <p>Naive key "AAPL" routes all AAPL writes to one partition → throttling at ~800 writes/sec. Shard key: ticker#shard_0-7, shard = hash(ticker+timestamp) % 8. Writes distributed across 8 partitions → ~100/sec each.</p>
               <pre>Naive key "AAPL":          Shard key "AAPL#0".."AAPL#7":
@@ -418,6 +441,20 @@ All writes → 1 partition   Writes distributed:
               <p>Isolation Forest with 6 features (price, volume, volume_zscore, price_momentum, vwap_deviation, trade_frequency). Rolling retraining every 500 events on last 1000. Contamination = 0.01.</p>
             </div></div>
           </div>
+
+          <div class="concept-card" data-concept>
+            <div class="concept-head"><div><h4>Two-Stream Join</h4><span class="sub">How TradePulse correlates news sentiment with market activity in real time</span></div><span class="chevron">▼</span></div>
+            <div class="concept-body"><div class="concept-body-inner">
+              <p><strong>The Problem:</strong> A news headline alone is weak signal. Most articles don't move markets. A volume spike alone is ambiguous — it could be institutional rebalancing, an index inclusion, or random noise. Neither stream is particularly useful on its own.</p>
+              <p><strong>The Insight:</strong> When a news article with strong sentiment AND unusual market volume occur within 60 seconds of each other, the probability that the market is reacting to the news in real time is significantly higher. This is the joint signal that matters.</p>
+              <p><strong>How It Works:</strong></p>
+              <p><strong>Stream 1 — Equity trades (market.trades):</strong> Polygon.io WebSocket → Kafka → Faust → computes volume z-score per ticker. Z-score cached in memory with timestamp for fast correlation lookups.</p>
+              <p><strong>Stream 2 — News headlines (market.news):</strong> Finnhub API polling every 60s → Kafka → VADER sentiment analysis. On each article: look up ticker's z-score cache.</p>
+              <p><strong>Join logic (60-second temporal window):</strong> IF published_at is within 60 seconds of a z-score &gt; 2.0: correlation detected. strength = f(sentiment_magnitude, z-score_magnitude). strong: |sentiment| &gt;= 0.5 AND z-score &gt;= 3.0. moderate: |sentiment| &gt;= 0.2 AND z-score &gt;= 2.0. weak: correlated but low magnitude.</p>
+              <p><strong>Why VADER over FinBERT:</strong> VADER: &lt;1ms inference, rule-based, no GPU required. FinBERT: 200-400ms inference, requires GPU for production throughput. For real-time stream processing on a single server, VADER's speed tradeoff is correct. FinBERT could enrich high-signal events async without blocking the main stream — a natural future extension.</p>
+              <p><strong>Why 60 seconds:</strong> Algorithmic traders typically react to headlines within seconds. Human traders within minutes. A 60-second window captures the initial market reaction while excluding longer-term price drift that may have other causes.</p>
+            </div></div>
+          </div>
         </section>
 
         <section id="tech-stack">
@@ -432,6 +469,8 @@ All writes → 1 partition   Writes distributed:
             <div class="tech-card"><div class="icon">🚀</div><h4>FastAPI</h4><div class="ver">v0.109.0</div><p>Async, auto OpenAPI, Pydantic validation built-in.</p></div>
             <div class="tech-card"><div class="icon">🐳</div><h4>Docker Compose</h4><p>One-command local stack; production parity.</p></div>
             <div class="tech-card"><div class="icon">📊</div><h4>CloudWatch</h4><p>Metrics, alarms, dashboards for all components.</p></div>
+            <div class="tech-card"><div class="icon">📰</div><h4>Finnhub</h4><div class="ver">v2.4.19</div><p>Free real-time news API. Chosen over NewsAPI for company-level filtering and higher free tier limits. 60-second polling sufficient for news frequency.</p></div>
+            <div class="tech-card"><div class="icon">🧠</div><h4>VADER Sentiment</h4><div class="ver">v3.3.2</div><p>Rule-based NLP scoring &lt;1ms per headline. Chosen over FinBERT (200-400ms) for real-time stream latency requirements. Compound score: -1.0 to +1.0.</p></div>
           </div>
         </section>
 
@@ -455,7 +494,7 @@ All writes → 1 partition   Writes distributed:
           <h2>Project Structure</h2>
           <span class="sub">Organized for clarity and separation of concerns</span>
           <div class="file-tree" id="file-tree">
-            <div class="folder-toggle open" data-folder>MarketFlow/</div>
+            <div class="folder-toggle open" data-folder>TradePulse/</div>
             <ul class="tree-children">
               <li><span class="file-row" data-tooltip="Full local stack: Kafka, Zookeeper, API">docker-compose.yml</span></li>
               <li><span class="file-row" data-tooltip="All dependencies pinned to exact versions">requirements.txt</span></li>
@@ -551,10 +590,10 @@ All writes → 1 partition   Writes distributed:
         </section>
 
         <footer class="footer">
-          <p><strong>MarketFlow</strong> · Real-time market data pipeline</p>
+          <p><strong>TradePulse</strong> · Real-time market data pipeline</p>
           <p>Built with Apache Kafka · Faust · AWS · Python</p>
           <div class="footer-links">
-            <a href="https://github.com/nikhilgiridharan/MarketFlow" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="/">Live Dashboard</a>
             <a href="/openapi.json">API Docs</a>
           </div>
@@ -563,7 +602,7 @@ All writes → 1 partition   Writes distributed:
       </div>
 
       <nav class="toc">
-        <a href="#what-is" class="toc-item">What is MarketFlow</a>
+        <a href="#what-is" class="toc-item">What is TradePulse</a>
         <a href="#architecture" class="toc-item">Architecture</a>
         <a href="#getting-started" class="toc-item">Getting Started</a>
         <a href="#api-ref" class="toc-item">API Reference</a>

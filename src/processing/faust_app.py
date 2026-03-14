@@ -1,5 +1,5 @@
 """
-Core Faust stream processing application for MarketFlow.
+Core Faust stream processing application for TradePulse.
 
 Consumes market.trades, validates, runs aggregations and anomaly detection,
 writes to DynamoDB with backpressure. Invalid messages go to DLQ. Exactly-once
@@ -23,6 +23,7 @@ from src.storage.s3_writer import S3Writer
 from src.processing.aggregations import RollingAggregations, AggregationResult
 from src.processing.anomaly_detection import AnomalyDetector
 from src.processing.feature_store import FeatureStore
+from src.processing.sentiment_analyzer import SentimentAnalyzer
 
 logger = structlog.get_logger(__name__)
 
@@ -32,7 +33,7 @@ settings = get_settings()
 # topic_replication_factor=1 for local dev (use 3 in production).
 # consumer_auto_offset_reset='latest' so first run doesn't replay full history.
 app = faust.App(
-    "marketflow",
+    "tradepulse",
     broker=settings.kafka.bootstrap_servers,
     store="rocksdb://",
     processing_guarantee="exactly_once",
@@ -45,6 +46,7 @@ trades_topic = app.topic(settings.kafka.topic_trades, value_type=bytes)
 dlq_topic = app.topic(settings.kafka.topic_dlq, value_type=bytes)
 aggregations_topic = app.topic(settings.kafka.topic_aggregations, value_type=bytes)
 anomalies_topic = app.topic(settings.kafka.topic_anomalies, value_type=bytes)
+news_topic = app.topic(settings.kafka.topic_news, value_type=bytes)
 
 # Backpressure: without it, slow DynamoDB writes let Faust's queue grow unbounded
 # → OOM or massive consumer lag. We trade increased Kafka lag (safe, durable) for
@@ -57,6 +59,7 @@ s3_writer = S3Writer()
 rolling_aggs = RollingAggregations()
 anomaly_detectors: dict[str, AnomalyDetector] = {}
 feature_store = FeatureStore()
+sentiment_analyzer = SentimentAnalyzer()
 
 
 def _get_aggregation_result(ticker: str) -> AggregationResult:
@@ -135,6 +138,11 @@ async def process_trades(stream: faust.Stream) -> None:
         anom_result = anomaly_detectors[ticker].add_event(event, agg_result)
         # Feature store
         feature_store.update_features(event, agg_result)
+        # Keep sentiment correlator's z-score cache fresh
+        sentiment_analyzer.update_zscore_cache(
+            ticker=event.ticker,
+            zscore=agg_result.volume_zscore
+        )
         # Backpressure: rolling avg of last 10 write latencies
         try:
             latency_ms = dynamo_writer.write_trade(event)
@@ -154,6 +162,90 @@ async def process_trades(stream: faust.Stream) -> None:
         s3_writer.add_event(event)
         if settings.cloudwatch_enabled:
             get_metrics().emit_metric("ProcessingThroughput", 1.0, "Count", {"ticker": ticker})
+
+
+@app.agent(news_topic)
+async def process_news(stream):
+    """
+    Consumes news headlines from market.news topic.
+
+    Flow per message:
+    1. Parse JSON payload
+    2. Run VADER sentiment analysis
+    3. Correlate with current volume z-score from cache
+    4. Write SentimentResult to DynamoDB
+    5. Write to S3 for historical analysis
+    6. Emit CloudWatch metrics
+
+    Why this agent runs separately from process_trades:
+    News arrives at much lower frequency than trades (~100 articles/hour
+    vs ~15,000 trades/second). Keeping them in separate agents allows
+    independent backpressure and scaling — a slow news processing step
+    won't affect trade processing throughput.
+    """
+    async for message in stream:
+        try:
+            import json
+            raw = message.decode("utf-8") if isinstance(message, bytes) else str(message)
+            news_data = json.loads(raw)
+
+            # Analyze sentiment and correlate with market signals
+            result = sentiment_analyzer.analyze(news_data)
+
+            # Persist to DynamoDB
+            sentiment_analyzer.write_to_dynamo(result)
+
+            # Emit CloudWatch metrics for monitoring
+            if settings.cloudwatch_enabled:
+                get_metrics().emit_metric(
+                    "SentimentAnalyzed",
+                    1,
+                    "Count",
+                    {"Ticker": result.ticker, "Label": result.sentiment_label}
+                )
+
+                if result.correlation_strength in ("strong", "moderate"):
+                    get_metrics().emit_metric(
+                        "NewsMarketCorrelations",
+                        1,
+                        "Count",
+                        {
+                            "Ticker":   result.ticker,
+                            "Strength": result.correlation_strength
+                        }
+                    )
+                    logger.info(
+                        f"News-market correlation: {result.ticker} | "
+                        f"{result.correlation_strength} | "
+                        f"sentiment={result.sentiment_score} | "
+                        f"z-score={result.volume_zscore_at_publish}"
+                    )
+
+        except Exception as e:
+            raw = message.decode("utf-8") if isinstance(message, bytes) else str(message)
+            logger.error(f"News processing failed: {e} | message={raw[:200]}")
+            ticker_from_msg = None
+            try:
+                parsed = json.loads(raw)
+                if isinstance(parsed, dict):
+                    ticker_from_msg = parsed.get("ticker")
+            except Exception:
+                pass
+            dlq_handler.send_to_dlq(
+                DLQMessage(
+                    original_message=raw[:5000],
+                    error_reason=str(e),
+                    error_type=type(e).__name__,
+                    kafka_topic=settings.kafka.topic_news,
+                    kafka_offset=0,
+                    kafka_partition=0,
+                    ticker=ticker_from_msg,
+                    retry_count=0,
+                    first_failed_at=datetime.now(timezone.utc),
+                    last_failed_at=datetime.now(timezone.utc),
+                ),
+                queue_type="main",
+            )
 
 
 @app.timer(30.0)

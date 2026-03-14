@@ -1,4 +1,4 @@
-# MarketFlow Features
+# TradePulse Features
 
 ## Real-Time Feature Store
 

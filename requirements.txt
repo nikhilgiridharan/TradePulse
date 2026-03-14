@@ -28,6 +28,14 @@ pydantic-settings==2.1.0
 # Polygon.io client — WebSocket and REST for market data
 polygon-api-client==1.13.3
 
+# Real-time market prices (Yahoo Finance) — for /market-prices and dashboard demo
+yfinance==0.2.37
+
+# News sentiment
+finnhub-python==2.4.19
+vaderSentiment==3.3.2
+textblob==0.17.1
+
 # Utilities — dotenv for .env loading; tenacity for retries; structlog for structured logging
 python-dotenv==1.0.0
 tenacity==8.2.3

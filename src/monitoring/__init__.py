@@ -1,5 +1,5 @@
 """
-CloudWatch metrics emission for MarketFlow. All components use this module
+CloudWatch metrics emission for TradePulse. All components use this module
 to emit counters, latencies, and gauges without blocking on the CloudWatch API.
 """
 

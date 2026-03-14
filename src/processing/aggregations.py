@@ -1,5 +1,5 @@
 """
-Windowed aggregations for MarketFlow.
+Windowed aggregations for TradePulse.
 
 VWAP (volume-weighted average price), rolling average price, volume z-score,
 and price momentum. Tumbling windows (non-overlapping) for VWAP; hopping

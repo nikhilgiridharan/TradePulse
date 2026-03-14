@@ -1,5 +1,5 @@
 """
-Real-time feature store for MarketFlow.
+Real-time feature store for TradePulse.
 
 Stores computed features (VWAP, volume z-score, price momentum, trade frequency)
 per ticker with hour-level partition key to distribute DynamoDB writes (write

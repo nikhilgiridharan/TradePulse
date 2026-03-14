@@ -1,1 +1,1 @@
-"""MarketFlow test suite."""
+"""TradePulse test suite."""

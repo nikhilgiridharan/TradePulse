@@ -1,4 +1,4 @@
-"""Production FastAPI application for MarketFlow.
+"""Production FastAPI application for TradePulse.
 
 Serves custom dashboard at / and GET /quotes/{ticker}, /aggregations/{ticker},
 /anomalies/{ticker}, /features/{ticker}, /health. OpenAPI spec at /openapi.json.
@@ -6,9 +6,13 @@ Serves custom dashboard at / and GET /quotes/{ticker}, /aggregations/{ticker},
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Optional
+
+import boto3
+from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key
 
 # Load .env from project root so config finds it regardless of cwd
 _path = Path(__file__).resolve().parents[2]
@@ -18,6 +22,7 @@ if _env.exists():
     load_dotenv(_env)
 
 import structlog
+import yfinance as yf
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -46,8 +51,8 @@ def _get_writer():
 _get_writer._writer = None
 
 app = FastAPI(
-    title="MarketFlow API",
-    description="MarketFlow — Real-time market data pipeline processing 15,000+ events/second",
+    title="TradePulse API",
+    description="TradePulse — Real-time market data pipeline processing 15,000+ events/second",
     version="1.0.0",
     docs_url=None,
     redoc_url=None,
@@ -57,11 +62,11 @@ app = FastAPI(
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard() -> HTMLResponse:
-    """Serve the custom MarketFlow dashboard (single-page app)."""
+    """Serve the custom TradePulse dashboard (single-page app)."""
     index_path = _STATIC_DIR / "index.html"
     if not index_path.exists():
         return HTMLResponse(
-            "<h1>MarketFlow API</h1><p>Dashboard not found. Ensure static/index.html exists.</p>"
+            "<h1>TradePulse API</h1><p>Dashboard not found. Ensure static/index.html exists.</p>"
             "<p><a href='/openapi.json'>OpenAPI spec</a></p>",
             status_code=200,
         )
@@ -71,14 +76,14 @@ async def serve_dashboard() -> HTMLResponse:
 @app.get("/about", response_class=HTMLResponse)
 async def serve_about() -> HTMLResponse:
     """
-    Serves the MarketFlow About and Documentation page.
+    Serves the TradePulse About and Documentation page.
     Explains what the project does, how to use the API,
     architecture overview, and setup instructions.
     """
     about_path = _STATIC_DIR / "about.html"
     if not about_path.exists():
         return HTMLResponse(
-            "<h1>MarketFlow</h1><p>About page not found.</p><a href='/'>Dashboard</a>",
+            "<h1>TradePulse</h1><p>About page not found.</p><a href='/'>Dashboard</a>",
             status_code=200,
         )
     return HTMLResponse(content=about_path.read_text(encoding="utf-8"))
@@ -306,6 +311,113 @@ async def health() -> HealthResponse:
         uptime_seconds=round(uptime, 2),
         checked_at=datetime.now(timezone.utc).isoformat(),
     )
+
+
+@app.get("/market-prices")
+async def get_market_prices():
+    """
+    Fetches current real market prices for all tracked tickers.
+
+    Used by the dashboard demo mode to seed the random walk simulation
+    from accurate real-world baseline prices rather than hardcoded values.
+
+    Primary source: yfinance (Yahoo Finance unofficial API, free, no key needed)
+    Fallback: hardcoded prices updated as of March 13, 2026
+
+    Why this endpoint exists on the backend rather than fetching directly
+    from the frontend: browser CORS restrictions prevent direct calls to
+    Yahoo Finance from client-side JavaScript. The FastAPI backend acts
+    as a proxy, making the request server-side and returning clean JSON.
+
+    Returns:
+        dict: ticker → {price, change_pct} for each tracked ticker
+    """
+    tickers = ["AAPL", "MSFT", "AMZN", "TSLA", "NVDA"]
+
+    try:
+        prices = {}
+        for ticker in tickers:
+            stock = yf.Ticker(ticker)
+            info = stock.fast_info
+
+            last_price = round(float(info.last_price), 2)
+            previous_close = round(float(info.previous_close), 2)
+            change_pct = round(
+                (last_price - previous_close) / previous_close * 100, 2
+            )
+
+            prices[ticker] = {
+                "price": last_price,
+                "change_pct": change_pct,
+                "previous_close": previous_close,
+            }
+
+        return prices
+
+    except Exception:
+        # Fallback hardcoded prices if yfinance is unavailable.
+        # Update these values manually before any live demo or recording.
+        # Last updated: March 13, 2026 — source: Google Finance closing prices
+        return {
+            "AAPL": {"price": 250.12, "change_pct": -2.21, "previous_close": 255.76},
+            "MSFT": {"price": 395.55, "change_pct": -1.84, "previous_close": 402.92},
+            "AMZN": {"price": 207.67, "change_pct": -2.10, "previous_close": 212.13},
+            "TSLA": {"price": 238.45, "change_pct": -3.92, "previous_close": 248.17},
+            "NVDA": {"price": 880.35, "change_pct": -3.44, "previous_close": 911.83},
+        }
+
+
+@app.get("/sentiment/{ticker}")
+@limiter.limit("100/minute")
+async def get_sentiment(request: Request, ticker: str, hours: int = 24):
+    """
+    Returns recent news sentiment analysis for a ticker.
+
+    Includes correlation data showing which articles coincided with
+    unusual volume activity — the core signal of the two-stream join.
+
+    Args:
+        ticker: Stock ticker symbol (AAPL, MSFT, AMZN, TSLA, NVDA)
+        hours:  Lookback window in hours (default 24, max 168)
+
+    Returns:
+        List of SentimentResult objects ordered newest first,
+        with correlation_strength and volume_zscore_at_publish
+        so consumers can filter for high-signal events.
+    """
+    hours = min(hours, 168)  # Cap at 7 days
+
+    try:
+        dynamodb = boto3.resource("dynamodb", region_name=settings.aws.region)
+        table = dynamodb.Table(settings.dynamo.table_sentiment)
+
+        cutoff = (
+            datetime.now(timezone.utc) - timedelta(hours=hours)
+        ).isoformat()
+
+        response = table.query(
+            KeyConditionExpression=Key("ticker").eq(ticker.upper()) & Key("published_at").gt(cutoff),
+            ScanIndexForward=False,  # Newest first
+            Limit=50
+        )
+
+        items = response.get("Items", [])
+
+        return {
+            "ticker":   ticker.upper(),
+            "hours":    hours,
+            "count":    len(items),
+            "items":    items,
+            "summary": {
+                "positive": sum(1 for i in items if i.get("sentiment_label") == "positive"),
+                "negative": sum(1 for i in items if i.get("sentiment_label") == "negative"),
+                "neutral":  sum(1 for i in items if i.get("sentiment_label") == "neutral"),
+                "strong_correlations": sum(1 for i in items if i.get("correlation_strength") == "strong"),
+            }
+        }
+
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def main() -> None:

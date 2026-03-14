@@ -1,4 +1,4 @@
-# MarketFlow Benchmarks
+# TradePulse Benchmarks
 
 ## Methodology
 
@@ -23,7 +23,7 @@
 
 ## How to Reproduce
 
-1. Set up MarketFlow with Kafka, DynamoDB, and Faust worker.
+1. Set up TradePulse with Kafka, DynamoDB, and Faust worker.
 2. Run load script (example):
    ```bash
    python scripts/load_test.py --duration 600 --tickers AAPL,GOOGL,MSFT,AMZN,TSLA --rate 15000

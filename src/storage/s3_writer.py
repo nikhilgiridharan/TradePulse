@@ -1,5 +1,5 @@
 """
-Buffered S3 Parquet writer for MarketFlow.
+Buffered S3 Parquet writer for TradePulse.
 
 Buffers events in memory and flushes to S3 as Parquet (Snappy) to reduce PUT
 cost and storage size. Flush triggers: buffer age > S3_BUFFER_FLUSH_INTERVAL_SECONDS
@@ -156,7 +156,7 @@ class S3Writer:
             import boto3
             glue = boto3.client("glue", region_name=self._settings.aws.region)
             # Assume table name matches bucket/prefix convention
-            db = "marketflow"
+            db = "tradepulse"
             table = "trades"
             location = f"s3://{self._settings.s3.bucket_name}/{self._settings.s3.prefix_trades}/"
             glue.batch_create_partition(

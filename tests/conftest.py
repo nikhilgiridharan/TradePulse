@@ -1,5 +1,5 @@
 """
-Shared test fixtures for MarketFlow.
+Shared test fixtures for TradePulse.
 
 Uses moto to mock AWS (DynamoDB, S3, SQS) so tests run without real AWS calls —
 no cost, deterministic, and safe for CI. mock_settings provides test config;
@@ -31,12 +31,12 @@ def mock_settings():
         settings.dynamo.table_aggregations = "test_market_aggregations"
         settings.dynamo.table_anomalies = "test_market_anomalies"
         settings.dynamo.table_features = "test_feature_store"
-        settings.s3.bucket_name = "test-marketflow-data"
+        settings.s3.bucket_name = "test-tradepulse-data"
         settings.s3.prefix_dead_letters = "dead-letters"
         settings.sqs.dlq_url = "https://sqs.us-east-1.amazonaws.com/123456789/test-dlq"
         settings.sqs.validation_dlq_url = "https://sqs.us-east-1.amazonaws.com/123456789/test-validation-dlq"
         settings.cloudwatch_enabled = False
-        settings.cloudwatch_namespace = "MarketFlow/Test"
+        settings.cloudwatch_namespace = "TradePulse/Test"
         settings.pipeline.dlq_max_retries = 3
         settings.pipeline.backpressure_latency_threshold_ms = 100
         settings.pipeline.backpressure_pause_ms = 500
@@ -76,7 +76,7 @@ def mock_s3():
     with mock_aws():
         import boto3
         client = boto3.client("s3", region_name="us-east-1")
-        client.create_bucket(Bucket="test-marketflow-data")
+        client.create_bucket(Bucket="test-tradepulse-data")
         yield client
 
 

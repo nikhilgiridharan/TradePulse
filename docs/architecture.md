@@ -1,8 +1,8 @@
-# MarketFlow Architecture
+# TradePulse Architecture
 
 ## Overview
 
-MarketFlow is a real-time market data pipeline that ingests trades and quotes from Polygon.io, processes them with Faust, and stores results in DynamoDB and S3. The API layer serves live quotes, aggregations, anomalies, and feature vectors.
+TradePulse is a real-time market data pipeline that ingests trades and quotes from Polygon.io, processes them with Faust, and stores results in DynamoDB and S3. The API layer serves live quotes, aggregations, anomalies, and feature vectors.
 
 ## Data Flow
 

@@ -1,4 +1,4 @@
-# MarketFlow Application Image
+# TradePulse Application Image
 # =============================
 # Multi-stage not required for Python; single stage with slim base.
 # Uses python:3.11-slim for smaller image and security updates.

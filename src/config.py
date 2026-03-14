@@ -1,5 +1,5 @@
 """
-Centralized configuration for MarketFlow pipeline.
+Centralized configuration for TradePulse pipeline.
 
 This module is the single source of truth for all configuration. Loading from
 environment variables (and .env) with validation at startup ensures we fail fast
@@ -28,6 +28,7 @@ class KafkaConfig(BaseSettings):
     topic_dlq: str = Field(default="market.trades.dlq", alias="topic_dlq")
     topic_aggregations: str = Field(default="market.aggregations", alias="topic_aggregations")
     topic_anomalies: str = Field(default="market.anomalies", alias="topic_anomalies")
+    topic_news: str = Field(default="market.news", env="KAFKA_TOPIC_NEWS")
 
 
 class AWSConfig(BaseSettings):
@@ -49,6 +50,7 @@ class DynamoConfig(BaseSettings):
     table_aggregations: str = Field(default="market_aggregations", alias="table_aggregations")
     table_anomalies: str = Field(default="market_anomalies", alias="table_anomalies")
     table_features: str = Field(default="feature_store", alias="table_features")
+    table_sentiment: str = Field(default="market_sentiment", env="DYNAMO_TABLE_SENTIMENT")
 
 
 class S3Config(BaseSettings):
@@ -131,6 +133,7 @@ class PipelineConfig(BaseSettings):
         alias="ANOMALY_RETRAIN_INTERVAL",
         description="Retrain after this many new events",
     )
+    finnhub_api_key: str = Field(default="", env="FINNHUB_API_KEY")
 
 
 class Settings(BaseSettings):
@@ -148,7 +151,7 @@ class Settings(BaseSettings):
 
     polygon_api_key: str = Field(..., alias="POLYGON_API_KEY")
     tickers: str = Field(default="AAPL,GOOGL,MSFT,AMZN,TSLA", description="Comma-separated symbols")
-    cloudwatch_namespace: str = Field(default="MarketFlow/Production", alias="CLOUDWATCH_NAMESPACE")
+    cloudwatch_namespace: str = Field(default="TradePulse/Production", alias="CLOUDWATCH_NAMESPACE")
     cloudwatch_enabled: bool = Field(default=True, alias="CLOUDWATCH_ENABLED")
 
     kafka: KafkaConfig = Field(default_factory=KafkaConfig)
