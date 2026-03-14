@@ -236,7 +236,7 @@
       gap: 16px;
       margin-top: 16px;
     }
-    .overview-widget {
+    .overview-widget, .overview-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: 12px;
@@ -556,7 +556,7 @@
             </g>
             <!-- Join annotation -->
             <line class="join-line" x1="476" y1="68" x2="476" y2="232"/>
-            <text x="476" y="152" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="middle">60s join</text>
+            <text x="476" y="152" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="middle">60s temporal join</text>
             <!-- News stream -->
             <g class="news-stream">
               <rect class="pipeline-box news" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
@@ -580,18 +580,18 @@
           </div>
         </div>
         <div class="overview-bottom-row">
-          <div class="overview-widget">
-            <h4>Recent Anomalies <a href="#" class="overview-all-link" data-section="anomalies" style="color:var(--accent-primary);font-weight:400;">All →</a></h4>
-            <div class="anomaly-preview-row">⚠ TSLA &nbsp; score: <span class="score">-0.847</span> &nbsp; 14:31:47<br/><span class="muted">volume z-score: +4.1 · strong signal</span></div>
-            <div class="anomaly-preview-row">⚠ NVDA &nbsp; score: <span class="score">-0.731</span> &nbsp; 13:58:22<br/><span class="muted">volume z-score: +3.8 · strong signal</span></div>
-            <div class="anomaly-preview-row">⚠ AAPL &nbsp; score: <span class="score">-0.612</span> &nbsp; 13:22:09<br/><span class="muted">volume z-score: +3.4 · moderate</span></div>
+          <div class="overview-card">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-weight:600; color:var(--text-primary);">Recent Anomalies</span>
+              <span onclick="showSection('anomalies')" style="color:var(--accent-primary); font-size:12px; cursor:pointer;">All →</span>
+            </div>
+            <div id="overview-anomalies-list"></div>
           </div>
-          <div class="overview-widget">
-            <h4>System Health</h4>
-            <div class="health-row"><div><span class="health-dot"></span>Kafka<br/><span class="muted">6 partitions</span></div><div class="value" id="health-kafka">● Healthy<br/>Lag: <span id="health-kafka-lag">42</span> msgs</div></div>
-            <div class="health-row"><div><span class="health-dot"></span>DynamoDB<br/><span class="muted">4 tables</span></div><div class="value" id="health-dynamo">● Healthy<br/>p99: <span id="health-dynamo-p99">18</span>ms</div></div>
-            <div class="health-row"><div><span class="health-dot"></span>DLQ<br/><span class="muted">2 queues</span></div><div class="value" id="health-dlq">● Empty<br/>Depth: <span id="health-dlq-depth">0</span></div></div>
-            <div class="health-row"><div><span class="health-dot"></span>S3<br/><span class="muted">Cold storage</span></div><div class="value" id="health-s3">● Healthy<br/>Last flush: <span id="health-s3-flush">3m</span> ago</div></div>
+          <div class="overview-card">
+            <div style="font-weight:600; color:var(--text-primary); margin-bottom:12px;">System Health</div>
+            <table style="width:100%; border-collapse:collapse;">
+              <tbody id="system-health-rows"></tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -651,8 +651,11 @@
           </div>
           <div class="live-panel">
             <h4>Feature Vector</h4>
-            <div style="font-size:12px;margin-bottom:4px;">trade_frequency <span class="font-mono" id="feat-freq">47/min</span></div>
+            <div style="font-size:12px;margin-bottom:4px;">vwap_5min <span class="font-mono" id="feat-vwap5">$249.31</span></div>
+            <div style="font-size:12px;margin-bottom:4px;">volume_zscore <span class="font-mono" id="feat-zscore">+1.84</span></div>
             <div style="font-size:12px;margin-bottom:4px;">price_momentum <span class="font-mono" id="feat-mom">+0.18%</span></div>
+            <div style="font-size:12px;margin-bottom:4px;">trade_frequency <span class="font-mono" id="feat-freq">47/min</span></div>
+            <div style="font-size:12px;margin-bottom:4px;">bid_ask_spread <span class="font-mono" id="feat-spread">$0.02</span></div>
             <div style="font-size:12px;">updated_at <span class="font-mono" id="feat-updated">14:32:01</span></div>
           </div>
           <div class="data-panel" id="sentiment-panel">
@@ -683,7 +686,7 @@
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Dead Letter Q</div><div class="detail">Depth: 0 · Retries: 0</div></div>
         </div>
         <div class="pipeline-diagram"><h4 style="margin-bottom:8px;">Throughput (last 10 min)</h4><canvas id="throughput-chart" width="800" height="120"></canvas></div>
-        <div class="pipeline-diagram" style="text-align:center;"><h4 style="margin-bottom:8px;">Consumer Lag</h4><div class="lag-gauge"><canvas id="lag-gauge" width="120" height="120"></canvas><div class="value font-mono" id="lag-value">42</div></div></div>
+        <div class="pipeline-diagram" style="text-align:center;"><h4 style="margin-bottom:8px;">Consumer Lag</h4><div style="display:flex; justify-content:center; align-items:center; padding: 16px 0;"><canvas id="lag-gauge-canvas" style="width:220px; height:220px;"></canvas></div></div>
       </section>
 
       <section id="section-anomalies" class="section">
@@ -728,11 +731,18 @@
     };
     // Demo mode aggregations (VWAP, rolling avg) per ticker — realistic ranges.
     const DEMO_AGG = {
-      'AAPL': { vwap_1min: 249.84, vwap_5min: 249.31, rolling_avg: 249.67, volume_zscore: 1.84, price_momentum: 0.18 },
-      'MSFT': { vwap_1min: 395.21, vwap_5min: 394.87, rolling_avg: 395.09, volume_zscore: 1.84, price_momentum: 0.18 },
-      'AMZN': { vwap_1min: 207.43, vwap_5min: 207.18, rolling_avg: 207.31, volume_zscore: 1.84, price_momentum: 0.18 },
-      'TSLA': { vwap_1min: 238.12, vwap_5min: 237.89, rolling_avg: 238.01, volume_zscore: 1.84, price_momentum: 0.18 },
-      'NVDA': { vwap_1min: 879.82, vwap_5min: 879.21, rolling_avg: 879.54, volume_zscore: 1.84, price_momentum: 0.18 }
+      'AAPL': { vwap_1min: 249.84, vwap_5min: 249.31, rolling_avg: 249.67, volume_zscore: 1.84, price_momentum: 0.18, bid_ask_spread: 0.02 },
+      'MSFT': { vwap_1min: 395.21, vwap_5min: 394.87, rolling_avg: 395.09, volume_zscore: 1.42, price_momentum: 0.18, bid_ask_spread: 0.03 },
+      'AMZN': { vwap_1min: 207.43, vwap_5min: 207.18, rolling_avg: 207.31, volume_zscore: 1.67, price_momentum: 0.18, bid_ask_spread: 0.02 },
+      'TSLA': { vwap_1min: 238.12, vwap_5min: 237.89, rolling_avg: 238.01, volume_zscore: 2.89, price_momentum: 0.18, bid_ask_spread: 0.04 },
+      'NVDA': { vwap_1min: 879.82, vwap_5min: 879.21, rolling_avg: 879.54, volume_zscore: 2.31, price_momentum: 0.18, bid_ask_spread: 0.05 }
+    };
+    const DEMO_FEATURES = {
+      'AAPL': { vwap_5min: 249.31, volume_zscore: 1.84, bid_ask_spread: 0.02 },
+      'MSFT': { vwap_5min: 394.87, volume_zscore: 1.42, bid_ask_spread: 0.03 },
+      'AMZN': { vwap_5min: 207.18, volume_zscore: 1.67, bid_ask_spread: 0.02 },
+      'TSLA': { vwap_5min: 237.89, volume_zscore: 2.89, bid_ask_spread: 0.04 },
+      'NVDA': { vwap_5min: 879.21, volume_zscore: 2.31, bid_ask_spread: 0.05 }
     };
     // Demo mode fallback sentiment data.
     // Displayed when the Finnhub news pipeline is not running or returns
@@ -916,6 +926,30 @@
         x: pad + plotW * (i / (priceArray.length - 1 || 1)),
         y: h - pad - ((p - yMin) / yRange) * plotH
       }));
+      const chartTop = pad;
+      const chartBottom = h - pad;
+      const firstX = pts[0].x;
+      const lastX = pts[pts.length - 1].x;
+      // Build path for fill (fill before stroke so line stays sharp on top)
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const prev = pts[i - 1];
+        const curr = pts[i];
+        const cpx = (prev.x + curr.x) / 2;
+        const cpy = (prev.y + curr.y) / 2;
+        ctx.quadraticCurveTo(cpx, cpy, curr.x, curr.y);
+      }
+      ctx.lineTo(lastX, chartBottom);
+      ctx.lineTo(firstX, chartBottom);
+      ctx.closePath();
+      const fillGradient = ctx.createLinearGradient(0, chartTop, 0, chartBottom);
+      fillGradient.addColorStop(0, 'rgba(0, 212, 255, 0.12)');
+      fillGradient.addColorStop(0.5, 'rgba(0, 212, 255, 0.04)');
+      fillGradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+      ctx.fillStyle = fillGradient;
+      ctx.fill();
+      // Redraw the line on top of the fill
       ctx.strokeStyle = color || '#00d4ff';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -928,28 +962,155 @@
         ctx.quadraticCurveTo(cpx, cpy, curr.x, curr.y);
       }
       ctx.stroke();
-      // Gradient fill
-      const gradient = ctx.createLinearGradient(0, 0, 0, h);
-      gradient.addColorStop(0, 'rgba(0, 212, 255, 0.15)');
-      gradient.addColorStop(0.6, 'rgba(0, 212, 255, 0.05)');
-      gradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) {
-        const prev = pts[i - 1];
-        const curr = pts[i];
-        const cpx = (prev.x + curr.x) / 2;
-        const cpy = (prev.y + curr.y) / 2;
-        ctx.quadraticCurveTo(cpx, cpy, curr.x, curr.y);
-      }
-      ctx.lineTo(pts[pts.length - 1].x, h - pad);
-      ctx.lineTo(pts[0].x, h - pad);
-      ctx.closePath();
-      ctx.fillStyle = gradient;
-      ctx.fill();
       // Price range label
       const rangeEl = document.getElementById('sparkline-range');
       if (rangeEl) rangeEl.textContent = '$' + min.toFixed(2) + ' — $' + max.toFixed(2);
+    }
+
+    function drawThroughputChart() {
+      const canvas = document.getElementById('throughput-chart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      const padding = { top: 16, right: 16, bottom: 24, left: 48 };
+      if (!window.throughputHistory) {
+        window.throughputHistory = Array.from({ length: 20 }, (_, i) => {
+          const base = 14800;
+          const variance = (Math.random() - 0.5) * 2000;
+          const spike = i === 3 ? 8000 : 0;
+          return Math.max(10000, base + variance + spike);
+        });
+      }
+      const data = window.throughputHistory;
+      const maxVal = Math.max(...data) * 1.1;
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+      const barWidth = (chartWidth / data.length) * 0.7;
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.lineWidth = 0.5;
+      [0.25, 0.5, 0.75, 1].forEach(ratio => {
+        const y = padding.top + chartHeight * (1 - ratio);
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.round(maxVal * ratio / 1000) + 'k', padding.left - 6, y + 4);
+      });
+      data.forEach((value, i) => {
+        const x = padding.left + i * (chartWidth / data.length);
+        const barHeight = (value / maxVal) * chartHeight;
+        const y = padding.top + chartHeight - barHeight;
+        const isPeak = value === Math.max(...data);
+        const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
+        if (isPeak) {
+          grad.addColorStop(0, 'rgba(0, 212, 255, 0.9)');
+          grad.addColorStop(1, 'rgba(0, 212, 255, 0.4)');
+        } else {
+          grad.addColorStop(0, 'rgba(0, 212, 255, 0.6)');
+          grad.addColorStop(1, 'rgba(0, 212, 255, 0.2)');
+        }
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, barWidth, barHeight, 2);
+        else ctx.rect(x, y, barWidth, barHeight);
+        ctx.fill();
+      });
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'center';
+      [0, 4, 9, 14, 19].forEach(i => {
+        const minutesAgo = Math.round((19 - i) * 0.5);
+        const label = minutesAgo === 0 ? 'now' : '-' + minutesAgo + 'm';
+        const x = padding.left + i * (chartWidth / data.length) + barWidth / 2;
+        ctx.fillText(label, x, height - 6);
+      });
+    }
+
+    function updateThroughputHistory() {
+      if (!window.throughputHistory) return;
+      window.throughputHistory.shift();
+      const last = window.throughputHistory[window.throughputHistory.length - 1];
+      const newVal = Math.max(10000, last + (Math.random() - 0.48) * 800);
+      window.throughputHistory.push(Math.round(newVal));
+      drawThroughputChart();
+    }
+
+    function drawLagGauge() {
+      const canvas = document.getElementById('lag-gauge-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      const cx = width / 2;
+      const cy = height / 2 + 10;
+      const radius = Math.min(width, height) * 0.35;
+      const lagValue = window.demoConsumerLag || 42;
+      let gaugeColor;
+      if (lagValue <= 1000) gaugeColor = '#10b981';
+      else if (lagValue <= 5000) gaugeColor = '#f59e0b';
+      else gaugeColor = '#ef4444';
+      const maxLag = 10000;
+      const fillRatio = Math.min(lagValue / maxLag, 1);
+      const startAngle = (225 * Math.PI) / 180;
+      const totalSweep = (270 * Math.PI) / 180;
+      const endAngle = startAngle + totalSweep * fillRatio;
+      ctx.clearRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, startAngle, startAngle + totalSweep);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 12;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      if (fillRatio > 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, startAngle, endAngle);
+        ctx.strokeStyle = gaugeColor;
+        ctx.lineWidth = 12;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = gaugeColor;
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+      ctx.fillStyle = '#f1f5f9';
+      ctx.font = 'bold ' + Math.round(radius * 0.5) + 'px JetBrains Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(lagValue.toLocaleString(), cx, cy - 4);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '12px Inter';
+      ctx.fillText('messages', cx, cy + radius * 0.4);
+      const statusLabel = lagValue <= 1000 ? '✓ normal' : lagValue <= 5000 ? '⚠ elevated' : '✗ critical';
+      ctx.fillStyle = gaugeColor;
+      ctx.font = '11px Inter';
+      ctx.fillText(statusLabel, cx, cy + radius * 0.65);
+      [0, 0.25, 0.5, 0.75, 1].forEach(ratio => {
+        const angle = startAngle + totalSweep * ratio;
+        const markerRadius = radius + 18;
+        const x = cx + Math.cos(angle) * markerRadius;
+        const y = cy + Math.sin(angle) * markerRadius;
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+        ctx.font = '9px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(Math.round(maxLag * ratio / 1000) + 'k', x, y);
+      });
+    }
+
+    function updateLagGauge() {
+      window.demoConsumerLag = Math.max(10, Math.round(window.demoConsumerLag + (Math.random() - 0.48) * 15));
+      drawLagGauge();
     }
 
     function flashPrice(el, direction) {
@@ -1032,6 +1193,20 @@
         if (zs) zs.textContent = (agg.volume_zscore != null ? (agg.volume_zscore >= 0 ? '+' : '') + agg.volume_zscore : '—');
         if (mom) mom.textContent = (agg.price_momentum != null ? (agg.price_momentum >= 0 ? '+' : '') + agg.price_momentum + '%' : '—');
       }
+      const feat = DEMO_FEATURES[t] || DEMO_FEATURES['AAPL'];
+      const agg2 = state.metrics.agg;
+      const fv5 = document.getElementById('feat-vwap5');
+      const fz = document.getElementById('feat-zscore');
+      const fsp = document.getElementById('feat-spread');
+      if (fv5) fv5.textContent = '$' + (agg2 && agg2.vwap_5min != null ? agg2.vwap_5min : feat.vwap_5min);
+      if (fz) fz.textContent = (agg2 && agg2.volume_zscore != null ? (agg2.volume_zscore >= 0 ? '+' : '') + agg2.volume_zscore : (feat.volume_zscore >= 0 ? '+' : '') + feat.volume_zscore);
+      if (fsp) fsp.textContent = '$' + (feat.bid_ask_spread != null ? feat.bid_ask_spread.toFixed(2) : '0.02');
+      const fm = document.getElementById('feat-mom');
+      const ff = document.getElementById('feat-freq');
+      if (fm && agg2) fm.textContent = (agg2.price_momentum != null ? (agg2.price_momentum >= 0 ? '+' : '') + agg2.price_momentum + '%' : '+0.18%');
+      if (ff) ff.textContent = '47/min';
+      const fu = document.getElementById('feat-updated');
+      if (fu) fu.textContent = new Date().toTimeString().slice(0, 8);
       if (!state.priceHistory[t]) state.priceHistory[t] = [];
       state.priceHistory[t].push(price || prev);
       if (state.priceHistory[t].length > 60) state.priceHistory[t].shift();
@@ -1193,6 +1368,79 @@
       `).join('');
     }
 
+    function showSection(section) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const navItem = document.querySelector('.nav-item[data-section="' + section + '"]');
+      if (navItem) navItem.classList.add('active');
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const sectionEl = document.getElementById('section-' + section);
+      if (sectionEl) sectionEl.classList.add('active');
+      state.activeSection = section;
+    }
+
+    function populateOverviewAnomalies() {
+      const container = document.getElementById('overview-anomalies-list');
+      if (!container) return;
+      const anomalies = [
+        { ticker: 'TSLA', score: -0.847, time: '14:31:47', zscore: 4.1, strength: 'strong' },
+        { ticker: 'NVDA', score: -0.731, time: '13:58:22', zscore: 3.8, strength: 'strong' },
+        { ticker: 'AAPL', score: -0.612, time: '13:22:09', zscore: 3.4, strength: 'moderate' },
+      ];
+      container.innerHTML = anomalies.map(a => `
+        <div style="
+          border-left: 2px solid rgba(239, 68, 68, 0.5);
+          padding: 8px 12px;
+          margin-bottom: 8px;
+          background: rgba(239, 68, 68, 0.04);
+          border-radius: 0 6px 6px 0;
+        ">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--accent-red); font-weight:600; font-size:13px;">⚠ ${a.ticker}</span>
+            <span style="color:var(--text-secondary); font-size:11px; font-family:'JetBrains Mono',monospace;">${a.time}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:4px;">
+            <span style="color:var(--text-secondary); font-size:12px; font-family:'JetBrains Mono',monospace;">score: ${a.score}</span>
+            <span style="color:${a.strength === 'strong' ? 'var(--accent-red)' : 'var(--accent-yellow)'}; font-size:11px;">
+              z-score: +${a.zscore} · ${a.strength}
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function populateSystemHealth() {
+      const tbody = document.getElementById('system-health-rows');
+      if (!tbody) return;
+      const lag = (typeof window.demoConsumerLag !== 'undefined' ? window.demoConsumerLag : 42);
+      const components = [
+        { name: 'Kafka', detail: '6 partitions', status: 'Healthy', metric: 'Lag: ' + lag + ' msgs' },
+        { name: 'DynamoDB', detail: '4 tables', status: 'Healthy', metric: 'p99: 18ms' },
+        { name: 'DLQ', detail: '2 queues', status: 'Empty', metric: 'Depth: 0' },
+        { name: 'S3', detail: 'Cold storage', status: 'Healthy', metric: 'Last flush: 3m' },
+      ];
+      tbody.innerHTML = components.map(c => `
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 10px 0;">
+            <div style="color:var(--text-primary); font-size:13px; font-weight:500;">${c.name}</div>
+            <div style="color:var(--text-secondary); font-size:11px;">${c.detail}</div>
+          </td>
+          <td style="padding: 10px 0; text-align:right;">
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+              <span style="
+                width:7px; height:7px; border-radius:50%;
+                background:#10b981;
+                box-shadow: 0 0 6px #10b981;
+                display:inline-block;
+                animation: pulse 2s infinite;
+              "></span>
+              <span style="color:#10b981; font-size:12px;">${c.status}</span>
+            </div>
+            <div style="color:var(--text-secondary); font-size:11px; font-family:'JetBrains Mono',monospace; margin-top:2px;">${c.metric}</div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', (e) => {
         const section = el.getAttribute('data-section');
@@ -1256,19 +1504,16 @@
     // (same pattern as other panels — don't wait for first 30s interval)
     pollSentiment(state.activeTicker);
     setInterval(() => { if (state.activeSection === 'pipeline') poll(); }, 30000);
-    // System Health widget: simulated variation every 10s
-    function updateHealthWidget() {
-      const lagEl = document.getElementById('health-kafka-lag');
-      const p99El = document.getElementById('health-dynamo-p99');
-      const depthEl = document.getElementById('health-dlq-depth');
-      const flushEl = document.getElementById('health-s3-flush');
-      if (lagEl) lagEl.textContent = Math.max(0, 42 + Math.floor((Math.random() - 0.5) * 20));
-      if (p99El) p99El.textContent = Math.max(12, 18 + Math.floor((Math.random() - 0.5) * 12));
-      if (depthEl) depthEl.textContent = '0';
-      if (flushEl) flushEl.textContent = (2 + Math.floor(Math.random() * 4)) + 'm';
-    }
-    updateHealthWidget();
-    setInterval(updateHealthWidget, 10000);
+    populateOverviewAnomalies();
+    populateSystemHealth();
+    setInterval(populateSystemHealth, 10000);
+    drawThroughputChart();
+    setInterval(updateThroughputHistory, 30000);
+    window.addEventListener('resize', drawThroughputChart);
+    if (typeof window.demoConsumerLag === 'undefined') window.demoConsumerLag = 42;
+    drawLagGauge();
+    setInterval(updateLagGauge, 10000);
+    window.addEventListener('resize', drawLagGauge);
   </script>
 </body>
 </html>
