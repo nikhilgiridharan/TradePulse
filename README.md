@@ -8,6 +8,12 @@
 
 Real-time market data pipeline processing 15,000+ events/second with sub-100ms end-to-end latency, built with Apache Kafka, Faust stream processing, and AWS.
 
+## 🌐 Live Demo
+
+**[tradepulse.dev](https://tradepulse.dev)** — Live dashboard (demo mode)  
+**[Demo Video](#)** — Full pipeline walkthrough (YouTube — add link after recording)  
+**[Architecture Article](#)** — Deep dive on Medium (add link after publishing)
+
 ## Dashboard Preview
 
 The **TradePulse Dashboard** is a custom fintech-style UI served at the API root. It includes:
@@ -94,33 +100,33 @@ Consider Apache Flink for processing; Redshift or similar for analytics; multi-r
 
 ## Getting Started
 
-### Prerequisites
+### Option A — View the live demo (no setup required)
+
+Visit **[tradepulse.dev](https://tradepulse.dev)** to see the dashboard running in demo mode with simulated market data.
+
+### Option B — Run the full pipeline locally
+
+**Prerequisites:**
 
 - Docker and Docker Compose
-- Polygon.io API key (free tier works)
-- AWS account with DynamoDB, S3, SQS access
-
-### Quick Start
+- Polygon.io API key (free tier)
+- Finnhub API key (free tier)
+- AWS account (DynamoDB, S3, SQS)
 
 ```bash
 git clone https://github.com/nikhilgiridharan/TradePulse
 cd TradePulse
 cp .env.example .env
-# Edit .env with your Polygon API key and AWS credentials
+# Edit .env with your API keys and AWS credentials
 make up
-# Dashboard at http://localhost:8000 — API at http://localhost:8000/openapi.json
+# Full pipeline available at http://localhost:8000
 ```
 
-**Run API standalone (no Docker) for frontend testing:**
-
-```bash
-uvicorn src.api.main:app --reload --port 8000
-```
-
-Then open http://localhost:8000 for the dashboard. When the pipeline is not running, the dashboard runs in **demo mode** with simulated data.
+The full pipeline runs: Kafka · Zookeeper · Polygon.io producer · Finnhub news producer · Faust stream processor · FastAPI dashboard
 
 ## Documentation
 
+- [Deployment](docs/deployment.md)
 - [Architecture](docs/architecture.md)
 - [Database Schema](docs/schema.md)
 - [Benchmarks](docs/benchmarks.md)

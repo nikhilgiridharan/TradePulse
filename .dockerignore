@@ -1,0 +1,54 @@
+# .dockerignore
+# Files excluded from the Docker build context
+# Keeping the build context small speeds up deployment
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+dist
+build
+.eggs
+
+# Virtual environments
+venv
+.venv
+env
+.env.local
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+pytest-results.xml
+
+# Development tools
+.mypy_cache
+.flake8
+
+# Documentation (not needed in container)
+docs/
+
+# Local environment file — never include secrets in Docker image
+# Environment variables are injected by Railway at runtime
+.env
+
+# Node (if any frontend tooling exists)
+node_modules
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo

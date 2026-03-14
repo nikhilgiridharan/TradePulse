@@ -473,7 +473,39 @@
   </style>
 </head>
 <body>
-  <div id="demo-banner" class="demo-banner" style="display:none;">DEMO MODE — Simulated data (API offline or demo enabled)</div>
+  <!-- Demo mode banner — shown when DEMO_MODE is active -->
+  <!-- Transparent and professional — tells visitors this is a portfolio demo -->
+  <div id="demo-banner" style="
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.15), rgba(0, 212, 255, 0.15));
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+  ">
+    <span>
+      <span style="color: var(--accent-primary);">◉ DEMO MODE</span>
+      &nbsp;·&nbsp; Simulated market data &nbsp;·&nbsp;
+      Full pipeline runs locally via <code style="color:var(--accent-primary);">make up</code>
+    </span>
+    <span style="display:flex; gap:16px; align-items:center;">
+      <a href="https://github.com/nikhilgiridharan/TradePulse"
+         target="_blank"
+         rel="noopener noreferrer"
+         style="color:var(--accent-primary); text-decoration:none;">
+        View Source →
+      </a>
+      <a href="#"
+         id="medium-article-link"
+         target="_blank"
+         rel="noopener noreferrer"
+         style="color:var(--accent-primary); text-decoration:none;">
+        Read Architecture Article →
+      </a>
+    </span>
+  </div>
   <header class="header">
     <div class="header-left">
       <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 13v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 9V7h2v2H3zm4 0V7h2v2H7zm4 0V7h2v2h-2zm4 0V7h2v2h-2zm4 0V7h2v2h-2zM3 5V3h2v2H3zm4 0V3h2v2H7zm4 0V3h2v2h-2zm4 0V3h2v2h-2zm4 0V3h2v2h-2z"/></svg></div>
@@ -486,7 +518,7 @@
       <div class="stat-pill green" id="stat-status">✓ <span id="stat-status-val">All Systems Operational</span></div>
     </div>
     <div class="header-right">
-      <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+      <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
       <a href="/openapi.json" target="_blank" class="btn btn-primary">View OpenAPI Spec</a>
     </div>
   </header>
@@ -717,8 +749,18 @@
   </div>
 
   <script>
+    // Detect if running on Railway (production) vs localhost (development)
+    // Used to show/hide demo banner and adjust API base URL if needed
+    const IS_PRODUCTION = window.location.hostname !== 'localhost' &&
+                          window.location.hostname !== '127.0.0.1';
+
+    const API_BASE = ''; // Same origin — FastAPI serves both API and static files
+
+    // Log environment for debugging
+    console.log('[TradePulse] Environment: ' + (IS_PRODUCTION ? 'production (Railway)' : 'local'));
+    console.log('[TradePulse] API base: ' + (API_BASE || 'same origin'));
+
     const DEMO_MODE = true;
-    const API_BASE = '';
     // Hardcoded fallback prices — used only if /market-prices API call fails.
     // Update these before any live demo or screen recording.
     // Last updated: March 13, 2026
@@ -1491,7 +1533,7 @@
       if (e.target.classList.contains('try-btn')) openTryPanel(e.target.getAttribute('data-path'));
     });
 
-    if (DEMO_MODE) document.getElementById('demo-banner').style.display = 'block';
+    if (DEMO_MODE && document.getElementById('demo-banner')) document.getElementById('demo-banner').style.display = 'flex';
     // Call fetchRealBasePrices before starting the simulation
     // so the random walk begins from accurate real market prices
     (async function () {
