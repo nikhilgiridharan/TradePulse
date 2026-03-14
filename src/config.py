@@ -19,7 +19,7 @@ class KafkaConfig(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="KAFKA_", extra="ignore")
 
-    bootstrap_servers: str = Field(..., description="Broker list, e.g. localhost:9092")
+    bootstrap_servers: str = Field(default="localhost:9092", description="Broker list, e.g. localhost:9092")
     security_protocol: str = Field(default="PLAINTEXT", description="PLAINTEXT or SASL_SSL")
     sasl_mechanism: Optional[str] = Field(default=None, description="PLAIN or SCRAM-SHA-256")
     sasl_username: Optional[str] = Field(default=None)
@@ -69,8 +69,8 @@ class SQSConfig(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="SQS_", extra="ignore")
 
-    dlq_url: str = Field(..., description="Main DLQ for processing failures")
-    validation_dlq_url: str = Field(..., description="DLQ for validation failures only")
+    dlq_url: str = Field(default="", description="Main DLQ for processing failures")
+    validation_dlq_url: str = Field(default="", description="DLQ for validation failures only")
 
 
 class APIConfig(BaseSettings):
@@ -149,10 +149,10 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
     )
 
-    polygon_api_key: str = Field(..., alias="POLYGON_API_KEY")
+    polygon_api_key: str = Field(default="", alias="POLYGON_API_KEY")
     tickers: str = Field(default="AAPL,GOOGL,MSFT,AMZN,TSLA", description="Comma-separated symbols")
     cloudwatch_namespace: str = Field(default="TradePulse/Production", alias="CLOUDWATCH_NAMESPACE")
-    cloudwatch_enabled: bool = Field(default=True, alias="CLOUDWATCH_ENABLED")
+    cloudwatch_enabled: bool = Field(default=False, alias="CLOUDWATCH_ENABLED")
 
     kafka: KafkaConfig = Field(default_factory=KafkaConfig)
     aws: AWSConfig = Field(default_factory=AWSConfig)
