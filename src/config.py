@@ -58,7 +58,7 @@ class S3Config(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="S3_", extra="ignore")
 
-    bucket_name: str = Field(..., description="Bucket for trades, anomalies, dead-letters")
+    bucket_name: str = Field(default="", description="Bucket for trades, anomalies, dead-letters")
     prefix_trades: str = Field(default="trades", alias="prefix_trades")
     prefix_anomalies: str = Field(default="anomalies", alias="prefix_anomalies")
     prefix_dead_letters: str = Field(default="dead-letters", alias="prefix_dead_letters")

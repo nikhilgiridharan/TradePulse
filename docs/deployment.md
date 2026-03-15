@@ -22,12 +22,22 @@ railway up
 
 3. Set environment variables in Railway dashboard:
 
-   - `DEMO_MODE=true`
-   - `AWS_REGION=us-east-1`
-   - `AWS_ACCESS_KEY_ID=your_key` (read-only IAM user recommended)
-   - `AWS_SECRET_ACCESS_KEY=your_key`
-   - `POLYGON_API_KEY=your_key`
-   - `FINNHUB_API_KEY=your_key`
+## Critical: Set these Railway variables BEFORE deploying
+
+The following variables must be set in Railway dashboard → Variables before the first successful deployment:
+
+```
+DEMO_MODE=true          ← Set this first — enables standalone mode
+
+# Optional but recommended:
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_key
+POLYGON_API_KEY=your_key
+FINNHUB_API_KEY=your_key
+```
+
+Without `DEMO_MODE=true`, the app attempts to connect to Kafka and AWS on startup, which will cause the healthcheck to timeout if those services are not reachable from Railway.
 
 4. Generate domain: Railway dashboard → your service → Settings → Domains
 
