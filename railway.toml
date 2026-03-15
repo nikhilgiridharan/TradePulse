@@ -1,17 +1,9 @@
-# railway.toml
-# Railway deployment configuration for TradePulse
-# This file tells Railway how to build and run the application
-# Only the FastAPI service is deployed to Railway — Kafka, Faust,
-# and the producer services run locally for the full pipeline demo.
-# The public URL always serves demo mode for cost efficiency.
-
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
-healthcheckTimeout = 60
+healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

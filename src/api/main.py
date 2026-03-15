@@ -3,42 +3,29 @@
 Serves custom dashboard at / and GET /quotes/{ticker}, /aggregations/{ticker},
 /anomalies/{ticker}, /features/{ticker}, /health. OpenAPI spec at /openapi.json.
 """
-from __future__ import annotations
-
 import os
-import time
+import random
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
-from typing import Any, Optional
 
-# Load .env from project root so config finds it regardless of cwd
-_path = Path(__file__).resolve().parents[2]
-_env = _path / ".env"
-if _env.exists():
-    from dotenv import load_dotenv
-    load_dotenv(_env)
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 
-# AWS SDK — optional in demo mode
 try:
     import boto3
+    from boto3.dynamodb.conditions import Key, Attr
     from botocore.exceptions import ClientError
-    from boto3.dynamodb.conditions import Key
     BOTO3_AVAILABLE = True
 except ImportError:
     BOTO3_AVAILABLE = False
-    boto3 = None
-    ClientError = Exception
-    Key = None
 
-# yfinance — optional, used only for /market-prices
 try:
     import yfinance as yf
     YFINANCE_AVAILABLE = True
 except ImportError:
     YFINANCE_AVAILABLE = False
-    yf = None
 
-# Config — wrap in try/except so missing env vars don't crash startup
 try:
     from src.config import get_settings
     from src.monitoring.cloudwatch_metrics import get_metrics
@@ -48,37 +35,24 @@ except Exception as e:
     CONFIG_AVAILABLE = False
     settings = None
     get_metrics = lambda: type("_Dummy", (), {"emit_metric": lambda self, *a, **k: None})()
-    print(f"[TradePulse] Config not fully loaded: {e} — running in demo mode")
+    print(f"[TradePulse] Config not loaded: {e} — running demo mode")
 
-import structlog
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+DEMO_MODE = os.getenv('DEMO_MODE', 'true').lower() == 'true'
+
+# Required for remaining routes (limiter, Request, BaseModel, logger, time)
+import time
+from typing import Any, Optional
+from fastapi import Request
 from pydantic import BaseModel
+import structlog
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 logger = structlog.get_logger(__name__)
 
-# DEMO_MODE controls whether the API serves simulated data or requires
-# a running pipeline (Kafka, Faust, DynamoDB).
-#
-# True (default on Railway): serves realistic simulated data from the
-#   dashboard's built-in demo data. No AWS or Kafka required.
-#   Cost: ~$5/month on Railway free tier.
-#
-# False (local full pipeline): requires Kafka, Faust, DynamoDB, and
-#   all AWS services to be running. Used for the full demo video.
-#
-# Set DEMO_MODE=false in Railway variables when you want to connect
-# to real AWS services from the deployed instance.
-DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
-
-# Path to API module for static files
-_API_DIR = Path(__file__).resolve().parent
-_STATIC_DIR = _API_DIR / "static"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 def _get_writer():
     """Lazy init DynamoWriter so app starts even if boto3 has import issues."""
@@ -94,51 +68,9 @@ app = FastAPI(
     version="1.0.0",
     docs_url=None,
     redoc_url=None,
-    openapi_url="/openapi.json",
+    openapi_url="/openapi.json"
 )
 
-
-@app.get("/", response_class=HTMLResponse)
-async def serve_dashboard() -> HTMLResponse:
-    """Serve the custom TradePulse dashboard (single-page app)."""
-    index_path = _STATIC_DIR / "index.html"
-    if not index_path.exists():
-        return HTMLResponse(
-            "<h1>TradePulse API</h1><p>Dashboard not found. Ensure static/index.html exists.</p>"
-            "<p><a href='/openapi.json'>OpenAPI spec</a></p>",
-            status_code=200,
-        )
-    return HTMLResponse(content=index_path.read_text(encoding="utf-8"))
-
-
-@app.get("/about", response_class=HTMLResponse)
-async def serve_about() -> HTMLResponse:
-    """
-    Serves the TradePulse About and Documentation page.
-    Explains what the project does, how to use the API,
-    architecture overview, and setup instructions.
-    """
-    about_path = _STATIC_DIR / "about.html"
-    if not about_path.exists():
-        return HTMLResponse(
-            "<h1>TradePulse</h1><p>About page not found.</p><a href='/'>Dashboard</a>",
-            status_code=200,
-        )
-    return HTMLResponse(content=about_path.read_text(encoding="utf-8"))
-
-
-# Mount static assets after explicit routes so / is not shadowed
-if _STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
-
-# Rate limit: 100 requests/minute per IP; 429 with Retry-After
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-# CORS: allow all origins for demo; restrict to specific domains in production
-# In production, replace "*" with your actual Railway domain
-# e.g. ["https://tradepulse.dev", "https://www.tradepulse.dev"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -146,6 +78,30 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+async def serve_dashboard():
+    try:
+        with open(os.path.join(STATIC_DIR, "index.html")) as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse("<h1>TradePulse</h1><p>Starting up...</p>")
+
+@app.get("/about", response_class=HTMLResponse)
+async def serve_about():
+    try:
+        with open(os.path.join(STATIC_DIR, "about.html")) as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse("<h1>TradePulse About</h1>")
+
+# Rate limit: 100 requests/minute per IP; 429 with Retry-After
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Request logging middleware
 @app.middleware("http")
@@ -338,30 +294,7 @@ async def get_features(request: Request, ticker: str) -> FeaturesResponse:
 
 @app.get("/health")
 async def health():
-    """
-    Lightweight health endpoint used by Railway's healthcheck.
-
-    Must respond instantly with no external dependencies.
-    Railway hits this endpoint every 30 seconds to confirm
-    the service is alive. Any timeout or error fails the
-    healthcheck and triggers a redeploy.
-
-    External service checks (DynamoDB latency, Kafka lag) are
-    intentionally excluded — those require network calls that
-    can timeout and should not gate the basic health response.
-    """
-    import random
-    from datetime import datetime, timezone
-
-    return {
-        "status": "healthy",
-        "mode": "demo" if DEMO_MODE else "pipeline",
-        "consumer_lag": random.randint(35, 65),
-        "dynamo_latency_p99": random.randint(14, 22),
-        "uptime_seconds": 3600,
-        "checked_at": datetime.now(timezone.utc).isoformat(),
-        "version": "1.0.0"
-    }
+    return {"status": "healthy", "mode": "demo"}
 
 
 @app.get("/market-prices")
@@ -465,6 +398,13 @@ async def get_sentiment(request: Request, ticker: str, hours: int = 24):
 
     except ClientError as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.on_event("startup")
+async def startup_event():
+    print("[TradePulse] Started successfully")
+    print(f"[TradePulse] DEMO_MODE={DEMO_MODE}")
+    print(f"[TradePulse] Static dir exists: {os.path.exists(STATIC_DIR)}")
 
 
 def main() -> None:
