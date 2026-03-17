@@ -6,8 +6,7 @@
 [![Railway](https://img.shields.io/badge/deployed-Railway-0b0d0e?logo=railway&logoColor=white)](https://tradepulse.nikhilgiridharan.com)
 [![License](https://img.shields.io/badge/license-MIT-10b981)](LICENSE)
 
-<<<<<<< HEAD
-A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 15,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
+A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 10,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
 
 =======
 [![CI](https://github.com/nikhilgiridharan/TradePulse/actions/workflows/ci.yml/badge.svg)](https://github.com/nikhilgiridharan/TradePulse/actions)
@@ -19,7 +18,6 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 
 A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 15,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
 
->>>>>>> 3e1c5f9 (docs: rewrite README with full production architecture, update Medium article link in dashboard banner)
 ---
 
 ## 🌐 Live Demo
@@ -27,7 +25,6 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 | | |
 |---|---|
 | **Dashboard** | [tradepulse.nikhilgiridharan.com](https://tradepulse.nikhilgiridharan.com) |
-<<<<<<< HEAD
 | **Demo Video** | [Demo(#) |
 | **Architecture Article** | [Medium](https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10) |
 | **OpenAPI Spec** | [tradepulse.nikhilgiridharan.com/openapi.json](https://tradepulse.nikhilgiridharan.com/openapi.json) |
@@ -39,7 +36,6 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 | **OpenAPI Spec** | [tradepulse.nikhilgiridharan.com/openapi.json](https://tradepulse.nikhilgiridharan.com/openapi.json) |
 
 > The live dashboard runs in demo mode with simulated market data.
->>>>>>> 3e1c5f9 (docs: rewrite README with full production architecture, update Medium article link in dashboard banner)
 > Run `make up` locally to spin up the full pipeline with live Polygon.io and Finnhub feeds.
 
 ---
