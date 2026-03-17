@@ -19,15 +19,6 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 | **Architecture Article** | [Medium](https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10) |
 | **OpenAPI Spec** | [tradepulse.nikhilgiridharan.com/openapi.json](https://tradepulse.nikhilgiridharan.com/openapi.json) |
 
-> The live dashboard runs in demo mode with simulated market data.  
-=======
-| **Demo Video** | [YouTube — Full Pipeline Walkthrough](#) |
-| **Architecture Article** | [Medium — Building TradePulse](https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10) |
-| **OpenAPI Spec** | [tradepulse.nikhilgiridharan.com/openapi.json](https://tradepulse.nikhilgiridharan.com/openapi.json) |
-
-> The live dashboard runs in demo mode with simulated market data.
-> Run `make up` locally to spin up the full pipeline with live Polygon.io and Finnhub feeds.
-
 ---
 
 ## Architecture
@@ -135,12 +126,6 @@ Isolation Forest runs inside the Faust agent at 0.3ms per event. The model train
 | GET | `/features/{ticker}` | Real-time feature vector | 1s |
 | GET | `/sentiment/{ticker}` | News sentiment with market correlation | None |
 | GET | `/health` | Pipeline health status | None |
-
-<<<<<<< HEAD
-Interactive docs available at [/docs](https://tradepulse.nikhilgiridharan.com/docs) or via the built-in API Reference section of the dashboard.
-=======
-Interactive docs available via the built-in API Reference section of the dashboard.
->>>>>>> 3e1c5f9 (docs: rewrite README with full production architecture, update Medium article link in dashboard banner)
 
 ---
 
@@ -287,12 +272,6 @@ TradePulse/
 ```
 
 ---
-<<<<<<< HEAD
-=======
-
-## Author
 
 **Nikhil Giridharan** — Data Engineer
 
-[GitHub](https://github.com/nikhilgiridharan) · [LinkedIn](https://linkedin.com/in/nikhilgiridharan) · [Portfolio](https://nikhilgiridharan.com) · [Medium](https://medium.com/@nikhilgiridharan)
->>>>>>> 3e1c5f9 (docs: rewrite README with full production architecture, update Medium article link in dashboard banner)
