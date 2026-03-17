@@ -277,19 +277,3 @@ TradePulse/
 ```
 
 ---
-
-## Author
-
-**Nikhil Giridharan** — Data Engineer
-
-[GitHub](https://github.com/nikhilgiridharan) · [LinkedIn](https://linkedin.com/in/nikhilgiridharan) · [Portfolio](https://nikhilgiridharan.com) · [Medium](https://medium.com/@nikhilgiridharan)
-```
-
----
-
-To update it, give Cursor this one-line prompt:
-```
-Replace the entire contents of README.md with the markdown I provide, 
-then run: git add README.md && git commit -m "docs: rewrite README with 
-full architecture, benchmarks, API reference, and project structure" 
-&& git push origin main
