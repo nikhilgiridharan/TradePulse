@@ -8,16 +8,6 @@
 
 A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 10,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
 
-=======
-[![CI](https://github.com/nikhilgiridharan/TradePulse/actions/workflows/ci.yml/badge.svg)](https://github.com/nikhilgiridharan/TradePulse/actions)
-[![Python](https://img.shields.io/badge/python-3.11-3776ab?logo=python&logoColor=white)](https://python.org)
-[![Kafka](https://img.shields.io/badge/Apache%20Kafka-7.5.0-231f20?logo=apachekafka&logoColor=white)](https://kafka.apache.org)
-[![AWS](https://img.shields.io/badge/AWS-DynamoDB%20·%20S3%20·%20SQS-ff9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com)
-[![Railway](https://img.shields.io/badge/deployed-Railway-0b0d0e?logo=railway&logoColor=white)](https://tradepulse.nikhilgiridharan.com)
-[![License](https://img.shields.io/badge/license-MIT-10b981)](LICENSE)
-
-A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 15,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
-
 ---
 
 ## 🌐 Live Demo
