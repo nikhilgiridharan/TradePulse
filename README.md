@@ -1,5 +1,5 @@
 # TradePulse
-
+[![CI](https://github.com/nikhilgiridharan/TradePulse/actions/workflows/ci.yml/badge.svg)](https://github.com/nikhilgiridharan/TradePulse/actions)
 [![Python](https://img.shields.io/badge/python-3.11-3776ab?logo=python&logoColor=white)](https://python.org)
 [![Kafka](https://img.shields.io/badge/Apache%20Kafka-7.5.0-231f20?logo=apachekafka&logoColor=white)](https://kafka.apache.org)
 [![AWS](https://img.shields.io/badge/AWS-DynamoDB%20·%20S3%20·%20SQS-ff9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com)
@@ -15,8 +15,8 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 | | |
 |---|---|
 | **Dashboard** | [tradepulse.nikhilgiridharan.com](https://tradepulse.nikhilgiridharan.com) |
-| **Demo Video** | [YouTube — Full Pipeline Walkthrough](#) |
-| **Architecture Article** | [Medium — Building TradePulse](https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10) |
+| **Demo Video** | [Demo(#) |
+| **Architecture Article** | [Medium](https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10) |
 | **OpenAPI Spec** | [tradepulse.nikhilgiridharan.com/openapi.json](https://tradepulse.nikhilgiridharan.com/openapi.json) |
 
 > The live dashboard runs in demo mode with simulated market data.  
