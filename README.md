@@ -1,6 +1,5 @@
 # TradePulse
 
-[![CI](https://github.com/nikhilgiridharan/TradePulse/actions/workflows/ci.yml/badge.svg)](https://github.com/nikhilgiridharan/TradePulse/actions)
 [![Python](https://img.shields.io/badge/python-3.11-3776ab?logo=python&logoColor=white)](https://python.org)
 [![Kafka](https://img.shields.io/badge/Apache%20Kafka-7.5.0-231f20?logo=apachekafka&logoColor=white)](https://kafka.apache.org)
 [![AWS](https://img.shields.io/badge/AWS-DynamoDB%20·%20S3%20·%20SQS-ff9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com)
