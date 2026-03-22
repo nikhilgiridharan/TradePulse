@@ -15,8 +15,8 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 | | |
 |---|---|
 | **Website** | tradepulse.nikhilgiridharan.com |
-| **Demo** | (https://www.youtube.com/watch?v=9LXrmeUyweI) |
-| **Medium** | (https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10) |
+| **Demo** | https://www.youtube.com/watch?v=9LXrmeUyweI |
+| **Medium** | https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10 |
 
 ---
 
