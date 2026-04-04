@@ -50,22 +50,6 @@
     .font-mono { font-family: var(--font-mono); }
     h1, h2, h3, .section-title { color: #0f172a; }
 
-    #demo-banner {
-      position: relative;
-      z-index: 60;
-      background: #dbeafe;
-      border-bottom: 1px solid #93c5fd;
-      color: #0369a1;
-    }
-    #demo-banner a { color: #0ea5e9; }
-    #demo-banner code {
-      background: #bfdbfe;
-      color: #0369a1;
-      padding: 1px 4px;
-      border-radius: 3px;
-      font-family: var(--font-mono);
-    }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.85; transform: scale(0.98); }
@@ -91,7 +75,7 @@
     .btn-primary { background: var(--accent-primary); color: #ffffff; }
     .btn-primary:hover { box-shadow: var(--shadow-md); }
 
-    /* Layout — sidebar sits below #demo-banner (fixed offset matches banner height) */
+    /* Layout */
     .app-layout { display: flex; min-height: 100vh; padding-top: 0; }
     .sidebar {
       width: 220px;
@@ -100,7 +84,7 @@
       border-right: 1px solid #b8c8dc;
       padding: 16px 0;
       position: fixed;
-      top: 40px;
+      top: 0;
       left: 0;
       bottom: 0;
       z-index: 50;
@@ -162,7 +146,7 @@
       flex: 1;
       margin-left: 220px;
       padding: 24px 32px;
-      min-height: calc(100vh - 40px);
+      min-height: 100vh;
       background: var(--bg-primary);
     }
 
@@ -564,31 +548,6 @@
   </style>
 </head>
 <body>
-  <!-- Demo mode banner — shown when DEMO_MODE is active -->
-  <!-- Transparent and professional — tells visitors this is a portfolio demo -->
-  <div id="demo-banner" style="padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600;">
-    <span>
-      <span style="color: #0ea5e9;">◉ DEMO MODE</span>
-      &nbsp;·&nbsp; Simulated market data &nbsp;·&nbsp;
-      Full pipeline runs locally via <code>make up</code>
-    </span>
-    <span style="display:flex; gap:16px; align-items:center;">
-      <a href="https://github.com/nikhilgiridharan/TradePulse"
-         target="_blank"
-         rel="noopener noreferrer"
-         style="text-decoration:none;">
-        View Source →
-      </a>
-      <a href="https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10"
-         id="medium-article-link"
-         target="_blank"
-         rel="noopener noreferrer"
-         style="text-decoration:none;">
-        Read Architecture Article →
-      </a>
-    </span>
-  </div>
-
   <div class="app-layout">
     <aside class="sidebar">
       <div class="wordmark sidebar-title">TradePulse</div>
@@ -2043,7 +2002,6 @@ function hideComponentDetail() {
       });
     });
 
-    if (DEMO_MODE && document.getElementById('demo-banner')) document.getElementById('demo-banner').style.display = 'flex';
     // Apply market-hours UI immediately — do not wait on /market-prices (slow/hanging fetch
     // would otherwise leave Live Data panels visible with default HTML all weekend).
     updateLiveDataSection();
