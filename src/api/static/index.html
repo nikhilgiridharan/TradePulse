@@ -9,34 +9,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #111827;
-      --bg-tertiary: #1a2235;
-      --accent-primary: #00d4ff;
-      --accent-secondary: #7c3aed;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-yellow: #f59e0b;
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --border-color: #1e293b;
-      --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.15);
-      --glow-purple: 0 0 20px rgba(124, 58, 237, 0.15);
+      --bg-primary: #060b18;
+      --bg-secondary: #0d1424;
+      --bg-tertiary: #131d30;
+      --accent-primary: #00e5ff;
+      --accent-secondary: #a855f7;
+      --accent-green: #22c55e;
+      --accent-red: #f43f5e;
+      --accent-yellow: #fbbf24;
+      --accent-orange: #fb923c;
+      --text-primary: #ffffff;
+      --text-secondary: #b4c6e0;
+      --border-color: #1e3a5f;
+      --glow-cyan: 0 0 24px rgba(0, 229, 255, 0.25);
+      --glow-purple: 0 0 24px rgba(168, 85, 247, 0.25);
+      --glow-green: 0 0 16px rgba(34, 197, 94, 0.2);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 14px; scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
       min-height: 100vh;
       overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(13, 20, 36, 0.8) 0%, transparent 100%);
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
     /* Demo banner */
     .demo-banner {
-      background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+      background: linear-gradient(90deg,
+        rgba(168, 85, 247, 0.12),
+        rgba(0, 229, 255, 0.12)
+      );
+      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
       color: var(--bg-primary);
       text-align: center;
       padding: 6px 12px;
@@ -51,13 +63,15 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
       z-index: 100;
+      background: rgba(6, 11, 24, 0.95);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(0, 229, 255, 0.08);
     }
     .header-left {
       display: flex;
@@ -95,8 +109,8 @@
     .sidebar {
       width: 240px;
       min-width: 240px;
-      background: var(--bg-secondary);
-      border-right: 1px solid var(--border-color);
+      background: rgba(8, 13, 22, 0.98);
+      border-right: 1px solid rgba(30, 58, 95, 0.8);
       padding: 16px 0;
       position: fixed;
       top: 56px;
@@ -112,14 +126,17 @@
       padding: 10px 20px;
       color: var(--text-secondary);
       cursor: pointer;
-      border-left: 3px solid transparent;
+      border-left: 2px solid transparent;
       transition: all 0.15s ease;
     }
     .sidebar a.nav-item { text-decoration: none; color: inherit; }
-    .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .nav-item:hover {
+      background: rgba(0, 229, 255, 0.05);
+      color: var(--text-primary);
+    }
     .nav-item.active {
+      background: rgba(0, 229, 255, 0.08);
       border-left-color: var(--accent-primary);
-      background: rgba(0, 212, 255, 0.08);
       color: var(--accent-primary);
     }
     .sidebar-footer {
@@ -155,21 +172,46 @@
     /* Overview: metric cards */
     .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
     .metric-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
+      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
+      border: 1px solid rgba(30, 58, 95, 0.9);
       border-radius: 12px;
-      padding: 20px;
+      padding: 20px 24px;
       transition: all 0.2s ease;
-      background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
-                  linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) border-box;
-      border: 1px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(0, 229, 255, 0.4),
+        transparent
+      );
     }
     .metric-card:hover {
-      transform: translateY(-2px);
+      border-color: rgba(0, 229, 255, 0.3);
       box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
     }
-    .metric-card .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-    .metric-card .value { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 500; }
+    .metric-card .label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .metric-card .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
     .metric-card .trend { font-size: 11px; margin-top: 4px; }
     .metric-card .trend.up { color: var(--accent-green); }
     .metric-card .trend.down { color: var(--accent-red); }
@@ -177,44 +219,76 @@
 
     /* Pipeline diagram */
     .pipeline-diagram {
-      background: var(--bg-secondary);
+      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
+      border: 1px solid rgba(30, 58, 95, 0.8);
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 24px;
       overflow-x: auto;
     }
     .pipeline-diagram svg { display: block; margin: 0 auto; width: 100%; height: auto; }
-    .pipeline-box { fill: #111827; stroke-width: 1; rx: 8; transition: filter 0.2s, box-shadow 0.2s; }
-    .pipeline-box.main { stroke: #00d4ff; }
-    .pipeline-box.main:hover { filter: drop-shadow(0 0 12px rgba(0,212,255,0.4)); }
-    .pipeline-box.news { stroke: #7c3aed; }
-    .pipeline-box.news:hover { filter: drop-shadow(0 0 12px rgba(124,58,237,0.4)); }
-    .pipeline-box.dlq { stroke: #ef4444; }
-    .pipeline-box.ml { stroke: #f59e0b; }
-    .pipeline-box.storage { stroke: #10b981; }
-    .pipeline-line { stroke: #00d4ff; stroke-width: 1.5; fill: none; }
-    .pipeline-line.news { stroke: #7c3aed; }
-    .flow-dot { fill: #00d4ff; }
-    .flow-dot.news { fill: #7c3aed; }
-    .join-line { stroke: #94a3b8; stroke-dasharray: 4 4; stroke-width: 1; fill: none; }
+    .pipeline-box { fill: #0d1424; stroke-width: 1; rx: 8; transition: filter 0.2s, box-shadow 0.2s, stroke 0.2s, fill 0.2s; }
+    .arch-box.pipeline-box.main {
+      fill: url(#pipeFillMain);
+      stroke: rgba(0, 229, 255, 0.5);
+      stroke-width: 1.5;
+    }
+    .arch-box.pipeline-box.news {
+      fill: url(#pipeFillNews);
+      stroke: rgba(168, 85, 247, 0.5);
+      stroke-width: 1.5;
+    }
+    .arch-box.pipeline-box.dlq {
+      fill: url(#pipeFillDlq);
+      stroke: rgba(244, 63, 94, 0.5);
+      stroke-width: 1.5;
+    }
+    .arch-box.pipeline-box.ml {
+      fill: url(#pipeFillMl);
+      stroke: rgba(251, 191, 36, 0.5);
+      stroke-width: 1.5;
+    }
+    .arch-box.pipeline-box.storage {
+      fill: url(#pipeFillStorage);
+      stroke: rgba(34, 197, 94, 0.5);
+      stroke-width: 1.5;
+    }
+    .arch-box.pipeline-box.main:hover {
+      stroke: rgba(0, 229, 255, 0.9);
+      stroke-opacity: 1;
+      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.35)) brightness(1.05);
+    }
+    .arch-box.pipeline-box.news:hover {
+      stroke: rgba(168, 85, 247, 0.9);
+      stroke-opacity: 1;
+      filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.35)) brightness(1.05);
+    }
+    .arch-box.pipeline-box.dlq:hover {
+      stroke: rgba(244, 63, 94, 0.9);
+      filter: brightness(1.08);
+    }
+    .arch-box.pipeline-box.ml:hover {
+      stroke: rgba(251, 191, 36, 0.9);
+      filter: brightness(1.08);
+    }
+    .arch-box.pipeline-box.storage:hover {
+      stroke: rgba(34, 197, 94, 0.9);
+      filter: brightness(1.08);
+    }
+    .pipeline-line { stroke: #00e5ff; stroke-width: 1.5; fill: none; }
+    .pipeline-line.news { stroke: #a855f7; }
+    .flow-dot { fill: #00e5ff; }
+    .flow-dot.news { fill: #a855f7; }
+    .join-line { stroke: #b4c6e0; stroke-dasharray: 4 4; stroke-width: 1; fill: none; opacity: 0.5; }
     .arch-box {
       cursor: pointer;
       transition: all 0.15s ease;
     }
     .arch-box:hover {
-      filter: brightness(1.2);
       transform: translateY(-1px);
     }
-    .arch-box.pipeline-box.main:hover {
-      stroke: #00d4ff;
-      stroke-opacity: 1;
-    }
-    .arch-box.pipeline-box.news:hover {
-      stroke: #c4b5fd;
-      stroke-opacity: 1;
-    }
     .arch-box-active {
-      filter: brightness(1.3);
+      filter: brightness(1.15);
       transform: translateY(-1px);
     }
 
@@ -229,7 +303,7 @@
       font-weight: 600;
     }
     .ticker-pill:hover { border-color: var(--accent-primary); }
-    .ticker-pill.active { background: rgba(0,212,255,0.15); border-color: var(--accent-primary); color: var(--accent-primary); }
+    .ticker-pill.active { background: rgba(0, 229, 255, 0.15); border-color: var(--accent-primary); color: var(--accent-primary); }
     .live-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
     .live-data-grid {
       display: grid;
@@ -241,9 +315,9 @@
     .live-data-grid .live-panel,
     .live-data-grid .data-panel { min-height: 160px; }
     .live-panel {
-      background: var(--bg-secondary);
+      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
       border-radius: 12px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(30, 58, 95, 0.8);
       padding: 20px;
     }
     .live-panel h4 { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
@@ -252,20 +326,20 @@
     .live-panel .flash-red { animation: flashRed 0.3s ease; }
     @keyframes flashGreen {
       0%, 100% { background-color: transparent; }
-      50% { background-color: rgba(16, 185, 129, 0.3); }
+      50% { background-color: rgba(34, 197, 94, 0.28); }
     }
     @keyframes flashRed {
       0%, 100% { background-color: transparent; }
-      50% { background-color: rgba(239, 68, 68, 0.3); }
+      50% { background-color: rgba(244, 63, 94, 0.28); }
     }
     .z-high { color: var(--accent-yellow); }
     .z-very-high { color: var(--accent-red); }
-    #sparkline-canvas { width: 100%; height: 120px; background: var(--bg-tertiary); border-radius: 8px; display: block; }
+    #sparkline-canvas { width: 100%; height: 120px; background: linear-gradient(135deg, #0d1424, #111c33); border: 1px solid rgba(30, 58, 95, 0.8); border-radius: 8px; display: block; }
 
     .data-panel {
-      background: var(--bg-secondary);
+      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
       border-radius: 12px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(30, 58, 95, 0.8);
       padding: 20px;
     }
     .data-panel .panel-header { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
@@ -280,7 +354,7 @@
     }
     .sentiment-item:last-child { border-bottom: none; }
     .sentiment-item.correlated {
-      background: rgba(239, 68, 68, 0.05);
+      background: rgba(244, 63, 94, 0.05);
       border-radius: 4px;
       padding: 8px;
       margin: 2px 0;
@@ -290,9 +364,9 @@
       font-size: 14px;
       min-width: 16px;
     }
-    .sentiment-positive { color: var(--accent-green); }
-    .sentiment-negative { color: var(--accent-red); }
-    .sentiment-neutral  { color: var(--accent-yellow); }
+    .sentiment-positive { color: #22c55e; }
+    .sentiment-negative { color: #f43f5e; }
+    .sentiment-neutral  { color: #fbbf24; }
     .sentiment-headline {
       color: var(--text-secondary);
       line-height: 1.4;
@@ -310,31 +384,36 @@
     /* Pipeline Status */
     .component-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
     .component-card {
-      background: var(--bg-secondary);
+      background: linear-gradient(135deg, #0d1424, #111c33);
       border-radius: 12px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(30, 58, 95, 0.8);
       padding: 16px;
     }
     .component-card .name { font-weight: 600; margin-bottom: 8px; }
     .component-card .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .component-card .status-dot.healthy { background: var(--accent-green); animation: pulse 2s infinite; }
+    .component-card .status-dot.healthy {
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+      animation: pulse 2s infinite;
+    }
     .component-card .status-dot.degraded { background: var(--accent-yellow); }
     .component-card .status-dot.down { background: var(--accent-red); animation: blink 0.5s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     .component-card .detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-    #throughput-chart { width: 100%; height: 120px; background: var(--bg-tertiary); border-radius: 8px; }
+    #throughput-chart { width: 100%; height: 120px; background: linear-gradient(135deg, #0d1424, #111c33); border: 1px solid rgba(30, 58, 95, 0.8); border-radius: 8px; }
     .lag-gauge { width: 120px; height: 120px; margin: 16px auto; position: relative; }
     .lag-gauge .value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; }
 
     /* Anomalies */
     .anomaly-feed { max-width: 720px; }
     .anomaly-card {
-      background: var(--bg-secondary);
+      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
       border-radius: 12px;
+      border: 1px solid rgba(30, 58, 95, 0.8);
       border-left: 4px solid var(--accent-red);
       padding: 16px;
       margin-bottom: 16px;
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.08);
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.1);
       animation: slideInTop 0.3s ease;
     }
     @keyframes slideInTop {
@@ -363,15 +442,19 @@
     /* Scrollbar */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg-primary); }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.2); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.4); }
   </style>
 </head>
 <body>
   <!-- Demo mode banner — shown when DEMO_MODE is active -->
   <!-- Transparent and professional — tells visitors this is a portfolio demo -->
   <div id="demo-banner" style="
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.15), rgba(0, 212, 255, 0.15));
-    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    background: linear-gradient(90deg,
+      rgba(168, 85, 247, 0.12),
+      rgba(0, 229, 255, 0.12)
+    );
+    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
     padding: 8px 24px;
     display: flex;
     align-items: center;
@@ -453,61 +536,76 @@
           <h3 style="margin-bottom:16px;">Pipeline Architecture</h3>
           <svg viewBox="0 0 820 320" style="min-height:320px;">
             <defs>
-              <marker id="arrow-main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#00d4ff"/></marker>
-              <marker id="arrow-news" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#7c3aed"/></marker>
+              <linearGradient id="pipeFillMain" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#0f1e38"/>
+              </linearGradient>
+              <linearGradient id="pipeFillNews" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#150f2e"/>
+              </linearGradient>
+              <linearGradient id="pipeFillDlq" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#1f0d14"/>
+              </linearGradient>
+              <linearGradient id="pipeFillMl" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#1a1508"/>
+              </linearGradient>
+              <linearGradient id="pipeFillStorage" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#0a1a12"/>
+              </linearGradient>
+              <marker id="arrow-main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#00e5ff"/></marker>
+              <marker id="arrow-news" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#a855f7"/></marker>
             </defs>
             <!-- Main stream -->
             <g class="main-stream">
               <rect class="arch-box pipeline-box main" data-component="polygon" onclick="showComponentDetail('polygon')" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 5 tickers</title>
               <text x="80" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Polygon.io</text>
-              <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="kafka" onclick="showComponentDetail('kafka')" x="152" y="24" width="120" height="44" rx="8"/><title>6 partitions · idempotent producer · exactly-once</title>
               <text x="212" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka</text>
-              <line class="pipeline-line" x1="272" y1="46" x2="284" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="272" y1="46" x2="284" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="validation" onclick="showComponentDetail('validation')" x="284" y="24" width="120" height="44" rx="8"/><title>Pydantic schema validation · invalid → SQS DLQ</title>
               <text x="344" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Validation</text>
-              <line class="pipeline-line" x1="404" y1="46" x2="416" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="404" y1="46" x2="416" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="faust" onclick="showComponentDetail('faust')" x="416" y="24" width="120" height="44" rx="8"/><title>Stream processing · VWAP · z-score · momentum · exactly-once</title>
               <text x="476" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Faust</text>
-              <line class="pipeline-line" x1="536" y1="46" x2="548" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="536" y1="46" x2="548" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="dynamodb" onclick="showComponentDetail('dynamodb')" x="548" y="24" width="120" height="44" rx="8"/><title>Hot storage · ticker#shard key · 48hr TTL · conditional writes</title>
               <text x="608" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB</text>
-              <line class="pipeline-line" x1="668" y1="46" x2="680" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="668" y1="46" x2="680" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="fastapi" onclick="showComponentDetail('fastapi')" x="680" y="24" width="120" height="44" rx="8"/><title>5 endpoints · rate limited · 1s cache · custom dashboard</title>
               <text x="740" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">FastAPI</text>
               <!-- DLQ -->
-              <line class="pipeline-line" x1="344" y1="68" x2="344" y2="88" stroke="#ef4444" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="344" y1="68" x2="344" y2="88" stroke="#f43f5e" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box dlq" data-component="sqs_dlq" onclick="showComponentDetail('sqs_dlq')" x="294" y="88" width="100" height="36" rx="8"/><title>Failed messages · 3 retries → DLQ · 5 DLQ retries → S3 archive</title>
               <text x="344" y="111" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">SQS DLQ</text>
               <!-- Anomaly ML, Feature Store -->
-              <line class="pipeline-line" x1="476" y1="68" x2="476" y2="88" stroke="#f59e0b"/>
+              <line class="pipeline-line" x1="476" y1="68" x2="476" y2="88" stroke="#fbbf24"/>
               <rect class="arch-box pipeline-box ml" data-component="anomaly_ml" onclick="showComponentDetail('anomaly_ml')" x="416" y="88" width="120" height="44" rx="8"/><title>Isolation Forest · rolling retrain · 0.3ms inference</title>
               <text x="476" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Anomaly ML</text>
-              <line class="pipeline-line" x1="476" y1="132" x2="476" y2="148" stroke="#f59e0b"/>
+              <line class="pipeline-line" x1="476" y1="132" x2="476" y2="148" stroke="#fbbf24"/>
               <rect class="arch-box pipeline-box ml" data-component="feature_store" onclick="showComponentDetail('feature_store')" x="416" y="148" width="120" height="44" rx="8"/><title>Precomputed features · DynamoDB · 7-day TTL</title>
               <text x="476" y="175" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Feature Store</text>
               <!-- S3 Cold -->
-              <line class="pipeline-line" x1="608" y1="68" x2="608" y2="88" stroke="#10b981"/>
+              <line class="pipeline-line" x1="608" y1="68" x2="608" y2="88" stroke="#22c55e"/>
               <rect class="arch-box pipeline-box storage" data-component="s3_parquet" onclick="showComponentDetail('s3_parquet')" x="548" y="88" width="120" height="44" rx="8"/><title>Cold storage · Hive partitioning · Snappy compression · Athena</title>
               <text x="608" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">S3 Parquet</text>
             </g>
             <!-- Join annotation -->
             <line class="join-line" x1="476" y1="68" x2="476" y2="232"/>
-            <text x="476" y="152" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">60s temporal join</text>
+            <text x="476" y="152" fill="#b4c6e0" font-size="10" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">60s temporal join</text>
             <!-- News stream -->
             <g class="news-stream">
               <rect class="arch-box pipeline-box news" data-component="finnhub" onclick="showComponentDetail('finnhub')" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
               <text x="80" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Finnhub API</text>
-              <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="kafka_news" onclick="showComponentDetail('kafka_news')" x="152" y="232" width="120" height="44" rx="8"/><title>Separate topic · low frequency · independent scaling</title>
               <text x="212" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka market.news</text>
-              <line class="pipeline-line news" x1="272" y1="254" x2="284" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <line class="pipeline-line news" x1="272" y1="254" x2="284" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="vader" onclick="showComponentDetail('vader')" x="284" y="232" width="120" height="44" rx="8"/><title>&lt;1ms inference · compound score -1.0 to +1.0</title>
               <text x="344" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">VADER Sentiment</text>
-              <line class="pipeline-line news" x1="404" y1="254" x2="416" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <line class="pipeline-line news" x1="404" y1="254" x2="416" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="correlator" onclick="showComponentDetail('correlator')" x="416" y="232" width="120" height="44" rx="8"/><title>Joins sentiment + volume z-score · 60s temporal window</title>
               <text x="476" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Correlator</text>
-              <line class="pipeline-line news" x1="536" y1="254" x2="548" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
+              <line class="pipeline-line news" x1="536" y1="254" x2="548" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="dynamo_sentiment" onclick="showComponentDetail('dynamo_sentiment')" x="548" y="232" width="120" height="44" rx="8"/><title>Sentiment store · 30-day TTL · strong correlation flagging</title>
               <text x="608" y="259" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB market_sentiment</text>
             </g>
@@ -517,8 +615,8 @@
         <div id="component-detail-panel" style="
     display: none;
     margin-top: 16px;
-    background: #111827;
-    border: 1px solid #1e293b;
+    background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
+    border: 1px solid rgba(30, 58, 95, 0.8);
     border-radius: 12px;
     padding: 24px;
     animation: slideInTop 0.25s ease;
@@ -534,7 +632,7 @@
             right: 16px;
             background: transparent;
             border: none;
-            color: #94a3b8;
+            color: #b4c6e0;
             font-size: 18px;
             cursor: pointer;
             line-height: 1;
@@ -553,14 +651,14 @@
         "></div>
         <div>
             <div id="detail-title" style="
-                color: #f1f5f9;
+                color: #ffffff;
                 font-size: 16px;
                 font-weight: 600;
                 font-family: Inter, sans-serif;
                 margin-bottom: 2px;
             "></div>
             <div id="detail-role" style="
-                color: #94a3b8;
+                color: #b4c6e0;
                 font-size: 12px;
                 font-family: Inter, sans-serif;
             "></div>
@@ -570,7 +668,7 @@
     <!-- Why section -->
     <div style="margin-bottom:16px;">
         <div style="
-            color: #94a3b8;
+            color: #6b85a8;
             font-size: 11px;
             font-family: Inter, sans-serif;
             text-transform: uppercase;
@@ -588,7 +686,7 @@
     <!-- Technical details -->
     <div>
         <div style="
-            color: #94a3b8;
+            color: #6b85a8;
             font-size: 11px;
             font-family: Inter, sans-serif;
             text-transform: uppercase;
@@ -843,7 +941,7 @@ const COMPONENT_DETAILS = {
             'Partitions messages by ticker symbol so all AAPL events go to the same Kafka partition in order',
             'Emits ProducerThroughput metric to CloudWatch every 10 seconds'
         ],
-        color: '#00d4ff'
+        color: '#00e5ff'
     },
     kafka: {
         title: 'Apache Kafka',
@@ -857,7 +955,7 @@ const COMPONENT_DETAILS = {
             'Acts as shock absorber during 8-10x market open volume spikes',
             'Retains data for 7 days — full replay window for debugging'
         ],
-        color: '#00d4ff'
+        color: '#00e5ff'
     },
     validation: {
         title: 'Schema Validation',
@@ -870,7 +968,7 @@ const COMPONENT_DETAILS = {
             'Tracks per-field failure counts to identify upstream data quality patterns',
             'Emits ValidationFailures metric to CloudWatch per field per minute'
         ],
-        color: '#00d4ff'
+        color: '#00e5ff'
     },
     faust: {
         title: 'Apache Faust',
@@ -885,7 +983,7 @@ const COMPONENT_DETAILS = {
             'Backpressure: pauses consumption 500ms when DynamoDB write latency exceeds 100ms',
             'Updates z-score cache every event so sentiment correlator has fresh signal'
         ],
-        color: '#00d4ff'
+        color: '#00e5ff'
     },
     dynamodb: {
         title: 'AWS DynamoDB',
@@ -899,7 +997,7 @@ const COMPONENT_DETAILS = {
             'Four tables: market_trades, market_aggregations, market_anomalies, feature_store',
             'Backpressure threshold: if write p99 exceeds 100ms for 3 consecutive writes, pause Faust'
         ],
-        color: '#00d4ff'
+        color: '#00e5ff'
     },
     fastapi: {
         title: 'FastAPI',
@@ -915,7 +1013,7 @@ const COMPONENT_DETAILS = {
             'Rate limited to 100 requests per minute per IP',
             'CORS enabled for dashboard access from any origin'
         ],
-        color: '#00d4ff'
+        color: '#00e5ff'
     },
     sqs_dlq: {
         title: 'SQS Dead Letter Queue',
@@ -929,7 +1027,7 @@ const COMPONENT_DETAILS = {
             'After 5 DLQ retries: archive to s3://tradepulse-data/dead-letters/ for manual inspection',
             'CloudWatch alarm fires when DLQ depth exceeds 100 messages'
         ],
-        color: '#ef4444'
+        color: '#f43f5e'
     },
     anomaly_ml: {
         title: 'Isolation Forest',
@@ -944,7 +1042,7 @@ const COMPONENT_DETAILS = {
             'Inference time: 0.3ms per event — adds negligible pipeline latency',
             'Anomalies written to DynamoDB market_anomalies and S3 with full feature vector'
         ],
-        color: '#f59e0b'
+        color: '#fbbf24'
     },
     s3_parquet: {
         title: 'S3 + Parquet',
@@ -958,7 +1056,7 @@ const COMPONENT_DETAILS = {
             'Glue catalog updated after each flush so Athena queries new partitions immediately',
             'S3 path: tradepulse-data/trades/year=2025/month=02/day=22/hour=14/'
         ],
-        color: '#10b981'
+        color: '#22c55e'
     },
     feature_store: {
         title: 'Feature Store',
@@ -972,7 +1070,7 @@ const COMPONENT_DETAILS = {
             'TTL: 7 days — features have longer analytical value than raw trades',
             'API serves features at single-digit millisecond latency from DynamoDB'
         ],
-        color: '#f59e0b'
+        color: '#fbbf24'
     },
     finnhub: {
         title: 'Finnhub API',
@@ -986,7 +1084,7 @@ const COMPONENT_DETAILS = {
             'Publishes to market.news Kafka topic partitioned by ticker symbol',
             'Free tier: 60 API calls per minute — well within polling budget'
         ],
-        color: '#7c3aed'
+        color: '#a855f7'
     },
     kafka_news: {
         title: 'Kafka market.news',
@@ -999,7 +1097,7 @@ const COMPONENT_DETAILS = {
             'Independent consumer group — news processing falling behind does not affect trade processing',
             'Retention: 7 days matching equity stream'
         ],
-        color: '#7c3aed'
+        color: '#a855f7'
     },
     vader: {
         title: 'VADER Sentiment',
@@ -1013,7 +1111,7 @@ const COMPONENT_DETAILS = {
             'Summary context reduces ambiguity in short headlines',
             'Inference time: under 1ms — adds negligible latency to news processing pipeline'
         ],
-        color: '#7c3aed'
+        color: '#a855f7'
     },
     correlator: {
         title: 'News-Market Correlator',
@@ -1027,7 +1125,7 @@ const COMPONENT_DETAILS = {
             'Z-score cache: in-memory per ticker with timestamp for fast lookups without DynamoDB reads',
             'Why 60 seconds: algorithmic traders react within seconds, human traders within minutes'
         ],
-        color: '#7c3aed'
+        color: '#a855f7'
     },
     dynamo_sentiment: {
         title: 'DynamoDB market_sentiment',
@@ -1041,7 +1139,7 @@ const COMPONENT_DETAILS = {
             'Low write volume — news arrives ~100 articles per hour vs 15000 trades per second',
             'Hot partition risk is minimal at this write frequency'
         ],
-        color: '#7c3aed'
+        color: '#a855f7'
     }
 };
 
@@ -1080,8 +1178,8 @@ function showComponentDetail(key) {
             align-items: flex-start;
             gap: 8px;
             padding: 6px 0;
-            border-bottom: 1px solid #1e293b;
-            color: #94a3b8;
+            border-bottom: 1px solid rgba(30, 58, 95, 0.8);
+            color: #b4c6e0;
             font-size: 12px;
             font-family: JetBrains Mono, monospace;
             line-height: 1.5;
@@ -1218,11 +1316,11 @@ function hideComponentDetail() {
 
         if (open) {
             // Green — market is open, data is live
-            bar.style.background = 'rgba(16, 185, 129, 0.06)';
-            bar.style.border = '1px solid rgba(16, 185, 129, 0.15)';
-            dot.style.background = '#10b981';
-            dot.style.boxShadow = '0 0 6px rgba(16, 185, 129, 0.6)';
-            text.style.color = '#10b981';
+            bar.style.background = 'rgba(34, 197, 94, 0.06)';
+            bar.style.border = '1px solid rgba(34, 197, 94, 0.15)';
+            dot.style.background = '#22c55e';
+            dot.style.boxShadow = '0 0 6px rgba(34, 197, 94, 0.6)';
+            text.style.color = '#22c55e';
             text.textContent = `Live data · Market open · ${currentET} ET`;
 
             // Cards at full opacity — data is current
@@ -1233,11 +1331,11 @@ function hideComponentDetail() {
 
         } else {
             // Red — market is closed
-            bar.style.background = 'rgba(239, 68, 68, 0.06)';
-            bar.style.border = '1px solid rgba(239, 68, 68, 0.15)';
-            dot.style.background = '#ef4444';
+            bar.style.background = 'rgba(244, 63, 94, 0.06)';
+            bar.style.border = '1px solid rgba(244, 63, 94, 0.15)';
+            dot.style.background = '#f43f5e';
             dot.style.boxShadow = 'none';
-            text.style.color = '#94a3b8';
+            text.style.color = '#b4c6e0';
             text.textContent = `Market closed · ${getNextMarketOpen()} · ${currentET} ET`;
 
             // Cards at slightly reduced opacity — values are from last session
@@ -1330,10 +1428,10 @@ function hideComponentDetail() {
       const yMin = min - range * yPadPct;
       const yMax = max + range * yPadPct;
       const yRange = yMax - yMin || 1;
-      ctx.fillStyle = '#0a0e1a';
+      ctx.fillStyle = '#060b18';
       ctx.fillRect(0, 0, w, h);
       // Grid lines at 25%, 50%, 75%
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 0.5;
       for (let i = 1; i < 4; i++) {
         const y = pad + plotH * (1 - i / 4);
@@ -1365,13 +1463,13 @@ function hideComponentDetail() {
       ctx.lineTo(firstX, chartBottom);
       ctx.closePath();
       const fillGradient = ctx.createLinearGradient(0, chartTop, 0, chartBottom);
-      fillGradient.addColorStop(0, 'rgba(0, 212, 255, 0.12)');
-      fillGradient.addColorStop(0.5, 'rgba(0, 212, 255, 0.04)');
-      fillGradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+      fillGradient.addColorStop(0, 'rgba(0, 229, 255, 0.18)');
+      fillGradient.addColorStop(0.5, 'rgba(0, 229, 255, 0.06)');
+      fillGradient.addColorStop(1, 'rgba(0, 229, 255, 0)');
       ctx.fillStyle = fillGradient;
       ctx.fill();
       // Redraw the line on top of the fill
-      ctx.strokeStyle = color || '#00d4ff';
+      ctx.strokeStyle = color || '#00e5ff';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(pts[0].x, pts[0].y);
@@ -1412,7 +1510,7 @@ function hideComponentDetail() {
       const chartHeight = height - padding.top - padding.bottom;
       const barWidth = (chartWidth / data.length) * 0.7;
       ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 0.5;
       [0.25, 0.5, 0.75, 1].forEach(ratio => {
         const y = padding.top + chartHeight * (1 - ratio);
@@ -1420,7 +1518,7 @@ function hideComponentDetail() {
         ctx.moveTo(padding.left, y);
         ctx.lineTo(width - padding.right, y);
         ctx.stroke();
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+        ctx.fillStyle = 'rgba(180, 198, 224, 0.65)';
         ctx.font = '10px Inter';
         ctx.textAlign = 'right';
         ctx.fillText(Math.round(maxVal * ratio / 1000) + 'k', padding.left - 6, y + 4);
@@ -1432,11 +1530,11 @@ function hideComponentDetail() {
         const isPeak = value === Math.max(...data);
         const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
         if (isPeak) {
-          grad.addColorStop(0, 'rgba(0, 212, 255, 0.9)');
-          grad.addColorStop(1, 'rgba(0, 212, 255, 0.4)');
+          grad.addColorStop(0, 'rgba(0, 229, 255, 1.0)');
+          grad.addColorStop(1, 'rgba(0, 229, 255, 0.5)');
         } else {
-          grad.addColorStop(0, 'rgba(0, 212, 255, 0.6)');
-          grad.addColorStop(1, 'rgba(0, 212, 255, 0.2)');
+          grad.addColorStop(0, 'rgba(0, 229, 255, 0.8)');
+          grad.addColorStop(1, 'rgba(0, 229, 255, 0.25)');
         }
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -1444,7 +1542,7 @@ function hideComponentDetail() {
         else ctx.rect(x, y, barWidth, barHeight);
         ctx.fill();
       });
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+      ctx.fillStyle = 'rgba(180, 198, 224, 0.65)';
       ctx.font = '10px Inter';
       ctx.textAlign = 'center';
       [0, 4, 9, 14, 19].forEach(i => {
@@ -1478,9 +1576,9 @@ function hideComponentDetail() {
       const radius = Math.min(width, height) * 0.35;
       const lagValue = window.demoConsumerLag || 42;
       let gaugeColor;
-      if (lagValue <= 1000) gaugeColor = '#10b981';
-      else if (lagValue <= 5000) gaugeColor = '#f59e0b';
-      else gaugeColor = '#ef4444';
+      if (lagValue <= 1000) gaugeColor = '#22c55e';
+      else if (lagValue <= 5000) gaugeColor = '#fbbf24';
+      else gaugeColor = '#f43f5e';
       const maxLag = 10000;
       const fillRatio = Math.min(lagValue / maxLag, 1);
       const startAngle = (225 * Math.PI) / 180;
@@ -1504,12 +1602,12 @@ function hideComponentDetail() {
         ctx.stroke();
         ctx.shadowBlur = 0;
       }
-      ctx.fillStyle = '#f1f5f9';
+      ctx.fillStyle = '#ffffff';
       ctx.font = 'bold ' + Math.round(radius * 0.5) + 'px JetBrains Mono, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(lagValue.toLocaleString(), cx, cy - 4);
-      ctx.fillStyle = '#94a3b8';
+      ctx.fillStyle = '#b4c6e0';
       ctx.font = '12px Inter';
       ctx.fillText('messages', cx, cy + radius * 0.4);
       const statusLabel = lagValue <= 1000 ? '✓ normal' : lagValue <= 5000 ? '⚠ elevated' : '✗ critical';
@@ -1521,7 +1619,7 @@ function hideComponentDetail() {
         const markerRadius = radius + 18;
         const x = cx + Math.cos(angle) * markerRadius;
         const y = cy + Math.sin(angle) * markerRadius;
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+        ctx.fillStyle = 'rgba(180, 198, 224, 0.55)';
         ctx.font = '9px Inter';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1588,7 +1686,7 @@ function hideComponentDetail() {
       if (!state.priceHistory[t]) state.priceHistory[t] = [];
       state.priceHistory[t].push(price || prev);
       if (state.priceHistory[t].length > 60) state.priceHistory[t].shift();
-      drawSparkline('sparkline-canvas', state.priceHistory[t].filter(Boolean), '#00d4ff');
+      drawSparkline('sparkline-canvas', state.priceHistory[t].filter(Boolean), '#00e5ff');
     }
 
     function renderAnomalies() {
