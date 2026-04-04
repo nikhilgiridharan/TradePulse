@@ -538,6 +538,30 @@
     <main class="main-content">
       <section id="section-overview" class="section active">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Overview</h1>
+        <!-- Market status bar — shown in Overview section -->
+        <!-- Updates automatically based on market hours -->
+        <div id="overview-market-status" style="
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    font-family: Inter, sans-serif;
+">
+    <span id="overview-status-dot" style="
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    "></span>
+    <span id="overview-status-text" style="
+        font-family: Inter, sans-serif;
+        font-size: 12px;
+    "></span>
+</div>
         <div class="metric-grid">
           <div class="metric-card"><div class="label">Events/sec</div><div class="value font-mono" id="ov-events">14,832</div><div class="trend up">↑ +2.3%</div></div>
           <div class="metric-card"><div class="label">p99 Latency</div><div class="value font-mono" id="ov-latency">67ms</div><div class="status">✓ healthy</div></div>
@@ -660,13 +684,6 @@
 
       <section id="section-live" class="section">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Live Data</h1>
-        <div class="ticker-pills">
-          <span class="ticker-pill active" data-ticker="AAPL">AAPL</span>
-          <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
-          <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
-          <span class="ticker-pill" data-ticker="AMZN">AMZN</span>
-          <span class="ticker-pill" data-ticker="TSLA">TSLA</span>
-        </div>
         <!-- Market closed state for Live Data section -->
         <!-- Shown when market is closed, hidden during trading hours -->
         <div id="market-closed-state" style="
@@ -706,7 +723,16 @@
         font-family: Inter, sans-serif;
     ">Live data resumes automatically at market open</div>
 </div>
-        <div class="live-data-grid">
+        <!-- Ticker, quote panels, sentiment, sparkline — hidden together when market is closed -->
+        <div id="live-data-when-open">
+        <div class="ticker-pills">
+          <span class="ticker-pill active" data-ticker="AAPL">AAPL</span>
+          <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
+          <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
+          <span class="ticker-pill" data-ticker="AMZN">AMZN</span>
+          <span class="ticker-pill" data-ticker="TSLA">TSLA</span>
+        </div>
+        <div class="live-data-grid" id="live-data-panels">
           <div class="live-panel">
             <h4>Latest Quote — <span id="live-ticker">AAPL</span></h4>
             <div class="price font-mono" id="live-price">$250.12</div>
@@ -743,6 +769,7 @@
             <span id="sparkline-range" class="muted" style="font-size:12px;font-family:JetBrains Mono,monospace;"></span>
           </div>
           <canvas id="sparkline-canvas" width="800" height="120"></canvas>
+        </div>
         </div>
       </section>
 
@@ -902,19 +929,21 @@
      */
     function isMarketOpen() {
         const now = new Date();
-
-        const etFormatter = new Intl.DateTimeFormat('en-US', {
+        // Separate formatters: some engines omit or mis-order parts when weekday + time are combined.
+        const weekday = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/New_York',
+            weekday: 'long',
+        }).format(now).trim();
+        const timeParts = new Intl.DateTimeFormat('en-US', {
             timeZone: 'America/New_York',
             hour: 'numeric',
             minute: 'numeric',
             hour12: false,
-            weekday: 'long'
-        });
-
-        const parts = etFormatter.formatToParts(now);
-        const weekday = parts.find(p => p.type === 'weekday').value;
-        const hour = parseInt(parts.find(p => p.type === 'hour').value);
-        const minute = parseInt(parts.find(p => p.type === 'minute').value);
+        }).formatToParts(now);
+        const hourPart = timeParts.find(p => p.type === 'hour');
+        const minPart = timeParts.find(p => p.type === 'minute');
+        const hour = hourPart ? parseInt(hourPart.value, 10) : 0;
+        const minute = minPart ? parseInt(minPart.value, 10) : 0;
 
         const timeInMinutes = hour * 60 + minute;
         const marketOpen = 9 * 60 + 30;   // 9:30 AM ET
@@ -931,19 +960,20 @@
      */
     function getNextMarketOpen() {
         const now = new Date();
-
-        const etFormatter = new Intl.DateTimeFormat('en-US', {
+        const weekday = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/New_York',
+            weekday: 'long',
+        }).format(now).trim();
+        const timeParts = new Intl.DateTimeFormat('en-US', {
             timeZone: 'America/New_York',
             hour: 'numeric',
             minute: 'numeric',
             hour12: false,
-            weekday: 'long'
-        });
-
-        const parts = etFormatter.formatToParts(now);
-        const weekday = parts.find(p => p.type === 'weekday').value;
-        const hour = parseInt(parts.find(p => p.type === 'hour').value);
-        const minute = parseInt(parts.find(p => p.type === 'minute').value);
+        }).formatToParts(now);
+        const hourPart = timeParts.find(p => p.type === 'hour');
+        const minPart = timeParts.find(p => p.type === 'minute');
+        const hour = hourPart ? parseInt(hourPart.value, 10) : 0;
+        const minute = minPart ? parseInt(minPart.value, 10) : 0;
         const timeInMinutes = hour * 60 + minute;
         const marketOpen = 9 * 60 + 30;
 
@@ -958,6 +988,67 @@
         }
 
         return 'Opens tomorrow at 9:30 AM ET';
+    }
+
+    /**
+     * Updates the market status bar in the Overview section.
+     * 
+     * When open:
+     *   Green dot + "Live data · Market open · [current ET time]"
+     *   Cards appear at full opacity
+     * 
+     * When closed:
+     *   Red dot + "Market closed · [next open message] · Showing last session values"
+     *   Cards appear at reduced opacity to signal data is not live
+     */
+    function updateOverviewMarketStatus() {
+        const open = isMarketOpen();
+
+        const bar = document.getElementById('overview-market-status');
+        const dot = document.getElementById('overview-status-dot');
+        const text = document.getElementById('overview-status-text');
+
+        if (!bar || !dot || !text) return;
+
+        // Get current ET time for display
+        const timeFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/New_York',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        const currentET = timeFormatter.format(new Date());
+
+        if (open) {
+            // Green — market is open, data is live
+            bar.style.background = 'rgba(16, 185, 129, 0.06)';
+            bar.style.border = '1px solid rgba(16, 185, 129, 0.15)';
+            dot.style.background = '#10b981';
+            dot.style.boxShadow = '0 0 6px rgba(16, 185, 129, 0.6)';
+            text.style.color = '#10b981';
+            text.textContent = `Live data · Market open · ${currentET} ET`;
+
+            // Cards at full opacity — data is current
+            const cards = document.querySelectorAll('.metric-card, .overview-card-item');
+            cards.forEach(card => {
+                card.style.opacity = '1';
+            });
+
+        } else {
+            // Red — market is closed
+            bar.style.background = 'rgba(239, 68, 68, 0.06)';
+            bar.style.border = '1px solid rgba(239, 68, 68, 0.15)';
+            dot.style.background = '#ef4444';
+            dot.style.boxShadow = 'none';
+            text.style.color = '#94a3b8';
+            text.textContent = `Market closed · ${getNextMarketOpen()} · ${currentET} ET`;
+
+            // Cards at slightly reduced opacity — values are from last session
+            const cards = document.querySelectorAll('.metric-card, .overview-card-item');
+            cards.forEach(card => {
+                card.style.opacity = '0.6';
+            });
+        }
     }
 
     function rnd(prev, drift = 0.005) {
@@ -1317,6 +1408,7 @@
     });
 
     function renderLiveData() {
+      if (!isMarketOpen()) return;
       const t = state.activeTicker;
       document.getElementById('live-ticker').textContent = t;
       const price = state.lastPrice[t] || 0;
@@ -1426,39 +1518,28 @@
     function updateLiveDataSection() {
         const marketOpen = isMarketOpen();
 
-        // Elements to show during market hours
-        const panelsGrid = document.querySelector('.live-data-grid');
-        const sparklineContainer = document.getElementById('sparkline-container');
-
-        // Market closed state element
+        const whenOpen = document.getElementById('live-data-when-open');
         const closedState = document.getElementById('market-closed-state');
         const nextOpenMsg = document.getElementById('next-open-message');
 
         if (!closedState) return;
 
         if (marketOpen) {
-            // Market is open — show panels, hide closed state
-            if (panelsGrid) panelsGrid.style.display = 'grid';
-            if (sparklineContainer) sparklineContainer.style.display = 'block';
+            if (whenOpen) whenOpen.style.display = '';
             closedState.style.display = 'none';
 
-            // Start simulation if not already running
             if (!window.priceSimulationInterval) {
                 startDemoSimulation();
             }
 
         } else {
-            // Market is closed — hide panels, show closed state
-            if (panelsGrid) panelsGrid.style.display = 'none';
-            if (sparklineContainer) sparklineContainer.style.display = 'none';
+            if (whenOpen) whenOpen.style.display = 'none';
             closedState.style.display = 'block';
 
-            // Update next open message
             if (nextOpenMsg) {
                 nextOpenMsg.textContent = getNextMarketOpen();
             }
 
-            // Stop simulation — no point running when market is closed
             if (window.priceSimulationInterval) {
                 clearInterval(window.priceSimulationInterval);
                 window.priceSimulationInterval = null;
@@ -1489,6 +1570,7 @@
      * The panel is clearly part of the demo mode simulation.
      */
     async function pollSentiment(ticker) {
+      if (!isMarketOpen()) return;
       try {
         const response = await fetch(`/sentiment/${ticker}?hours=4`);
 
@@ -1586,6 +1668,7 @@
       const sectionEl = document.getElementById('section-' + section);
       if (sectionEl) sectionEl.classList.add('active');
       state.activeSection = section;
+      if (section === 'overview') updateOverviewMarketStatus();
     }
 
     function populateOverviewAnomalies() {
@@ -1662,6 +1745,7 @@
         if (sectionEl) sectionEl.classList.add('active');
         state.activeSection = section;
         if (section === 'live') updateLiveDataSection();
+        if (section === 'overview') updateOverviewMarketStatus();
       });
     });
 
@@ -1677,6 +1761,7 @@
         if (sectionEl) sectionEl.classList.add('active');
         state.activeSection = section;
         if (section === 'live') updateLiveDataSection();
+        if (section === 'overview') updateOverviewMarketStatus();
       });
     });
 
@@ -1704,14 +1789,20 @@
     });
 
     if (DEMO_MODE && document.getElementById('demo-banner')) document.getElementById('demo-banner').style.display = 'flex';
+    // Apply market-hours UI immediately — do not wait on /market-prices (slow/hanging fetch
+    // would otherwise leave Live Data panels visible with default HTML all weekend).
+    updateLiveDataSection();
+    updateOverviewMarketStatus();
     // Call fetchRealBasePrices before starting the simulation
     // so the random walk begins from accurate real market prices
     (async function () {
       await fetchRealBasePrices();
       poll();
       updateLiveDataSection();
+      updateOverviewMarketStatus();
     })();
     setInterval(updateLiveDataSection, 60000);
+    setInterval(updateOverviewMarketStatus, 60000);
     setInterval(() => pollSentiment(state.activeTicker), 30000);
     // Populate sentiment panel immediately on load
     // (same pattern as other panels — don't wait for first 30s interval)
