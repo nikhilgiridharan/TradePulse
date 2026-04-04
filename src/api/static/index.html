@@ -64,44 +64,11 @@
       align-items: center;
       gap: 12px;
     }
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .logo-icon svg { width: 16px; height: 16px; fill: white; }
     .logo-text { font-weight: 700; font-size: 1.25rem; }
-    .version-badge {
-      background: var(--bg-tertiary);
-      color: var(--accent-primary);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .header-center { display: flex; gap: 16px; align-items: center; }
-    .stat-pill {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .stat-pill.cyan { color: var(--accent-primary); }
-    .stat-pill.green { color: var(--accent-green); }
-    .stat-pill.pulse { animation: pulse 2s ease-in-out infinite; }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.85; transform: scale(0.98); }
     }
-    .header-right { display: flex; gap: 8px; }
     .btn {
       padding: 8px 14px;
       border-radius: 6px;
@@ -230,96 +197,26 @@
     .flow-dot { fill: #00d4ff; }
     .flow-dot.news { fill: #7c3aed; }
     .join-line { stroke: #94a3b8; stroke-dasharray: 4 4; stroke-width: 1; fill: none; }
-    .overview-bottom-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .overview-widget, .overview-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-    }
-    .overview-widget h4 { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .anomaly-preview-row {
-      padding: 10px 12px;
-      border-left: 2px solid rgba(239, 68, 68, 0.5);
-      margin-bottom: 8px;
-      border-radius: 4px;
-      background: var(--bg-tertiary);
-      font-size: 12px;
-    }
-    .anomaly-preview-row .score { font-family: 'JetBrains Mono', monospace; }
-    .health-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 12px; }
-    .health-row:last-child { border-bottom: none; }
-    .health-row .value { font-family: 'JetBrains Mono', monospace; color: var(--accent-green); }
-    .health-dot { display: inline-block; width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; margin-right: 6px; animation: pulse 2s ease-in-out infinite; }
-    .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
-    .tech-badge {
-      background: var(--bg-tertiary);
-      color: var(--text-secondary);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-    }
-
-    /* API Reference */
-    .api-layout { display: flex; gap: 24px; }
-    .api-list { width: 320px; flex-shrink: 0; }
-    .api-list .endpoint-item {
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      background: var(--bg-tertiary);
+    .arch-box {
       cursor: pointer;
-      border: 1px solid transparent;
+      transition: all 0.15s ease;
     }
-    .endpoint-item:hover { border-color: var(--border-color); }
-    .endpoint-item.selected { border-color: var(--accent-primary); background: rgba(0,212,255,0.06); }
-    .endpoint-item .method { font-family: 'JetBrains Mono', monospace; font-size: 11px; display: inline-block; padding: 2px 6px; border-radius: 4px; background: var(--accent-primary); color: var(--bg-primary); margin-right: 8px; }
-    .endpoint-item .path { font-size: 13px; }
-    .api-detail { flex: 1; }
-    .api-card {
-      background: var(--bg-secondary);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      padding: 20px;
-      margin-bottom: 16px;
+    .arch-box:hover {
+      filter: brightness(1.2);
+      transform: translateY(-1px);
     }
-    .api-card h3 { font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-    .api-card .try-btn { font-size: 12px; color: var(--accent-primary); cursor: pointer; }
-    .api-card pre { background: var(--bg-primary); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
-    .try-panel {
-      position: fixed;
-      top: 56px;
-      right: 0;
-      width: 400px;
-      max-width: 100%;
-      height: calc(100vh - 56px);
-      background: var(--bg-secondary);
-      border-left: 1px solid var(--border-color);
-      padding: 20px;
-      overflow-y: auto;
-      transform: translateX(100%);
-      transition: transform 0.25s ease;
-      z-index: 90;
+    .arch-box.pipeline-box.main:hover {
+      stroke: #00d4ff;
+      stroke-opacity: 1;
     }
-    .try-panel.open { transform: translateX(0); }
-    .try-panel input { width: 100%; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); margin: 8px 0; }
-    .try-panel .response-box { background: var(--bg-primary); padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 11px; font-family: 'JetBrains Mono', monospace; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; }
-    .try-panel .meta { font-size: 11px; color: var(--text-secondary); margin-top: 8px; }
-    .try-panel .close-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; }
-    .try-panel .close-btn:hover { color: var(--text-primary); }
-    .response-box .key { color: #94a3b8; }
-    .response-box .str { color: var(--accent-primary); }
-    .response-box .num { color: var(--accent-green); }
-    .response-box .bool { color: var(--accent-secondary); }
-    .response-box .null { color: var(--accent-red); }
-    .status-200 { color: var(--accent-green); }
-    .status-404 { color: var(--accent-yellow); }
-    .status-500 { color: var(--accent-red); }
+    .arch-box.pipeline-box.news:hover {
+      stroke: #c4b5fd;
+      stroke-opacity: 1;
+    }
+    .arch-box-active {
+      filter: brightness(1.3);
+      transform: translateY(-1px);
+    }
 
     /* Live Data */
     .ticker-pills { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -460,10 +357,7 @@
       .sidebar { width: 60px; min-width: 60px; padding: 16px 0; }
       .sidebar .wordmark, .sidebar .nav-item span { display: none; }
       .main-content { margin-left: 60px; }
-      .header-center { display: none; }
       .metric-grid { grid-template-columns: 1fr; }
-      .api-layout { flex-direction: column; }
-      .api-list { width: 100%; }
     }
 
     /* Scrollbar */
@@ -508,18 +402,7 @@
   </div>
   <header class="header">
     <div class="header-left">
-      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 13v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 9V7h2v2H3zm4 0V7h2v2H7zm4 0V7h2v2h-2zm4 0V7h2v2h-2zm4 0V7h2v2h-2zM3 5V3h2v2H3zm4 0V3h2v2H7zm4 0V3h2v2h-2zm4 0V3h2v2h-2zm4 0V3h2v2h-2z"/></svg></div>
       <span class="logo-text">TradePulse</span>
-      <span class="version-badge">API v1.0.0</span>
-    </div>
-    <div class="header-center">
-      <div class="stat-pill cyan pulse" id="stat-events">⚡ <span id="stat-events-val">14,832</span> events/sec</div>
-      <div class="stat-pill green pulse" id="stat-latency">⏱ <span id="stat-latency-val">12ms</span> p50 latency</div>
-      <div class="stat-pill green" id="stat-status">✓ <span id="stat-status-val">All Systems Operational</span></div>
-    </div>
-    <div class="header-right">
-      <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
-      <a href="/openapi.json" target="_blank" class="btn btn-primary">View OpenAPI Spec</a>
     </div>
   </header>
 
@@ -527,11 +410,9 @@
     <aside class="sidebar">
       <div class="wordmark">TradePulse</div>
       <div class="nav-item active" data-section="overview">📊 <span>Overview</span></div>
-      <div class="nav-item" data-section="api">📡 <span>API Reference</span></div>
       <div class="nav-item" data-section="live">📈 <span>Live Data</span></div>
       <div class="nav-item" data-section="pipeline">🔧 <span>Pipeline Status</span></div>
       <div class="nav-item" data-section="anomalies">⚠️ <span>Anomalies</span></div>
-      <a href="/about" class="nav-item" id="nav-about">📖 <span>About</span></a>
       <div class="sidebar-footer"><div class="dot"></div> Pipeline Active</div>
     </aside>
 
@@ -577,109 +458,150 @@
             </defs>
             <!-- Main stream -->
             <g class="main-stream">
-              <rect class="pipeline-box main" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 5 tickers</title>
-              <text x="80" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Polygon.io</text>
+              <rect class="arch-box pipeline-box main" data-component="polygon" onclick="showComponentDetail('polygon')" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 5 tickers</title>
+              <text x="80" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Polygon.io</text>
               <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
-              <rect class="pipeline-box main" x="152" y="24" width="120" height="44" rx="8"/><title>6 partitions · idempotent producer · exactly-once</title>
-              <text x="212" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Kafka</text>
+              <rect class="arch-box pipeline-box main" data-component="kafka" onclick="showComponentDetail('kafka')" x="152" y="24" width="120" height="44" rx="8"/><title>6 partitions · idempotent producer · exactly-once</title>
+              <text x="212" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka</text>
               <line class="pipeline-line" x1="272" y1="46" x2="284" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
-              <rect class="pipeline-box main" x="284" y="24" width="120" height="44" rx="8"/><title>Pydantic schema validation · invalid → SQS DLQ</title>
-              <text x="344" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Validation</text>
+              <rect class="arch-box pipeline-box main" data-component="validation" onclick="showComponentDetail('validation')" x="284" y="24" width="120" height="44" rx="8"/><title>Pydantic schema validation · invalid → SQS DLQ</title>
+              <text x="344" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Validation</text>
               <line class="pipeline-line" x1="404" y1="46" x2="416" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
-              <rect class="pipeline-box main" x="416" y="24" width="120" height="44" rx="8"/><title>Stream processing · VWAP · z-score · momentum · exactly-once</title>
-              <text x="476" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Faust</text>
+              <rect class="arch-box pipeline-box main" data-component="faust" onclick="showComponentDetail('faust')" x="416" y="24" width="120" height="44" rx="8"/><title>Stream processing · VWAP · z-score · momentum · exactly-once</title>
+              <text x="476" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Faust</text>
               <line class="pipeline-line" x1="536" y1="46" x2="548" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
-              <rect class="pipeline-box main" x="548" y="24" width="120" height="44" rx="8"/><title>Hot storage · ticker#shard key · 48hr TTL · conditional writes</title>
-              <text x="608" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">DynamoDB</text>
+              <rect class="arch-box pipeline-box main" data-component="dynamodb" onclick="showComponentDetail('dynamodb')" x="548" y="24" width="120" height="44" rx="8"/><title>Hot storage · ticker#shard key · 48hr TTL · conditional writes</title>
+              <text x="608" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB</text>
               <line class="pipeline-line" x1="668" y1="46" x2="680" y2="46" stroke="#00d4ff" marker-end="url(#arrow-main)"/>
-              <rect class="pipeline-box main" x="680" y="24" width="120" height="44" rx="8"/><title>5 endpoints · rate limited · 1s cache · custom dashboard</title>
-              <text x="740" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">FastAPI</text>
+              <rect class="arch-box pipeline-box main" data-component="fastapi" onclick="showComponentDetail('fastapi')" x="680" y="24" width="120" height="44" rx="8"/><title>5 endpoints · rate limited · 1s cache · custom dashboard</title>
+              <text x="740" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">FastAPI</text>
               <!-- DLQ -->
               <line class="pipeline-line" x1="344" y1="68" x2="344" y2="88" stroke="#ef4444" marker-end="url(#arrow-main)"/>
-              <rect class="pipeline-box dlq" x="294" y="88" width="100" height="36" rx="8"/><title>Failed messages · 3 retries → DLQ · 5 DLQ retries → S3 archive</title>
-              <text x="344" y="111" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">SQS DLQ</text>
+              <rect class="arch-box pipeline-box dlq" data-component="sqs_dlq" onclick="showComponentDetail('sqs_dlq')" x="294" y="88" width="100" height="36" rx="8"/><title>Failed messages · 3 retries → DLQ · 5 DLQ retries → S3 archive</title>
+              <text x="344" y="111" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">SQS DLQ</text>
               <!-- Anomaly ML, Feature Store -->
               <line class="pipeline-line" x1="476" y1="68" x2="476" y2="88" stroke="#f59e0b"/>
-              <rect class="pipeline-box ml" x="416" y="88" width="120" height="44" rx="8"/><title>Isolation Forest · rolling retrain · 0.3ms inference</title>
-              <text x="476" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">Anomaly ML</text>
+              <rect class="arch-box pipeline-box ml" data-component="anomaly_ml" onclick="showComponentDetail('anomaly_ml')" x="416" y="88" width="120" height="44" rx="8"/><title>Isolation Forest · rolling retrain · 0.3ms inference</title>
+              <text x="476" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Anomaly ML</text>
               <line class="pipeline-line" x1="476" y1="132" x2="476" y2="148" stroke="#f59e0b"/>
-              <rect class="pipeline-box ml" x="416" y="148" width="120" height="44" rx="8"/><title>Precomputed features · DynamoDB · 7-day TTL</title>
-              <text x="476" y="175" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">Feature Store</text>
+              <rect class="arch-box pipeline-box ml" data-component="feature_store" onclick="showComponentDetail('feature_store')" x="416" y="148" width="120" height="44" rx="8"/><title>Precomputed features · DynamoDB · 7-day TTL</title>
+              <text x="476" y="175" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Feature Store</text>
               <!-- S3 Cold -->
               <line class="pipeline-line" x1="608" y1="68" x2="608" y2="88" stroke="#10b981"/>
-              <rect class="pipeline-box storage" x="548" y="88" width="120" height="44" rx="8"/><title>Cold storage · Hive partitioning · Snappy compression · Athena</title>
-              <text x="608" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">S3 Parquet</text>
+              <rect class="arch-box pipeline-box storage" data-component="s3_parquet" onclick="showComponentDetail('s3_parquet')" x="548" y="88" width="120" height="44" rx="8"/><title>Cold storage · Hive partitioning · Snappy compression · Athena</title>
+              <text x="608" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">S3 Parquet</text>
             </g>
             <!-- Join annotation -->
             <line class="join-line" x1="476" y1="68" x2="476" y2="232"/>
-            <text x="476" y="152" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="middle">60s temporal join</text>
+            <text x="476" y="152" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">60s temporal join</text>
             <!-- News stream -->
             <g class="news-stream">
-              <rect class="pipeline-box news" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
-              <text x="80" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Finnhub API</text>
+              <rect class="arch-box pipeline-box news" data-component="finnhub" onclick="showComponentDetail('finnhub')" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
+              <text x="80" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Finnhub API</text>
               <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
-              <rect class="pipeline-box news" x="152" y="232" width="120" height="44" rx="8"/><title>Separate topic · low frequency · independent scaling</title>
-              <text x="212" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Kafka market.news</text>
+              <rect class="arch-box pipeline-box news" data-component="kafka_news" onclick="showComponentDetail('kafka_news')" x="152" y="232" width="120" height="44" rx="8"/><title>Separate topic · low frequency · independent scaling</title>
+              <text x="212" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka market.news</text>
               <line class="pipeline-line news" x1="272" y1="254" x2="284" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
-              <rect class="pipeline-box news" x="284" y="232" width="120" height="44" rx="8"/><title>&lt;1ms inference · compound score -1.0 to +1.0</title>
-              <text x="344" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">VADER Sentiment</text>
+              <rect class="arch-box pipeline-box news" data-component="vader" onclick="showComponentDetail('vader')" x="284" y="232" width="120" height="44" rx="8"/><title>&lt;1ms inference · compound score -1.0 to +1.0</title>
+              <text x="344" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">VADER Sentiment</text>
               <line class="pipeline-line news" x1="404" y1="254" x2="416" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
-              <rect class="pipeline-box news" x="416" y="232" width="120" height="44" rx="8"/><title>Joins sentiment + volume z-score · 60s temporal window</title>
-              <text x="476" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle">Correlator</text>
+              <rect class="arch-box pipeline-box news" data-component="correlator" onclick="showComponentDetail('correlator')" x="416" y="232" width="120" height="44" rx="8"/><title>Joins sentiment + volume z-score · 60s temporal window</title>
+              <text x="476" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Correlator</text>
               <line class="pipeline-line news" x1="536" y1="254" x2="548" y2="254" stroke="#7c3aed" marker-end="url(#arrow-news)"/>
-              <rect class="pipeline-box news" x="548" y="232" width="120" height="44" rx="8"/><title>Sentiment store · 30-day TTL · strong correlation flagging</title>
-              <text x="608" y="259" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle">DynamoDB market_sentiment</text>
+              <rect class="arch-box pipeline-box news" data-component="dynamo_sentiment" onclick="showComponentDetail('dynamo_sentiment')" x="548" y="232" width="120" height="44" rx="8"/><title>Sentiment store · 30-day TTL · strong correlation flagging</title>
+              <text x="608" y="259" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB market_sentiment</text>
             </g>
           </svg>
-          <div class="tech-badges">
-            <span class="tech-badge">Python 3.11</span><span class="tech-badge">Apache Kafka</span><span class="tech-badge">Faust</span><span class="tech-badge">AWS DynamoDB</span><span class="tech-badge">AWS S3</span><span class="tech-badge">AWS SQS</span><span class="tech-badge">Scikit-learn</span><span class="tech-badge">FastAPI</span><span class="tech-badge">Docker</span>
-          </div>
         </div>
-        <div class="overview-bottom-row">
-          <div class="overview-card">
-            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-weight:600; color:var(--text-primary);">Recent Anomalies</span>
-              <span onclick="showSection('anomalies')" style="color:var(--accent-primary); font-size:12px; cursor:pointer;">All →</span>
-            </div>
-            <div id="overview-anomalies-list"></div>
-          </div>
-          <div class="overview-card">
-            <div style="font-weight:600; color:var(--text-primary); margin-bottom:12px;">System Health</div>
-            <table style="width:100%; border-collapse:collapse;">
-              <tbody id="system-health-rows"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+        <!-- Component detail panel — slides in when a diagram box is clicked -->
+        <div id="component-detail-panel" style="
+    display: none;
+    margin-top: 16px;
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 24px;
+    animation: slideInTop 0.25s ease;
+    position: relative;
+">
+    <!-- Close button -->
+    <button
+        type="button"
+        onclick="hideComponentDetail()"
+        style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 4px;
+        "
+    >×</button>
 
-      <section id="section-api" class="section">
-        <h1 style="margin-bottom:24px;font-size:1.5rem;">API Reference</h1>
-        <div class="api-layout">
-          <div class="api-list">
-            <div class="endpoint-item selected" data-path="/quotes/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/quotes/{ticker}</span></div>
-            <div class="endpoint-item" data-path="/aggregations/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/aggregations/{ticker}</span></div>
-            <div class="endpoint-item" data-path="/anomalies/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/anomalies/{ticker}</span></div>
-            <div class="endpoint-item" data-path="/features/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/features/{ticker}</span></div>
-            <div class="endpoint-item" data-path="/health" data-method="GET"><span class="method">GET</span><span class="path">/health</span></div>
-            <div class="endpoint-item" data-path="/sentiment/{ticker}" data-method="GET"><span class="method">GET</span><span class="path">/sentiment/{ticker}</span></div>
-          </div>
-          <div class="api-detail">
-            <div class="api-card" id="api-detail-card">
-              <h3>GET /quotes/{ticker} <span class="try-btn" data-path="/quotes/{ticker}">Try it ▶</span></h3>
-              <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Returns the latest trade for a given ticker symbol.</p>
-              <p style="font-size:12px;margin-bottom:8px;"><strong>Parameters</strong></p>
-              <p style="font-size:12px;color:var(--text-secondary);">ticker — string, required — Stock ticker (e.g. AAPL)</p>
-              <p style="font-size:12px;margin:12px 0 8px;"><strong>Response 200</strong></p>
-              <pre id="api-response-sample">{
-  "ticker": "AAPL",
-  "price": 250.12,
-  "volume": 1250,
-  "timestamp": "2025-02-22T14:32:01.123Z",
-  "sequence_number": 8472910
-}</pre>
-            </div>
-          </div>
+    <!-- Header -->
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <div id="detail-color-dot" style="
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        "></div>
+        <div>
+            <div id="detail-title" style="
+                color: #f1f5f9;
+                font-size: 16px;
+                font-weight: 600;
+                font-family: Inter, sans-serif;
+                margin-bottom: 2px;
+            "></div>
+            <div id="detail-role" style="
+                color: #94a3b8;
+                font-size: 12px;
+                font-family: Inter, sans-serif;
+            "></div>
         </div>
+    </div>
+
+    <!-- Why section -->
+    <div style="margin-bottom:16px;">
+        <div style="
+            color: #94a3b8;
+            font-size: 11px;
+            font-family: Inter, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        ">Why this component</div>
+        <div id="detail-why" style="
+            color: #cbd5e1;
+            font-size: 13px;
+            font-family: Inter, sans-serif;
+            line-height: 1.6;
+        "></div>
+    </div>
+
+    <!-- Technical details -->
+    <div>
+        <div style="
+            color: #94a3b8;
+            font-size: 11px;
+            font-family: Inter, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        ">Technical details</div>
+        <ul id="detail-list" style="
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        "></ul>
+    </div>
+</div>
       </section>
 
       <section id="section-live" class="section">
@@ -803,17 +725,6 @@
     </main>
   </div>
 
-  <div class="try-panel" id="try-panel">
-    <button class="close-btn" id="try-panel-close" aria-label="Close">×</button>
-    <h3 style="margin-bottom:12px;">Try it</h3>
-    <p id="try-endpoint" style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">GET /quotes/{ticker}</p>
-    <label style="font-size:11px;">ticker</label>
-    <input type="text" id="try-input" placeholder="AAPL" value="AAPL" />
-    <button class="btn btn-primary" id="try-send">Send Request</button>
-    <div class="response-box" id="try-response">Response will appear here.</div>
-    <div class="meta" id="try-meta"></div>
-  </div>
-
   <script>
     // Detect if running on Railway (production) vs localhost (development)
     // Used to show/hide demo banner and adjust API base URL if needed
@@ -913,15 +824,301 @@
       anomalies: [],
       pipelineStatus: {},
       metrics: {},
-      endpoints: [
-        { path: '/quotes/{ticker}', method: 'GET', desc: 'Latest trade for a given ticker symbol.', params: [{ name: 'ticker', type: 'string', required: true }], sample: '{"ticker":"AAPL","price":250.12,"volume":1250,"timestamp":"2025-02-22T14:32:01.123Z","sequence_number":8472910}' },
-        { path: '/aggregations/{ticker}', method: 'GET', desc: 'VWAP, rolling averages, momentum.', params: [{ name: 'ticker', type: 'string', required: true }], sample: '{"ticker":"AAPL","vwap_1min":249.84,"vwap_5min":249.31,"volume_zscore":1.84,"price_momentum":0.18}' },
-        { path: '/anomalies/{ticker}', method: 'GET', desc: 'Recent anomaly detections.', params: [{ name: 'ticker', type: 'string' }, { name: 'hours', type: 'number' }], sample: '{"ticker":"AAPL","anomalies":[{"timestamp":"2025-02-22T14:31:47Z","anomaly_score":-0.847}]}' },
-        { path: '/features/{ticker}', method: 'GET', desc: 'Real-time feature vector.', params: [{ name: 'ticker', type: 'string' }], sample: '{"ticker":"AAPL","vwap_5min":249.31,"volume_zscore":1.84,"price_momentum_1min":0.18,"trade_frequency":47}' },
-        { path: '/health', method: 'GET', desc: 'Pipeline health status.', params: [], sample: '{"status":"healthy","uptime_seconds":3600,"consumer_lag":42}' },
-        { path: '/sentiment/{ticker}', method: 'GET', desc: 'Returns news sentiment analysis with market correlation data. Shows which headlines coincided with unusual volume activity — the output of the two-stream news + market data join.', params: [{ name: 'ticker', type: 'string', required: true }, { name: 'hours', type: 'integer', required: false }], sample: '{"ticker":"NVDA","hours":4,"count":4,"summary":{"positive":4,"negative":0,"neutral":0,"strong_correlations":2},"items":[{"article_id":"9182736","ticker":"NVDA","headline":"NVIDIA Blackwell GPU shipments accelerate ahead of schedule","source":"Bloomberg","published_at":"2025-02-22T14:31:55Z","sentiment_score":0.891,"sentiment_label":"positive","correlated_anomaly":true,"volume_zscore_at_publish":4.7,"correlation_strength":"strong","analyzed_at":"2025-02-22T14:31:55.412Z"}]}', paramsDetail: 'ticker  string   required  Stock symbol (AAPL, NVDA, MSFT, AMZN, TSLA)\nhours  integer  optional  Lookback window in hours (default 24, max 168)', exampleReq: 'curl http://localhost:8000/sentiment/NVDA?hours=4', responseLabel: 'Cache: none', responseNote: 'Note: correlation_strength: strong | moderate | weak | none. strong = |sentiment| >= 0.5 AND volume z-score >= 3.0. These are the highest-signal events in the system.' }
-      ]
     };
+
+/**
+ * Detail information for each pipeline component.
+ * Shown in the slide-in panel when a diagram box is clicked.
+ * Each entry has: title, role, why, details array, and color.
+ */
+const COMPONENT_DETAILS = {
+    polygon: {
+        title: 'Polygon.io WebSocket',
+        role: 'Live equity data source',
+        why: 'Polygon.io provides a free-tier WebSocket API streaming real trades and quotes with microsecond timestamps. Chosen over REST polling because WebSocket delivers events as they happen rather than requiring repeated HTTP requests every second.',
+        details: [
+            'Subscribes to XT.* (trades) and XQ.* (quotes) for 5 tickers',
+            'Reconnects automatically with exponential backoff and jitter on disconnect',
+            'Jitter prevents thundering herd when multiple producers reconnect simultaneously',
+            'Partitions messages by ticker symbol so all AAPL events go to the same Kafka partition in order',
+            'Emits ProducerThroughput metric to CloudWatch every 10 seconds'
+        ],
+        color: '#00d4ff'
+    },
+    kafka: {
+        title: 'Apache Kafka',
+        role: 'Durable message buffer and backbone',
+        why: 'Kafka decouples every component in the system. If DynamoDB throttles at market open, the producer keeps running at full speed and events accumulate in Kafka rather than being dropped. Chosen over SQS or Kinesis because Kafka supports replay — you can re-read historical messages from any offset to reprocess data after a bug fix.',
+        details: [
+            '6 partitions on market.trades topic — 2 per ticker with room to grow',
+            'Separate market.news topic for low-frequency news stream',
+            'Idempotent producer enabled — Kafka deduplicates via sequence numbers',
+            'Consumer group offset tracks exactly where processing left off',
+            'Acts as shock absorber during 8-10x market open volume spikes',
+            'Retains data for 7 days — full replay window for debugging'
+        ],
+        color: '#00d4ff'
+    },
+    validation: {
+        title: 'Schema Validation',
+        role: 'Fail-fast data quality gate',
+        why: 'Every event is validated before touching the processing layer. Corrupted data that passes validation would poison aggregations — a negative price would break VWAP, an invalid timestamp would break time-series ordering. Failing fast at the boundary is cheaper than cleaning up corrupted downstream data.',
+        details: [
+            'Pydantic model validates: price > 0, volume >= 0, valid ISO 8601 timestamp, ticker 1-5 uppercase letters',
+            'On failure: logs full raw message with the specific field that failed',
+            'Failed messages route to SQS Dead Letter Queue — never silently dropped',
+            'Tracks per-field failure counts to identify upstream data quality patterns',
+            'Emits ValidationFailures metric to CloudWatch per field per minute'
+        ],
+        color: '#00d4ff'
+    },
+    faust: {
+        title: 'Apache Faust',
+        role: 'Stream processing engine',
+        why: 'Faust is Python-native, lightweight, and supports exactly-once processing via Kafka transactions. Chosen over Spark Streaming because Spark requires a cluster and adds JVM overhead that is overkill at this scale. Faust stores state in RocksDB backed by Kafka changelog topics — fault-tolerant state without a separate state store.',
+        details: [
+            'processing_guarantee exactly_once — process and offset commit are atomic',
+            'Computes VWAP over 1-minute and 5-minute tumbling windows',
+            'Computes volume z-score against 20-period rolling mean and standard deviation',
+            'Computes price momentum as percentage change over 60-second window',
+            'Runs Isolation Forest inference at 0.3ms per event on every trade',
+            'Backpressure: pauses consumption 500ms when DynamoDB write latency exceeds 100ms',
+            'Updates z-score cache every event so sentiment correlator has fresh signal'
+        ],
+        color: '#00d4ff'
+    },
+    dynamodb: {
+        title: 'AWS DynamoDB',
+        role: 'Hot storage — last 48 hours',
+        why: 'DynamoDB delivers single-digit millisecond reads at any scale with zero operational overhead. No servers to manage, no indexes to tune, no vacuum operations. Chosen over Cassandra because Cassandra requires cluster management that is unnecessary for a system at this scale.',
+        details: [
+            'Partition key: ticker#shard where shard = hash(ticker+timestamp) % 8',
+            'Sharding prevents hot partitions — naive ticker key causes throttling at market open',
+            'Conditional writes: ConditionExpression attribute_not_exists for exactly-once',
+            'TTL: 48 hours on raw trades, 7 days on aggregations and features, 30 days on anomalies',
+            'Four tables: market_trades, market_aggregations, market_anomalies, feature_store',
+            'Backpressure threshold: if write p99 exceeds 100ms for 3 consecutive writes, pause Faust'
+        ],
+        color: '#00d4ff'
+    },
+    fastapi: {
+        title: 'FastAPI',
+        role: 'REST API and dashboard server',
+        why: 'FastAPI is async, generates OpenAPI docs automatically, and has Pydantic validation built in. Serves both the REST API and the static dashboard from the same process, which simplifies the Railway deployment significantly.',
+        details: [
+            'GET /quotes/{ticker} — latest trade, cached 1 second',
+            'GET /aggregations/{ticker} — VWAP, z-score, momentum, cached 5 seconds',
+            'GET /anomalies/{ticker} — Isolation Forest detections, no cache',
+            'GET /features/{ticker} — feature vector, cached 1 second',
+            'GET /sentiment/{ticker} — news sentiment with correlation data, no cache',
+            'GET /health — pipeline health, no cache',
+            'Rate limited to 100 requests per minute per IP',
+            'CORS enabled for dashboard access from any origin'
+        ],
+        color: '#00d4ff'
+    },
+    sqs_dlq: {
+        title: 'SQS Dead Letter Queue',
+        role: 'Failure capture and retry system',
+        why: 'Failed messages are never silently dropped. The DLQ pattern ensures every failure has a complete record with full context for investigation and replay. In financial data pipelines, silent data loss is unacceptable — a missing trade corrupts aggregations in ways that may not be discovered for hours.',
+        details: [
+            'Two queues: tradepulse-dlq for processing failures, tradepulse-validation-dlq for schema failures',
+            'Messages include: original payload, error reason, exception type, Kafka offset, retry count, timestamps',
+            'DLQ consumer retries every 15 minutes — gives downstream systems time to recover',
+            '15-minute interval prevents retry storms against a system that is still recovering',
+            'After 5 DLQ retries: archive to s3://tradepulse-data/dead-letters/ for manual inspection',
+            'CloudWatch alarm fires when DLQ depth exceeds 100 messages'
+        ],
+        color: '#ef4444'
+    },
+    anomaly_ml: {
+        title: 'Isolation Forest',
+        role: 'Real-time anomaly detection',
+        why: 'Isolation Forest works by randomly partitioning the feature space. Anomalies are data points that get isolated quickly with few partitions because they sit in sparse regions. Chosen over a simple threshold detector because market conditions vary — what is unusual at 9:31 AM is normal by 2:00 PM. Isolation Forest adapts to current conditions via rolling retraining.',
+        details: [
+            'Per-ticker models — AAPL volatility patterns differ from NVDA',
+            'Feature vector: price, volume, volume z-score, price momentum, VWAP deviation, trade frequency',
+            'Training window: last 1000 events per ticker',
+            'Retrains every 500 new events — adapts to intraday market condition changes',
+            'Contamination: 0.01 — flags top 1% of events as anomalous',
+            'Inference time: 0.3ms per event — adds negligible pipeline latency',
+            'Anomalies written to DynamoDB market_anomalies and S3 with full feature vector'
+        ],
+        color: '#f59e0b'
+    },
+    s3_parquet: {
+        title: 'S3 + Parquet',
+        role: 'Cold storage — historical data',
+        why: 'S3 with Parquet is dramatically cheaper than keeping all historical data in DynamoDB. Parquet is columnar — a query for just price data skips volume, timestamp, and sequence number columns entirely. Athena charges per bytes scanned so columnar format reduces query cost by roughly 80% versus JSON.',
+        details: [
+            'Hive-style partitioning: year=/month=/day=/hour= for Athena partition pruning',
+            'Snappy compression reduces file size by approximately 50%',
+            'Buffer flushes every 5 minutes or when buffer exceeds 10MB',
+            'PyArrow writes Parquet with explicit schema for type safety',
+            'Glue catalog updated after each flush so Athena queries new partitions immediately',
+            'S3 path: tradepulse-data/trades/year=2025/month=02/day=22/hour=14/'
+        ],
+        color: '#10b981'
+    },
+    feature_store: {
+        title: 'Feature Store',
+        role: 'Precomputed real-time features',
+        why: 'The feature store decouples feature computation from model serving. Instead of recomputing VWAP, z-score, and momentum on every API request, features are computed once in the stream and stored for instant retrieval. This pattern is used by Robinhood and Citadel for their real-time ML serving infrastructure.',
+        details: [
+            'Stores: vwap_5min, volume_zscore, price_momentum, trade_frequency, bid_ask_spread',
+            'Partition key: ticker#date_bucket where bucket = YYYY-MM-DD-HH',
+            'Hour bucketing distributes writes — naive ticker key causes hot partitions',
+            'Updated on every new trade event — always reflects current market state',
+            'TTL: 7 days — features have longer analytical value than raw trades',
+            'API serves features at single-digit millisecond latency from DynamoDB'
+        ],
+        color: '#f59e0b'
+    },
+    finnhub: {
+        title: 'Finnhub API',
+        role: 'Real-time news data source',
+        why: 'Finnhub provides company-level news filtering on the free tier, which is exactly what is needed to get AAPL news rather than all financial news. Chosen over NewsAPI because NewsAPI only supports HTTP polling with a 15-minute delay on the free tier — not suitable for real-time correlation.',
+        details: [
+            'Polls every 60 seconds per ticker — sufficient given news arrives at ~100 articles per hour',
+            'Bounded seen-IDs set deduplicates articles across polling intervals',
+            'Seen-IDs set uses FIFO eviction after 10000 entries to prevent memory growth',
+            'Staggered 2-second delay between ticker requests to avoid rate limit bursts',
+            'Publishes to market.news Kafka topic partitioned by ticker symbol',
+            'Free tier: 60 API calls per minute — well within polling budget'
+        ],
+        color: '#7c3aed'
+    },
+    kafka_news: {
+        title: 'Kafka market.news',
+        role: 'News stream buffer',
+        why: 'A separate Kafka topic for news keeps the two streams independent. News arrives at roughly 100 articles per hour versus 15000 trades per second. Mixing them in one topic would require complex routing logic. Separate topics allow independent scaling, independent consumer groups, and independent failure domains.',
+        details: [
+            'Separate from market.trades — independent scaling and failure domain',
+            'Low frequency: roughly 100 articles per hour across all 5 tickers',
+            'Same partitioning strategy as equity stream — partitioned by ticker',
+            'Independent consumer group — news processing falling behind does not affect trade processing',
+            'Retention: 7 days matching equity stream'
+        ],
+        color: '#7c3aed'
+    },
+    vader: {
+        title: 'VADER Sentiment',
+        role: 'Real-time sentiment scoring',
+        why: "VADER runs in under 1 millisecond per headline. FinBERT would be more accurate for financial text but requires 200-400ms per inference and a GPU for production throughput. For real-time stream processing where the signal only needs to be directionally correct for the correlation, VADER's speed tradeoff is the right choice.",
+        details: [
+            'VADER: Valence Aware Dictionary and sEntiment Reasoner — rule-based NLP',
+            'Compound score range: -1.0 most bearish to +1.0 most bullish',
+            'Threshold: >= 0.05 positive, <= -0.05 negative, else neutral',
+            'Analyzes headline plus first 200 characters of article summary',
+            'Summary context reduces ambiguity in short headlines',
+            'Inference time: under 1ms — adds negligible latency to news processing pipeline'
+        ],
+        color: '#7c3aed'
+    },
+    correlator: {
+        title: 'News-Market Correlator',
+        role: 'Two-stream temporal join',
+        why: 'A news article alone is weak signal — most headlines do not move markets. A volume spike alone is ambiguous — it could be institutional rebalancing or noise. When both occur within 60 seconds of each other, the probability of a news-driven market reaction is significantly higher. This compound signal is what quantitative traders call news alpha.',
+        details: [
+            '60-second temporal window: news within 60 seconds of a z-score spike is correlated',
+            'Z-score threshold: 2.0 for correlation, 3.0 for strong correlation',
+            'Correlation strength: strong when sentiment magnitude >= 0.5 AND z-score >= 3.0',
+            'Correlation strength: moderate when sentiment >= 0.2 AND z-score >= 2.0',
+            'Z-score cache: in-memory per ticker with timestamp for fast lookups without DynamoDB reads',
+            'Why 60 seconds: algorithmic traders react within seconds, human traders within minutes'
+        ],
+        color: '#7c3aed'
+    },
+    dynamo_sentiment: {
+        title: 'DynamoDB market_sentiment',
+        role: 'Sentiment and correlation storage',
+        why: 'Sentiment results are stored in their own DynamoDB table rather than the main trades table because they have different access patterns and longer retention requirements. Sentiment data is useful for backtesting and pattern analysis over 30 days, much longer than the 48-hour retention on raw trades.',
+        details: [
+            'Partition key: ticker, sort key: published_at for chronological queries',
+            'Stores: headline, source, sentiment score, VADER breakdown, correlation strength, z-score at publish time',
+            'TTL: 30 days — sentiment has longer analytical value than raw trades',
+            'Conditional write: skips duplicates on Kafka replay without error',
+            'Low write volume — news arrives ~100 articles per hour vs 15000 trades per second',
+            'Hot partition risk is minimal at this write frequency'
+        ],
+        color: '#7c3aed'
+    }
+};
+
+/**
+ * Shows the component detail panel for a clicked diagram box.
+ * If the same component is clicked twice, dismisses the panel.
+ *
+ * @param {string} key - Component key matching COMPONENT_DETAILS object
+ */
+function showComponentDetail(key) {
+    const data = COMPONENT_DETAILS[key];
+    if (!data) return;
+
+    const panel = document.getElementById('component-detail-panel');
+    if (!panel) return;
+
+    // If same box clicked again — toggle off
+    if (panel.style.display !== 'none' && panel.dataset.activeKey === key) {
+        hideComponentDetail();
+        return;
+    }
+
+    // Populate content
+    document.getElementById('detail-title').textContent = data.title;
+    document.getElementById('detail-role').textContent = data.role;
+    document.getElementById('detail-why').textContent = data.why;
+    document.getElementById('detail-color-dot').style.background = data.color;
+    document.getElementById('detail-color-dot').style.boxShadow =
+        `0 0 8px ${data.color}80`;
+
+    // Build details list
+    const list = document.getElementById('detail-list');
+    list.innerHTML = data.details.map(detail => `
+        <li style="
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 12px;
+            font-family: JetBrains Mono, monospace;
+            line-height: 1.5;
+        ">
+            <span style="color: ${data.color}; flex-shrink:0; margin-top:1px;">›</span>
+            <span>${detail}</span>
+        </li>
+    `).join('');
+
+    // Show panel
+    panel.style.display = 'block';
+    panel.dataset.activeKey = key;
+
+    // Highlight the active box — find it and add active border
+    document.querySelectorAll('.arch-box').forEach(box => {
+        box.classList.remove('arch-box-active');
+    });
+    const activeBox = document.querySelector(`[data-component="${key}"]`);
+    if (activeBox) activeBox.classList.add('arch-box-active');
+
+    // Smooth scroll to panel
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/**
+ * Hides the component detail panel and removes active state from all boxes.
+ */
+function hideComponentDetail() {
+    const panel = document.getElementById('component-detail-panel');
+    if (panel) {
+        panel.style.display = 'none';
+        panel.dataset.activeKey = '';
+    }
+    document.querySelectorAll('.arch-box').forEach(box => {
+        box.classList.remove('arch-box-active');
+    });
+}
 
     /**
      * Returns true if the US stock market is currently open.
@@ -1115,18 +1312,6 @@
       } catch (e) {
         return { ok: false, status: 0, error: e.message };
       }
-    }
-
-    function syntaxHighlight(json) {
-      const s = typeof json === 'string' ? json : JSON.stringify(json, null, 2);
-      return s
-        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?)/g, (m) => {
-          const cls = m.endsWith(':') ? 'key' : 'str';
-          return '<span class="' + cls + '">' + m + '</span>';
-        })
-        .replace(/\b(true|false)\b/g, '<span class="bool">$1</span>')
-        .replace(/\b(null)\b/g, '<span class="null">$1</span>')
-        .replace(/\b(-?\d+\.?\d*)\b/g, '<span class="num">$1</span>');
     }
 
     function drawSparkline(canvasId, priceArray, color) {
@@ -1363,50 +1548,6 @@
       if (state.metrics.anomalies !== undefined) document.getElementById('ov-anomalies').textContent = state.metrics.anomalies;
     }
 
-    function renderApiDetail(path) {
-      const ep = state.endpoints.find(e => e.path === path);
-      if (!ep) return;
-      const card = document.getElementById('api-detail-card');
-      const paramsHtml = ep.paramsDetail != null ? ('<p style="font-size:12px;margin-bottom:8px;"><strong>Parameters</strong></p><p style="font-size:12px;color:var(--text-secondary);white-space:pre-wrap;">' + ep.paramsDetail + '</p>') : ('<p style="font-size:12px;margin-bottom:8px;"><strong>Parameters</strong></p><p style="font-size:12px;color:var(--text-secondary);">' + ep.params.map(p => p.name + ' — ' + p.type + (p.required ? ', required' : '')).join('\n') + '</p>');
-      let body = '<h3>' + ep.method + ' ' + ep.path + ' <span class="try-btn" data-path="' + ep.path + '">Try it ▶</span></h3><p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">' + ep.desc + '</p>' + paramsHtml;
-      if (ep.exampleReq) body += '<p style="font-size:12px;margin:12px 0 8px;"><strong>Example Request</strong></p><pre style="background:var(--bg-primary);padding:12px;border-radius:6px;font-size:12px;font-family:JetBrains Mono,monospace;">' + ep.exampleReq + '</pre>';
-      body += '<p style="font-size:12px;margin:12px 0 8px;"><strong>Response 200 OK' + (ep.responseLabel ? ' — ' + ep.responseLabel : '') + '</strong></p><pre id="api-response-sample">' + ep.sample + '</pre>';
-      if (ep.responseNote) body += '<p style="font-size:11px;color:var(--text-secondary);margin-top:8px;">' + ep.responseNote + '</p>';
-      card.innerHTML = body;
-      const tb = card.querySelector('.try-btn');
-      if (tb) tb.addEventListener('click', () => openTryPanel(ep.path));
-    }
-
-    function openTryPanel(path) {
-      document.getElementById('try-panel').classList.add('open');
-      document.getElementById('try-endpoint').textContent = path;
-      const tickerInput = document.getElementById('try-input');
-      tickerInput.placeholder = path.includes('ticker') ? 'AAPL' : '';
-      tickerInput.style.display = path.includes('ticker') ? 'block' : 'none';
-    }
-
-    document.getElementById('try-panel-close').addEventListener('click', () => document.getElementById('try-panel').classList.remove('open'));
-    document.getElementById('try-send').addEventListener('click', async () => {
-      const ticker = document.getElementById('try-input').value.trim() || 'AAPL';
-      const path = document.getElementById('try-endpoint').textContent.replace(/\{ticker\}/g, ticker);
-      const start = performance.now();
-      const pathOnly = path.replace(/^GET\s+/, '').split('?')[0];
-      const apiPath = pathOnly.startsWith('/') ? pathOnly : '/' + pathOnly;
-      let res = await apiGet(apiPath);
-      if (DEMO_MODE && !res.ok && res.status === 0) res = { ok: true, status: 200, data: JSON.parse(state.endpoints.find(e => e.path === apiPath.split('?')[0])?.sample || '{}') };
-      const elapsed = Math.round(performance.now() - start);
-      const responseEl = document.getElementById('try-response');
-      const metaEl = document.getElementById('try-meta');
-      if (res.data) {
-        responseEl.innerHTML = syntaxHighlight(res.data);
-        responseEl.style.color = '';
-      } else {
-        responseEl.textContent = res.body || res.error || 'No response';
-        responseEl.style.color = 'var(--accent-red)';
-      }
-      metaEl.innerHTML = '<span class="status-' + res.status + '">' + res.status + '</span> · ' + elapsed + ' ms';
-    });
-
     function renderLiveData() {
       if (!isMarketOpen()) return;
       const t = state.activeTicker;
@@ -1470,9 +1611,6 @@
         }
         state.metrics.agg = DEMO_AGG[t] || DEMO_AGG['AAPL'];
         state.metrics.vwap = state.metrics.agg.vwap_1min;
-        document.getElementById('stat-events-val').textContent = Number(state.metrics.events).toLocaleString();
-        document.getElementById('stat-latency-val').textContent = state.metrics.latency + 'ms';
-        document.getElementById('stat-status-val').textContent = 'All Systems Operational';
         renderOverview();
         renderLiveData();
         if (state.activeSection === 'anomalies' && Math.random() > 0.95) {
@@ -1485,7 +1623,6 @@
         if (r.data) {
           state.metrics.lag = r.data.consumer_lag;
           state.metrics.latency = r.data.dynamo_latency_p99;
-          document.getElementById('stat-status-val').textContent = r.data.status === 'healthy' ? 'All Systems Operational' : r.data.status;
         }
         renderOverview();
       });
@@ -1671,73 +1808,10 @@
       if (section === 'overview') updateOverviewMarketStatus();
     }
 
-    function populateOverviewAnomalies() {
-      const container = document.getElementById('overview-anomalies-list');
-      if (!container) return;
-      const anomalies = [
-        { ticker: 'TSLA', score: -0.847, time: '14:31:47', zscore: 4.1, strength: 'strong' },
-        { ticker: 'NVDA', score: -0.731, time: '13:58:22', zscore: 3.8, strength: 'strong' },
-        { ticker: 'AAPL', score: -0.612, time: '13:22:09', zscore: 3.4, strength: 'moderate' },
-      ];
-      container.innerHTML = anomalies.map(a => `
-        <div style="
-          border-left: 2px solid rgba(239, 68, 68, 0.5);
-          padding: 8px 12px;
-          margin-bottom: 8px;
-          background: rgba(239, 68, 68, 0.04);
-          border-radius: 0 6px 6px 0;
-        ">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--accent-red); font-weight:600; font-size:13px;">⚠ ${a.ticker}</span>
-            <span style="color:var(--text-secondary); font-size:11px; font-family:'JetBrains Mono',monospace;">${a.time}</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-top:4px;">
-            <span style="color:var(--text-secondary); font-size:12px; font-family:'JetBrains Mono',monospace;">score: ${a.score}</span>
-            <span style="color:${a.strength === 'strong' ? 'var(--accent-red)' : 'var(--accent-yellow)'}; font-size:11px;">
-              z-score: +${a.zscore} · ${a.strength}
-            </span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function populateSystemHealth() {
-      const tbody = document.getElementById('system-health-rows');
-      if (!tbody) return;
-      const lag = (typeof window.demoConsumerLag !== 'undefined' ? window.demoConsumerLag : 42);
-      const components = [
-        { name: 'Kafka', detail: '6 partitions', status: 'Healthy', metric: 'Lag: ' + lag + ' msgs' },
-        { name: 'DynamoDB', detail: '4 tables', status: 'Healthy', metric: 'p99: 18ms' },
-        { name: 'DLQ', detail: '2 queues', status: 'Empty', metric: 'Depth: 0' },
-        { name: 'S3', detail: 'Cold storage', status: 'Healthy', metric: 'Last flush: 3m' },
-      ];
-      tbody.innerHTML = components.map(c => `
-        <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 10px 0;">
-            <div style="color:var(--text-primary); font-size:13px; font-weight:500;">${c.name}</div>
-            <div style="color:var(--text-secondary); font-size:11px;">${c.detail}</div>
-          </td>
-          <td style="padding: 10px 0; text-align:right;">
-            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
-              <span style="
-                width:7px; height:7px; border-radius:50%;
-                background:#10b981;
-                box-shadow: 0 0 6px #10b981;
-                display:inline-block;
-                animation: pulse 2s infinite;
-              "></span>
-              <span style="color:#10b981; font-size:12px;">${c.status}</span>
-            </div>
-            <div style="color:var(--text-secondary); font-size:11px; font-family:'JetBrains Mono',monospace; margin-top:2px;">${c.metric}</div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', (e) => {
         const section = el.getAttribute('data-section');
-        if (!section) return; // external or same-origin link (e.g. /about) — let browser navigate
+        if (!section) return; // external link without data-section — let browser navigate
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1776,18 +1850,6 @@
       });
     });
 
-    document.querySelectorAll('.endpoint-item').forEach(el => {
-      el.addEventListener('click', function () {
-        document.querySelectorAll('.endpoint-item').forEach(e => e.classList.remove('selected'));
-        this.classList.add('selected');
-        renderApiDetail(this.getAttribute('data-path'));
-      });
-    });
-
-    document.getElementById('api-detail-card').addEventListener('click', (e) => {
-      if (e.target.classList.contains('try-btn')) openTryPanel(e.target.getAttribute('data-path'));
-    });
-
     if (DEMO_MODE && document.getElementById('demo-banner')) document.getElementById('demo-banner').style.display = 'flex';
     // Apply market-hours UI immediately — do not wait on /market-prices (slow/hanging fetch
     // would otherwise leave Live Data panels visible with default HTML all weekend).
@@ -1808,9 +1870,6 @@
     // (same pattern as other panels — don't wait for first 30s interval)
     pollSentiment(state.activeTicker);
     setInterval(() => { if (state.activeSection === 'pipeline') poll(); }, 30000);
-    populateOverviewAnomalies();
-    populateSystemHealth();
-    setInterval(populateSystemHealth, 10000);
     drawThroughputChart();
     setInterval(updateThroughputHistory, 30000);
     window.addEventListener('resize', drawThroughputChart);
