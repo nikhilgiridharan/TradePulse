@@ -506,133 +506,6 @@
       </a>
     </span>
   </div>
-  <!-- Market closed overlay -->
-  <!-- Hidden by default — shown by JavaScript when market is closed -->
-  <!-- Sits above the dashboard content but below the header -->
-  <div id="market-closed-overlay" style="
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(10, 14, 26, 0.92);
-    z-index: 900;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 24px;
-">
-    <div style="
-        background: #111827;
-        border: 1px solid #1e293b;
-        border-radius: 16px;
-        padding: 48px 64px;
-        text-align: center;
-        max-width: 480px;
-    ">
-        <!-- Market closed icon -->
-        <div style="
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 28px;
-        ">🔔</div>
-
-        <div style="
-            color: #f1f5f9;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-family: Inter, sans-serif;
-        ">Market Closed</div>
-
-        <div id="market-closed-time" style="
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 24px;
-            font-family: Inter, sans-serif;
-        ">
-            <!-- Populated by JavaScript -->
-        </div>
-
-        <div style="
-            color: #94a3b8;
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 32px;
-            font-family: Inter, sans-serif;
-        ">
-            Live market data is only available during regular US trading hours.
-            The pipeline resumes automatically at market open.
-        </div>
-
-        <div id="market-next-open" style="
-            display: inline-block;
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px 20px;
-            color: #00d4ff;
-            font-size: 13px;
-            font-family: Inter, sans-serif;
-            margin-bottom: 32px;
-        ">
-            <!-- Next open time populated by JavaScript -->
-        </div>
-
-        <div style="
-            border-top: 1px solid #1e293b;
-            padding-top: 24px;
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-        ">
-            <a href="https://github.com/nikhilgiridharan/TradePulse"
-               target="_blank"
-               rel="noopener noreferrer"
-               style="
-                   color: #94a3b8;
-                   font-size: 12px;
-                   text-decoration: none;
-                   font-family: Inter, sans-serif;
-               ">View Source on GitHub →</a>
-
-            <a href="https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10"
-               target="_blank"
-               rel="noopener noreferrer"
-               style="
-                   color: #94a3b8;
-                   font-size: 12px;
-                   text-decoration: none;
-                   font-family: Inter, sans-serif;
-               ">Read Architecture Article →</a>
-        </div>
-
-        <!-- Explore anyway button -->
-        <div style="margin-top: 16px;">
-            <button
-                onclick="dismissMarketClosedOverlay()"
-                style="
-                    background: transparent;
-                    border: none;
-                    color: #475569;
-                    font-size: 12px;
-                    cursor: pointer;
-                    font-family: Inter, sans-serif;
-                    text-decoration: underline;
-                ">
-                Explore dashboard anyway
-            </button>
-        </div>
-    </div>
-</div>
   <header class="header">
     <div class="header-left">
       <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 17v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 13v-2h2v2H3zm4 0v-2h2v2H7zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zm4 0v-2h2v2h-2zM3 9V7h2v2H3zm4 0V7h2v2H7zm4 0V7h2v2h-2zm4 0V7h2v2h-2zm4 0V7h2v2h-2zM3 5V3h2v2H3zm4 0V3h2v2H7zm4 0V3h2v2h-2zm4 0V3h2v2h-2zm4 0V3h2v2h-2z"/></svg></div>
@@ -643,27 +516,6 @@
       <div class="stat-pill cyan pulse" id="stat-events">⚡ <span id="stat-events-val">14,832</span> events/sec</div>
       <div class="stat-pill green pulse" id="stat-latency">⏱ <span id="stat-latency-val">12ms</span> p50 latency</div>
       <div class="stat-pill green" id="stat-status">✓ <span id="stat-status-val">All Systems Operational</span></div>
-      <div id="market-status-pill" style="
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-family: Inter, sans-serif;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    color: #10b981;
-">
-    <span id="market-status-dot" style="
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #10b981;
-        display: inline-block;
-    "></span>
-    <span id="market-status-text">Market Open</span>
-</div>
     </div>
     <div class="header-right">
       <a href="https://github.com/nikhilgiridharan/TradePulse" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">GitHub</a>
@@ -815,6 +667,45 @@
           <span class="ticker-pill" data-ticker="AMZN">AMZN</span>
           <span class="ticker-pill" data-ticker="TSLA">TSLA</span>
         </div>
+        <!-- Market closed state for Live Data section -->
+        <!-- Shown when market is closed, hidden during trading hours -->
+        <div id="market-closed-state" style="
+    display: none;
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--text-secondary);
+">
+    <div style="
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 22px;
+    ">🔔</div>
+    <div style="
+        color: var(--text-primary);
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        font-family: Inter, sans-serif;
+    ">Market Closed</div>
+    <div id="next-open-message" style="
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-family: Inter, sans-serif;
+        margin-bottom: 4px;
+    "></div>
+    <div style="
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-family: Inter, sans-serif;
+    ">Live data resumes automatically at market open</div>
+</div>
         <div class="live-data-grid">
           <div class="live-panel">
             <h4>Latest Quote — <span id="live-ticker">AAPL</span></h4>
@@ -846,7 +737,7 @@
             </div>
           </div>
         </div>
-        <div class="pipeline-diagram">
+        <div class="pipeline-diagram" id="sparkline-container">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <h4 style="margin:0;color:var(--text-secondary);">Price (last 60s)</h4>
             <span id="sparkline-range" class="muted" style="font-size:12px;font-family:JetBrains Mono,monospace;"></span>
@@ -909,7 +800,6 @@
     console.log('[TradePulse] API base: ' + (API_BASE || 'same origin'));
 
     const DEMO_MODE = true;
-    window.marketClosedOverlayDismissed = false;
     // Hardcoded fallback prices — used only if /market-prices API call fails.
     // Update these before any live demo or screen recording.
     // Last updated: March 13, 2026
@@ -1007,19 +897,10 @@
     };
 
     /**
-     * Determines whether the US stock market is currently open.
-     * Regular trading hours: Monday-Friday 9:30 AM - 4:00 PM Eastern Time.
-     * Does not account for market holidays — standard portfolio project scope.
-     *
-     * Returns an object with:
-     *   isOpen: boolean — true if market is currently open
-     *   nextOpen: string — human-readable string of when market next opens
-     *   statusMessage: string — display message for the UI
+     * Returns true if the US stock market is currently open.
+     * Regular hours: Monday-Friday 9:30 AM to 4:00 PM Eastern Time.
      */
-    function getMarketStatus() {
-        // Convert current time to Eastern Time
-        // Using Intl.DateTimeFormat for reliable timezone conversion
-        // without requiring an external library
+    function isMarketOpen() {
         const now = new Date();
 
         const etFormatter = new Intl.DateTimeFormat('en-US', {
@@ -1030,56 +911,53 @@
             weekday: 'long'
         });
 
-        const etParts = etFormatter.formatToParts(now);
-        const weekday = etParts.find(p => p.type === 'weekday').value;
-        const hour = parseInt(etParts.find(p => p.type === 'hour').value, 10);
-        const minute = parseInt(etParts.find(p => p.type === 'minute').value, 10);
+        const parts = etFormatter.formatToParts(now);
+        const weekday = parts.find(p => p.type === 'weekday').value;
+        const hour = parseInt(parts.find(p => p.type === 'hour').value);
+        const minute = parseInt(parts.find(p => p.type === 'minute').value);
 
         const timeInMinutes = hour * 60 + minute;
-        const marketOpenMinutes = 9 * 60 + 30;   // 9:30 AM ET
-        const marketCloseMinutes = 16 * 60;        // 4:00 PM ET
+        const marketOpen = 9 * 60 + 30;   // 9:30 AM ET
+        const marketClose = 16 * 60;       // 4:00 PM ET
 
         const isWeekday = !['Saturday', 'Sunday'].includes(weekday);
-        const isDuringHours = timeInMinutes >= marketOpenMinutes &&
-                          timeInMinutes < marketCloseMinutes;
-        const isOpen = isWeekday && isDuringHours;
+        const isDuringHours = timeInMinutes >= marketOpen && timeInMinutes < marketClose;
 
-        // Build next open message
-        let nextOpen = '';
-        if (!isWeekday) {
-            nextOpen = weekday === 'Saturday'
-            ? 'Opens Monday at 9:30 AM ET'
-            : 'Opens tomorrow at 9:30 AM ET';
-        } else if (timeInMinutes < marketOpenMinutes) {
-            const minutesUntilOpen = marketOpenMinutes - timeInMinutes;
-            const hoursUntil = Math.floor(minutesUntilOpen / 60);
-            const minsUntil = minutesUntilOpen % 60;
-            nextOpen = hoursUntil > 0
-            ? `Opens in ${hoursUntil}h ${minsUntil}m`
-            : `Opens in ${minsUntil} minutes`;
-        } else {
-            // After close on a weekday
-            nextOpen = 'Opens tomorrow at 9:30 AM ET';
-        }
+        return isWeekday && isDuringHours;
+    }
 
-        // Format current ET time for display
-        const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    /**
+     * Returns the next market open time as a human-readable string.
+     */
+    function getNextMarketOpen() {
+        const now = new Date();
+
+        const etFormatter = new Intl.DateTimeFormat('en-US', {
             timeZone: 'America/New_York',
             hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
+            minute: 'numeric',
+            hour12: false,
+            weekday: 'long'
         });
-        const currentET = timeFormatter.format(now);
 
-        return {
-            isOpen,
-            nextOpen,
-            statusMessage: isOpen
-            ? `Market open · ${currentET} ET`
-            : `Market closed · ${currentET} ET · ${nextOpen}`,
-            currentET,
-            weekday
-        };
+        const parts = etFormatter.formatToParts(now);
+        const weekday = parts.find(p => p.type === 'weekday').value;
+        const hour = parseInt(parts.find(p => p.type === 'hour').value);
+        const minute = parseInt(parts.find(p => p.type === 'minute').value);
+        const timeInMinutes = hour * 60 + minute;
+        const marketOpen = 9 * 60 + 30;
+
+        if (weekday === 'Saturday') return 'Opens Monday at 9:30 AM ET';
+        if (weekday === 'Sunday') return 'Opens tomorrow at 9:30 AM ET';
+
+        if (timeInMinutes < marketOpen) {
+            const minutesUntil = marketOpen - timeInMinutes;
+            const h = Math.floor(minutesUntil / 60);
+            const m = minutesUntil % 60;
+            return h > 0 ? `Opens in ${h}h ${m}m` : `Opens in ${m} minutes`;
+        }
+
+        return 'Opens tomorrow at 9:30 AM ET';
     }
 
     function rnd(prev, drift = 0.005) {
@@ -1489,13 +1367,11 @@
     function poll() {
       const t = state.activeTicker;
       if (DEMO_MODE) {
-        const ms = getMarketStatus();
-        const priceSimActive = ms.isOpen || window.marketClosedOverlayDismissed;
         state.metrics.events = 14832 + Math.floor(Math.random() * 200);
         state.metrics.latency = 12 + Math.floor(Math.random() * 10);
         state.metrics.lag = 42 + Math.floor(Math.random() * 20);
         state.metrics.anomalies = 7;
-        if (priceSimActive) {
+        if (isMarketOpen()) {
           const q = demoQuote(t);
           state.lastPrice[t] = q.price;
           state.metrics.volume = q.volume;
@@ -1538,101 +1414,64 @@
     }
 
     /**
-     * Updates the market status pill in the header.
-     * Green when open, red when closed.
+     * Controls the Live Data section based on market hours.
+     * When market is closed: hides all data panels and sparkline,
+     * shows the market closed message.
+     * When market is open: shows all panels, hides the closed message,
+     * starts the data simulation.
+     *
+     * Called on page load and every 60 seconds to catch
+     * open and close transitions without requiring a page refresh.
      */
-    function updateMarketStatusPill() {
-        const status = getMarketStatus();
-        const pill = document.getElementById('market-status-pill');
-        const dot = document.getElementById('market-status-dot');
-        const text = document.getElementById('market-status-text');
+    function updateLiveDataSection() {
+        const marketOpen = isMarketOpen();
 
-        if (!pill || !dot || !text) return;
+        // Elements to show during market hours
+        const panelsGrid = document.querySelector('.live-data-grid');
+        const sparklineContainer = document.getElementById('sparkline-container');
 
-        if (status.isOpen) {
-            pill.style.background = 'rgba(16, 185, 129, 0.1)';
-            pill.style.border = '1px solid rgba(16, 185, 129, 0.2)';
-            pill.style.color = '#10b981';
-            dot.style.background = '#10b981';
-            text.textContent = 'Market Open';
-        } else {
-            pill.style.background = 'rgba(239, 68, 68, 0.1)';
-            pill.style.border = '1px solid rgba(239, 68, 68, 0.2)';
-            pill.style.color = '#ef4444';
-            dot.style.background = '#ef4444';
-            text.textContent = 'Market Closed';
-        }
-    }
+        // Market closed state element
+        const closedState = document.getElementById('market-closed-state');
+        const nextOpenMsg = document.getElementById('next-open-message');
 
-    /**
-     * Shows or hides the market closed overlay based on current time.
-     * Called on page load and every minute to catch market open/close transitions.
-     */
-    function checkMarketHours() {
-        const status = getMarketStatus();
-        const overlay = document.getElementById('market-closed-overlay');
-        const timeEl = document.getElementById('market-closed-time');
-        const nextOpenEl = document.getElementById('market-next-open');
+        if (!closedState) return;
 
-        if (!overlay) return;
+        if (marketOpen) {
+            // Market is open — show panels, hide closed state
+            if (panelsGrid) panelsGrid.style.display = 'grid';
+            if (sparklineContainer) sparklineContainer.style.display = 'block';
+            closedState.style.display = 'none';
 
-        if (status.isOpen) {
-            window.marketClosedOverlayDismissed = false;
-        }
-
-        updateMarketStatusPill();
-
-        if (!status.isOpen) {
-            if (!window.marketClosedOverlayDismissed) {
-                overlay.style.display = 'flex';
-
-                if (timeEl) {
-                    timeEl.textContent = status.statusMessage;
-                }
-                if (nextOpenEl) {
-                    nextOpenEl.textContent = status.nextOpen;
-                }
-
-                if (window.priceSimulationInterval) {
-                    clearInterval(window.priceSimulationInterval);
-                    window.priceSimulationInterval = null;
-                }
-            } else {
-                overlay.style.display = 'none';
-                if (!window.priceSimulationInterval) {
-                    startPriceSimulation();
-                }
-            }
-
-        } else {
-            overlay.style.display = 'none';
-
+            // Start simulation if not already running
             if (!window.priceSimulationInterval) {
-                startPriceSimulation();
+                startDemoSimulation();
+            }
+
+        } else {
+            // Market is closed — hide panels, show closed state
+            if (panelsGrid) panelsGrid.style.display = 'none';
+            if (sparklineContainer) sparklineContainer.style.display = 'none';
+            closedState.style.display = 'block';
+
+            // Update next open message
+            if (nextOpenMsg) {
+                nextOpenMsg.textContent = getNextMarketOpen();
+            }
+
+            // Stop simulation — no point running when market is closed
+            if (window.priceSimulationInterval) {
+                clearInterval(window.priceSimulationInterval);
+                window.priceSimulationInterval = null;
             }
         }
     }
 
     /**
-     * Dismisses the market closed overlay so the user can
-     * explore the dashboard with demo data even when market is closed.
-     * The overlay does not return until page reload.
+     * Wraps the existing demo simulation startup.
+     * Assigns the interval to window.priceSimulationInterval
+     * so market hours logic can pause and resume it.
      */
-    function dismissMarketClosedOverlay() {
-        window.marketClosedOverlayDismissed = true;
-        const overlay = document.getElementById('market-closed-overlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-        if (!window.priceSimulationInterval) {
-            startPriceSimulation();
-        }
-    }
-
-    /**
-     * Starts the demo price simulation interval (poll every 2s).
-     */
-    function startPriceSimulation() {
+    function startDemoSimulation() {
         if (window.priceSimulationInterval) return;
         window.priceSimulationInterval = setInterval(poll, 2000);
     }
@@ -1822,6 +1661,7 @@
         const sectionEl = document.getElementById('section-' + section);
         if (sectionEl) sectionEl.classList.add('active');
         state.activeSection = section;
+        if (section === 'live') updateLiveDataSection();
       });
     });
 
@@ -1836,6 +1676,7 @@
         const sectionEl = document.getElementById('section-' + section);
         if (sectionEl) sectionEl.classList.add('active');
         state.activeSection = section;
+        if (section === 'live') updateLiveDataSection();
       });
     });
 
@@ -1868,9 +1709,9 @@
     (async function () {
       await fetchRealBasePrices();
       poll();
-      checkMarketHours();
+      updateLiveDataSection();
     })();
-    setInterval(checkMarketHours, 60000);
+    setInterval(updateLiveDataSection, 60000);
     setInterval(() => pollSentiment(state.activeTicker), 30000);
     // Populate sentiment panel immediately on load
     // (same pattern as other panels — don't wait for first 30s interval)
