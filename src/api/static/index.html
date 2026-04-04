@@ -9,51 +9,59 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-primary: #060b18;
-      --bg-secondary: #0d1424;
-      --bg-tertiary: #131d30;
-      --accent-primary: #00e5ff;
-      --accent-secondary: #a855f7;
-      --accent-green: #22c55e;
-      --accent-red: #f43f5e;
-      --accent-yellow: #fbbf24;
-      --accent-orange: #fb923c;
-      --text-primary: #ffffff;
-      --text-secondary: #b4c6e0;
-      --border-color: #1e3a5f;
-      --glow-cyan: 0 0 24px rgba(0, 229, 255, 0.25);
-      --glow-purple: 0 0 24px rgba(168, 85, 247, 0.25);
-      --glow-green: 0 0 16px rgba(34, 197, 94, 0.2);
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-hover: #f8fafc;
+      --accent-primary: #0ea5e9;
+      --accent-secondary: #7c3aed;
+      --accent-green: #16a34a;
+      --accent-red: #dc2626;
+      --accent-yellow: #d97706;
+      --accent-orange: #ea580c;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+      --glow-cyan: 0 0 0 3px rgba(14, 165, 233, 0.15);
+      --glow-purple: 0 0 0 3px rgba(124, 58, 237, 0.15);
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --border-radius-xl: 16px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 14px; scroll-behavior: smooth; }
     body {
       background: var(--bg-primary);
       color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-sans);
       margin: 0;
       padding: 0;
       min-height: 100vh;
       overflow-x: hidden;
-      background-image:
-        radial-gradient(ellipse at 20% 10%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(13, 20, 36, 0.8) 0%, transparent 100%);
     }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-mono { font-family: var(--font-mono); }
+    h1, h2, h3, .section-title { color: #0f172a; }
 
-    /* Demo banner */
-    .demo-banner {
-      background: linear-gradient(90deg,
-        rgba(168, 85, 247, 0.12),
-        rgba(0, 229, 255, 0.12)
-      );
-      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
-      color: var(--bg-primary);
-      text-align: center;
-      padding: 6px 12px;
-      font-weight: 600;
-      font-size: 12px;
+    #demo-banner {
+      background: #f0f9ff;
+      border-bottom: 1px solid #bae6fd;
+      color: #0369a1;
+    }
+    #demo-banner a { color: #0ea5e9; }
+    #demo-banner code {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
     }
 
     /* Header */
@@ -68,17 +76,57 @@
       justify-content: space-between;
       padding: 0 24px;
       z-index: 100;
-      background: rgba(6, 11, 24, 0.95);
-      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 1px 0 rgba(0, 229, 255, 0.08);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
     }
     .header-left {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    .logo-text { font-weight: 700; font-size: 1.25rem; }
+    .logo-text, .header-logo-text { font-weight: 700; font-size: 1.25rem; color: #0f172a; }
+    .header-badge {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid var(--border-color);
+    }
+    .stat-pill {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+    .stat-pill-cyan {
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      color: #0369a1;
+    }
+    .stat-pill-green {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+    }
+    .btn-github {
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-openapi {
+      background: var(--accent-primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.85; transform: scale(0.98); }
@@ -101,16 +149,16 @@
       border: 1px solid var(--border-color);
     }
     .btn-ghost:hover { background: var(--bg-tertiary); color: var(--accent-primary); }
-    .btn-primary { background: var(--accent-primary); color: var(--bg-primary); }
-    .btn-primary:hover { box-shadow: var(--glow-cyan); }
+    .btn-primary { background: var(--accent-primary); color: #ffffff; }
+    .btn-primary:hover { box-shadow: var(--shadow-md); }
 
     /* Layout */
     .app-layout { display: flex; min-height: 100vh; padding-top: 56px; }
     .sidebar {
-      width: 240px;
-      min-width: 240px;
-      background: rgba(8, 13, 22, 0.98);
-      border-right: 1px solid rgba(30, 58, 95, 0.8);
+      width: 220px;
+      min-width: 220px;
+      background: #ffffff;
+      border-right: 1px solid var(--border-color);
       padding: 16px 0;
       position: fixed;
       top: 56px;
@@ -118,26 +166,35 @@
       bottom: 0;
       z-index: 50;
     }
-    .sidebar .wordmark { padding: 0 20px 16px; font-weight: 700; font-size: 0.9rem; color: var(--text-secondary); }
+    .sidebar .wordmark, .sidebar-title {
+      padding: 0 20px 16px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #0f172a;
+    }
     .nav-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 20px;
-      color: var(--text-secondary);
+      padding: 8px 16px;
+      margin: 2px 8px;
+      color: #475569;
       cursor: pointer;
+      border-radius: 6px;
       border-left: 2px solid transparent;
+      font-size: 13px;
       transition: all 0.15s ease;
     }
     .sidebar a.nav-item { text-decoration: none; color: inherit; }
     .nav-item:hover {
-      background: rgba(0, 229, 255, 0.05);
-      color: var(--text-primary);
+      background: #f1f5f9;
+      color: #0f172a;
     }
     .nav-item.active {
-      background: rgba(0, 229, 255, 0.08);
-      border-left-color: var(--accent-primary);
-      color: var(--accent-primary);
+      background: #e0f2fe;
+      color: #0369a1;
+      border-left-color: #0ea5e9;
+      font-weight: 500;
     }
     .sidebar-footer {
       position: absolute;
@@ -148,21 +205,26 @@
       align-items: center;
       gap: 8px;
       font-size: 12px;
-      color: var(--accent-green);
     }
-    .sidebar-footer .dot {
+    .pipeline-active {
+      color: #15803d;
+      font-size: 11px;
+    }
+    .sidebar-footer .dot, .pipeline-active-dot {
       width: 8px;
       height: 8px;
-      background: var(--accent-green);
+      background: #16a34a;
       border-radius: 50%;
+      box-shadow: 0 0 6px rgba(22, 163, 74, 0.4);
       animation: pulse 2s ease-in-out infinite;
     }
 
     .main-content {
       flex: 1;
-      margin-left: 240px;
-      padding: 24px;
+      margin-left: 220px;
+      padding: 24px 32px;
       min-height: calc(100vh - 56px);
+      background: var(--bg-primary);
     }
 
     /* Section (hidden by default) */
@@ -172,114 +234,107 @@
     /* Overview: metric cards */
     .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
     .metric-card {
-      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
-      border: 1px solid rgba(30, 58, 95, 0.9);
-      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
       padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg,
-        transparent,
-        rgba(0, 229, 255, 0.4),
-        transparent
-      );
     }
     .metric-card:hover {
-      border-color: rgba(0, 229, 255, 0.3);
-      box-shadow: var(--glow-cyan);
-      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
     }
-    .metric-card .label {
-      color: var(--text-secondary);
+    .metric-card-cyan { border-top: 2px solid #0ea5e9; }
+    .metric-card-purple { border-top: 2px solid #7c3aed; }
+    .metric-card-blue { border-top: 2px solid #3b82f6; }
+    .metric-card-amber { border-top: 2px solid #d97706; }
+    .metric-card .label, .metric-label {
+      color: #64748b;
       font-size: 12px;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       margin-bottom: 8px;
     }
-    .metric-card .value {
-      font-family: 'JetBrains Mono', monospace;
+    .metric-card .value, .metric-value {
+      font-family: var(--font-mono);
       font-size: 28px;
       font-weight: 700;
-      color: #ffffff;
+      color: #0f172a;
       letter-spacing: -0.5px;
     }
-    .metric-card .trend { font-size: 11px; margin-top: 4px; }
-    .metric-card .trend.up { color: var(--accent-green); }
-    .metric-card .trend.down { color: var(--accent-red); }
-    .metric-card .status { font-size: 11px; color: var(--accent-green); margin-top: 4px; }
+    .metric-card .trend { font-size: 12px; margin-top: 4px; }
+    .metric-card .trend.up, .metric-trend-up { color: #16a34a; }
+    .metric-card .trend.down, .metric-trend-down { color: #dc2626; }
+    .metric-card .status { font-size: 12px; margin-top: 4px; }
+    .metric-status-healthy, .metric-card .status { color: #16a34a; }
+    .metric-status-normal { color: #16a34a; }
+    .metric-status-warning { color: #d97706; }
 
     /* Pipeline diagram */
     .pipeline-diagram {
-      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
-      border: 1px solid rgba(30, 58, 95, 0.8);
-      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
       padding: 24px;
       margin-bottom: 24px;
       overflow-x: auto;
+      box-shadow: var(--shadow-sm);
     }
     .pipeline-diagram svg { display: block; margin: 0 auto; width: 100%; height: auto; }
-    .pipeline-box { fill: #0d1424; stroke-width: 1; rx: 8; transition: filter 0.2s, box-shadow 0.2s, stroke 0.2s, fill 0.2s; }
+    .pipeline-box { fill: #eff6ff; stroke-width: 1; rx: 8; transition: filter 0.2s, stroke 0.2s, fill 0.2s; }
     .arch-box.pipeline-box.main {
       fill: url(#pipeFillMain);
-      stroke: rgba(0, 229, 255, 0.5);
+      stroke: #93c5fd;
       stroke-width: 1.5;
     }
     .arch-box.pipeline-box.news {
       fill: url(#pipeFillNews);
-      stroke: rgba(168, 85, 247, 0.5);
+      stroke: #c4b5fd;
       stroke-width: 1.5;
     }
     .arch-box.pipeline-box.dlq {
       fill: url(#pipeFillDlq);
-      stroke: rgba(244, 63, 94, 0.5);
+      stroke: #fca5a5;
       stroke-width: 1.5;
     }
     .arch-box.pipeline-box.ml {
       fill: url(#pipeFillMl);
-      stroke: rgba(251, 191, 36, 0.5);
+      stroke: #fcd34d;
       stroke-width: 1.5;
     }
     .arch-box.pipeline-box.storage {
       fill: url(#pipeFillStorage);
-      stroke: rgba(34, 197, 94, 0.5);
+      stroke: #86efac;
       stroke-width: 1.5;
     }
     .arch-box.pipeline-box.main:hover {
-      stroke: rgba(0, 229, 255, 0.9);
-      stroke-opacity: 1;
-      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.35)) brightness(1.05);
+      stroke: #3b82f6;
+      filter: drop-shadow(0 2px 8px rgba(14, 165, 233, 0.2));
     }
     .arch-box.pipeline-box.news:hover {
-      stroke: rgba(168, 85, 247, 0.9);
-      stroke-opacity: 1;
-      filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.35)) brightness(1.05);
+      stroke: #7c3aed;
+      filter: drop-shadow(0 2px 8px rgba(124, 58, 237, 0.2));
     }
     .arch-box.pipeline-box.dlq:hover {
-      stroke: rgba(244, 63, 94, 0.9);
-      filter: brightness(1.08);
+      stroke: #dc2626;
+      filter: drop-shadow(0 2px 8px rgba(220, 38, 38, 0.15));
     }
     .arch-box.pipeline-box.ml:hover {
-      stroke: rgba(251, 191, 36, 0.9);
-      filter: brightness(1.08);
+      stroke: #d97706;
+      filter: drop-shadow(0 2px 8px rgba(217, 119, 6, 0.15));
     }
     .arch-box.pipeline-box.storage:hover {
-      stroke: rgba(34, 197, 94, 0.9);
-      filter: brightness(1.08);
+      stroke: #16a34a;
+      filter: drop-shadow(0 2px 8px rgba(22, 163, 74, 0.15));
     }
-    .pipeline-line { stroke: #00e5ff; stroke-width: 1.5; fill: none; }
-    .pipeline-line.news { stroke: #a855f7; }
-    .flow-dot { fill: #00e5ff; }
-    .flow-dot.news { fill: #a855f7; }
-    .join-line { stroke: #b4c6e0; stroke-dasharray: 4 4; stroke-width: 1; fill: none; opacity: 0.5; }
+    .pipeline-line { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .pipeline-line.news { stroke: #94a3b8; }
+    .flow-dot { fill: #0ea5e9; }
+    .flow-dot.news { fill: #7c3aed; }
+    .join-line { stroke: #94a3b8; stroke-dasharray: 4 4; stroke-width: 1; fill: none; opacity: 0.7; }
     .arch-box {
       cursor: pointer;
       transition: all 0.15s ease;
@@ -294,16 +349,25 @@
 
     /* Live Data */
     .ticker-pills { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .ticker-pill {
-      padding: 8px 16px;
+    .ticker-pill, .ticker-btn {
+      padding: 6px 16px;
       border-radius: 8px;
-      background: var(--bg-tertiary);
+      background: #ffffff;
       border: 1px solid var(--border-color);
+      color: #475569;
       cursor: pointer;
       font-weight: 600;
+      transition: all 0.15s ease;
     }
-    .ticker-pill:hover { border-color: var(--accent-primary); }
-    .ticker-pill.active { background: rgba(0, 229, 255, 0.15); border-color: var(--accent-primary); color: var(--accent-primary); }
+    .ticker-pill:hover, .ticker-btn:hover {
+      background: #f1f5f9;
+      border-color: var(--border-strong);
+    }
+    .ticker-pill.active, .ticker-btn.active {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: #ffffff;
+    }
     .live-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
     .live-data-grid {
       display: grid;
@@ -315,34 +379,47 @@
     .live-data-grid .live-panel,
     .live-data-grid .data-panel { min-height: 160px; }
     .live-panel {
-      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
-      border-radius: 12px;
-      border: 1px solid rgba(30, 58, 95, 0.8);
+      background: #ffffff;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--border-color);
       padding: 20px;
+      box-shadow: var(--shadow-sm);
     }
-    .live-panel h4 { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
-    .live-panel .price { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; }
+    .live-panel h4 { font-size: 12px; color: #64748b; margin-bottom: 12px; font-weight: 500; }
+    .live-panel .price, .price-large { font-family: var(--font-mono); font-size: 32px; font-weight: 700; color: #0f172a; }
+    .price-up { color: #16a34a; }
+    .price-down { color: #dc2626; }
     .live-panel .flash-green { animation: flashGreen 0.3s ease; }
     .live-panel .flash-red { animation: flashRed 0.3s ease; }
     @keyframes flashGreen {
       0%, 100% { background-color: transparent; }
-      50% { background-color: rgba(34, 197, 94, 0.28); }
+      50% { background-color: rgba(22, 163, 74, 0.2); }
     }
     @keyframes flashRed {
       0%, 100% { background-color: transparent; }
-      50% { background-color: rgba(244, 63, 94, 0.28); }
+      50% { background-color: rgba(220, 38, 38, 0.2); }
     }
     .z-high { color: var(--accent-yellow); }
     .z-very-high { color: var(--accent-red); }
-    #sparkline-canvas { width: 100%; height: 120px; background: linear-gradient(135deg, #0d1424, #111c33); border: 1px solid rgba(30, 58, 95, 0.8); border-radius: 8px; display: block; }
+    #sparkline-canvas { width: 100%; height: 120px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); display: block; }
 
     .data-panel {
-      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
-      border-radius: 12px;
-      border: 1px solid rgba(30, 58, 95, 0.8);
+      background: #ffffff;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--border-color);
       padding: 20px;
+      box-shadow: var(--shadow-sm);
     }
-    .data-panel .panel-header { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+    .data-panel .panel-header, .panel-header {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
     .data-panel .panel-body { font-size: 12px; }
     .sentiment-item {
       display: flex;
@@ -354,19 +431,19 @@
     }
     .sentiment-item:last-child { border-bottom: none; }
     .sentiment-item.correlated {
-      background: rgba(244, 63, 94, 0.05);
+      background: #fef2f2;
       border-radius: 4px;
       padding: 8px;
       margin: 2px 0;
     }
     .sentiment-label {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 14px;
       min-width: 16px;
     }
-    .sentiment-positive { color: #22c55e; }
-    .sentiment-negative { color: #f43f5e; }
-    .sentiment-neutral  { color: #fbbf24; }
+    .sentiment-positive { color: #16a34a; }
+    .sentiment-negative { color: #dc2626; }
+    .sentiment-neutral  { color: #d97706; }
     .sentiment-headline {
       color: var(--text-secondary);
       line-height: 1.4;
@@ -384,37 +461,59 @@
     /* Pipeline Status */
     .component-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
     .component-card {
-      background: linear-gradient(135deg, #0d1424, #111c33);
-      border-radius: 12px;
-      border: 1px solid rgba(30, 58, 95, 0.8);
+      background: #ffffff;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--border-color);
       padding: 16px;
+      box-shadow: var(--shadow-sm);
     }
-    .component-card .name { font-weight: 600; margin-bottom: 8px; }
+    .component-card .name, .component-name { font-weight: 600; margin-bottom: 8px; color: #0f172a; }
     .component-card .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .component-card .status-dot.healthy {
-      background: #22c55e;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    .component-card .status-dot.healthy, .status-healthy {
+      background: #16a34a;
+      box-shadow: 0 0 6px rgba(22, 163, 74, 0.4);
       animation: pulse 2s infinite;
     }
-    .component-card .status-dot.degraded { background: var(--accent-yellow); }
-    .component-card .status-dot.down { background: var(--accent-red); animation: blink 0.5s infinite; }
+    .component-card .status-dot.degraded, .status-degraded { background: #d97706; }
+    .component-card .status-dot.down, .status-down { background: #dc2626; animation: blink 1s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-    .component-card .detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-    #throughput-chart { width: 100%; height: 120px; background: linear-gradient(135deg, #0d1424, #111c33); border: 1px solid rgba(30, 58, 95, 0.8); border-radius: 8px; }
+    .component-card .detail, .component-detail { font-size: 12px; color: #64748b; margin-top: 4px; }
+    #throughput-chart { width: 100%; height: 120px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); }
     .lag-gauge { width: 120px; height: 120px; margin: 16px auto; position: relative; }
     .lag-gauge .value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; }
 
     /* Anomalies */
     .anomaly-feed { max-width: 720px; }
     .anomaly-card {
-      background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
-      border-radius: 12px;
-      border: 1px solid rgba(30, 58, 95, 0.8);
-      border-left: 4px solid var(--accent-red);
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 0 20px rgba(244, 63, 94, 0.1);
+      border-left: 3px solid #dc2626;
+      background: #fff5f5;
+      border-radius: 0 8px 8px 0;
+      border-top: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      margin-bottom: 12px;
       animation: slideInTop 0.3s ease;
+    }
+    .anomaly-ticker { color: #dc2626; font-weight: 600; }
+    .anomaly-score { color: #0f172a; font-family: var(--font-mono); }
+    .anomaly-feature { color: #64748b; font-family: var(--font-mono); font-size: 11px; }
+    .anomaly-filter-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: #475569;
+      border-radius: 8px;
+      padding: 5px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .anomaly-filter-btn:hover { background: #f1f5f9; }
+    .anomaly-filter-btn.active {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: #ffffff;
     }
     @keyframes slideInTop {
       from { transform: translateY(-20px); opacity: 0; }
@@ -423,7 +522,85 @@
     .anomaly-card .header-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; }
     .anomaly-card .score-bar { height: 6px; background: var(--bg-tertiary); border-radius: 3px; margin: 8px 0; overflow: hidden; }
     .anomaly-card .score-bar fill { fill: var(--accent-red); }
-    .anomaly-summary { display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); }
+    .anomaly-summary { display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; font-size: 13px; color: #64748b; }
+
+    /* API Reference (shared styles) */
+    .endpoint-list {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+    }
+    .endpoint-item {
+      border-bottom: 1px solid var(--border-color);
+      color: #0f172a;
+    }
+    .endpoint-item:hover { background: #f1f5f9; }
+    .endpoint-item.active { background: #e0f2fe; }
+    .method-get {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .endpoint-detail {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+    }
+    .code-block {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #0f172a;
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    .token-string { color: #0369a1; }
+    .token-number { color: #7c3aed; }
+    .token-key { color: #0f172a; font-weight: 500; }
+    .token-comment { color: #94a3b8; }
+    .token-keyword { color: #dc2626; }
+
+    #overview-market-status.open {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+    }
+    #overview-market-status.closed {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #64748b;
+    }
+
+    #market-closed-state {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+    }
+    #market-closed-state .title { color: #0f172a; }
+    #market-closed-state .subtitle { color: #64748b; }
+    #next-open-message {
+      color: #0ea5e9;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: inline-block;
+    }
+
+    #component-detail-panel {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+    }
+    #detail-title { color: #0f172a; }
+    #detail-role { color: #64748b; }
+    #detail-why { color: #334155; }
+    #detail-list li { color: #475569; border-bottom: 1px solid var(--border-color); }
 
     /* Responsive */
     @media (max-width: 1200px) {
@@ -440,63 +617,51 @@
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg-primary); }
-    ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.2); border-radius: 2px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.4); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 <body>
   <!-- Demo mode banner — shown when DEMO_MODE is active -->
   <!-- Transparent and professional — tells visitors this is a portfolio demo -->
-  <div id="demo-banner" style="
-    background: linear-gradient(90deg,
-      rgba(168, 85, 247, 0.12),
-      rgba(0, 229, 255, 0.12)
-    );
-    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
-    padding: 8px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--text-secondary);
-  ">
+  <div id="demo-banner" style="padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600;">
     <span>
-      <span style="color: var(--accent-primary);">◉ DEMO MODE</span>
+      <span style="color: #0ea5e9;">◉ DEMO MODE</span>
       &nbsp;·&nbsp; Simulated market data &nbsp;·&nbsp;
-      Full pipeline runs locally via <code style="color:var(--accent-primary);">make up</code>
+      Full pipeline runs locally via <code>make up</code>
     </span>
     <span style="display:flex; gap:16px; align-items:center;">
       <a href="https://github.com/nikhilgiridharan/TradePulse"
          target="_blank"
          rel="noopener noreferrer"
-         style="color:var(--accent-primary); text-decoration:none;">
+         style="text-decoration:none;">
         View Source →
       </a>
       <a href="https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10"
          id="medium-article-link"
          target="_blank"
          rel="noopener noreferrer"
-         style="color:var(--accent-primary); text-decoration:none;">
+         style="text-decoration:none;">
         Read Architecture Article →
       </a>
     </span>
   </div>
   <header class="header">
     <div class="header-left">
-      <span class="logo-text">TradePulse</span>
+      <span class="logo-text header-logo-text">TradePulse</span>
     </div>
   </header>
 
   <div class="app-layout">
     <aside class="sidebar">
-      <div class="wordmark">TradePulse</div>
+      <div class="wordmark sidebar-title">TradePulse</div>
       <div class="nav-item active" data-section="overview">📊 <span>Overview</span></div>
       <div class="nav-item" data-section="live">📈 <span>Live Data</span></div>
       <div class="nav-item" data-section="pipeline">🔧 <span>Pipeline Status</span></div>
       <div class="nav-item" data-section="anomalies">⚠️ <span>Anomalies</span></div>
-      <div class="sidebar-footer"><div class="dot"></div> Pipeline Active</div>
+      <div class="sidebar-footer"><div class="dot pipeline-active-dot"></div><span class="pipeline-active">Pipeline Active</span></div>
     </aside>
 
     <main class="main-content">
@@ -527,87 +692,86 @@
     "></span>
 </div>
         <div class="metric-grid">
-          <div class="metric-card"><div class="label">Events/sec</div><div class="value font-mono" id="ov-events">14,832</div><div class="trend up">↑ +2.3%</div></div>
-          <div class="metric-card"><div class="label">p99 Latency</div><div class="value font-mono" id="ov-latency">67ms</div><div class="status">✓ healthy</div></div>
-          <div class="metric-card"><div class="label">Consumer Lag</div><div class="value font-mono" id="ov-lag">42</div><div class="status">✓ normal</div></div>
-          <div class="metric-card"><div class="label">Anomalies Today</div><div class="value font-mono" id="ov-anomalies">7</div><div class="trend">⚠ 2 active</div></div>
+          <div class="metric-card metric-card-cyan"><div class="label">Events/sec</div><div class="value font-mono" id="ov-events">14,832</div><div class="trend up metric-trend-up">↑ +2.3%</div></div>
+          <div class="metric-card metric-card-purple"><div class="label">p99 Latency</div><div class="value font-mono" id="ov-latency">67ms</div><div class="status metric-status-healthy">✓ healthy</div></div>
+          <div class="metric-card metric-card-blue"><div class="label">Consumer Lag</div><div class="value font-mono" id="ov-lag">42</div><div class="status metric-status-normal">✓ normal</div></div>
+          <div class="metric-card metric-card-amber"><div class="label">Anomalies Today</div><div class="value font-mono" id="ov-anomalies">7</div><div class="trend metric-status-warning">⚠ 2 active</div></div>
         </div>
         <div class="pipeline-diagram">
           <h3 style="margin-bottom:16px;">Pipeline Architecture</h3>
           <svg viewBox="0 0 820 320" style="min-height:320px;">
             <defs>
               <linearGradient id="pipeFillMain" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#0f1e38"/>
+                <stop offset="0%" stop-color="#eff6ff"/><stop offset="100%" stop-color="#dbeafe"/>
               </linearGradient>
               <linearGradient id="pipeFillNews" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#150f2e"/>
+                <stop offset="0%" stop-color="#faf5ff"/><stop offset="100%" stop-color="#f3e8ff"/>
               </linearGradient>
               <linearGradient id="pipeFillDlq" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#1f0d14"/>
+                <stop offset="0%" stop-color="#fff5f5"/><stop offset="100%" stop-color="#fef2f2"/>
               </linearGradient>
               <linearGradient id="pipeFillMl" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#1a1508"/>
+                <stop offset="0%" stop-color="#fffbeb"/><stop offset="100%" stop-color="#fef3c7"/>
               </linearGradient>
               <linearGradient id="pipeFillStorage" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0d1424"/><stop offset="100%" stop-color="#0a1a12"/>
+                <stop offset="0%" stop-color="#f0fdf4"/><stop offset="100%" stop-color="#dcfce7"/>
               </linearGradient>
-              <marker id="arrow-main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#00e5ff"/></marker>
-              <marker id="arrow-news" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#a855f7"/></marker>
+              <marker id="arrow-main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#0ea5e9"/></marker>
+              <marker id="arrow-news" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#7c3aed"/></marker>
             </defs>
             <!-- Main stream -->
             <g class="main-stream">
               <rect class="arch-box pipeline-box main" data-component="polygon" onclick="showComponentDetail('polygon')" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 5 tickers</title>
-              <text x="80" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Polygon.io</text>
-              <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
+              <text x="80" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Polygon.io</text>
+              <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="kafka" onclick="showComponentDetail('kafka')" x="152" y="24" width="120" height="44" rx="8"/><title>6 partitions · idempotent producer · exactly-once</title>
-              <text x="212" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka</text>
-              <line class="pipeline-line" x1="272" y1="46" x2="284" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
+              <text x="212" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka</text>
+              <line class="pipeline-line" x1="272" y1="46" x2="284" y2="46" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="validation" onclick="showComponentDetail('validation')" x="284" y="24" width="120" height="44" rx="8"/><title>Pydantic schema validation · invalid → SQS DLQ</title>
-              <text x="344" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Validation</text>
-              <line class="pipeline-line" x1="404" y1="46" x2="416" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
+              <text x="344" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Validation</text>
+              <line class="pipeline-line" x1="404" y1="46" x2="416" y2="46" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="faust" onclick="showComponentDetail('faust')" x="416" y="24" width="120" height="44" rx="8"/><title>Stream processing · VWAP · z-score · momentum · exactly-once</title>
-              <text x="476" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Faust</text>
-              <line class="pipeline-line" x1="536" y1="46" x2="548" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
+              <text x="476" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Faust</text>
+              <line class="pipeline-line" x1="536" y1="46" x2="548" y2="46" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="dynamodb" onclick="showComponentDetail('dynamodb')" x="548" y="24" width="120" height="44" rx="8"/><title>Hot storage · ticker#shard key · 48hr TTL · conditional writes</title>
-              <text x="608" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB</text>
-              <line class="pipeline-line" x1="668" y1="46" x2="680" y2="46" stroke="#00e5ff" marker-end="url(#arrow-main)"/>
+              <text x="608" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB</text>
+              <line class="pipeline-line" x1="668" y1="46" x2="680" y2="46" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="fastapi" onclick="showComponentDetail('fastapi')" x="680" y="24" width="120" height="44" rx="8"/><title>5 endpoints · rate limited · 1s cache · custom dashboard</title>
-              <text x="740" y="51" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">FastAPI</text>
+              <text x="740" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">FastAPI</text>
               <!-- DLQ -->
-              <line class="pipeline-line" x1="344" y1="68" x2="344" y2="88" stroke="#f43f5e" marker-end="url(#arrow-main)"/>
+              <line class="pipeline-line" x1="344" y1="68" x2="344" y2="88" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box dlq" data-component="sqs_dlq" onclick="showComponentDetail('sqs_dlq')" x="294" y="88" width="100" height="36" rx="8"/><title>Failed messages · 3 retries → DLQ · 5 DLQ retries → S3 archive</title>
-              <text x="344" y="111" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">SQS DLQ</text>
+              <text x="344" y="111" fill="#dc2626" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">SQS DLQ</text>
               <!-- Anomaly ML, Feature Store -->
-              <line class="pipeline-line" x1="476" y1="68" x2="476" y2="88" stroke="#fbbf24"/>
+              <line class="pipeline-line" x1="476" y1="68" x2="476" y2="88" stroke="#94a3b8"/>
               <rect class="arch-box pipeline-box ml" data-component="anomaly_ml" onclick="showComponentDetail('anomaly_ml')" x="416" y="88" width="120" height="44" rx="8"/><title>Isolation Forest · rolling retrain · 0.3ms inference</title>
-              <text x="476" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Anomaly ML</text>
-              <line class="pipeline-line" x1="476" y1="132" x2="476" y2="148" stroke="#fbbf24"/>
+              <text x="476" y="115" fill="#92400e" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Anomaly ML</text>
+              <line class="pipeline-line" x1="476" y1="132" x2="476" y2="148" stroke="#94a3b8"/>
               <rect class="arch-box pipeline-box ml" data-component="feature_store" onclick="showComponentDetail('feature_store')" x="416" y="148" width="120" height="44" rx="8"/><title>Precomputed features · DynamoDB · 7-day TTL</title>
-              <text x="476" y="175" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Feature Store</text>
+              <text x="476" y="175" fill="#92400e" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Feature Store</text>
               <!-- S3 Cold -->
-              <line class="pipeline-line" x1="608" y1="68" x2="608" y2="88" stroke="#22c55e"/>
+              <line class="pipeline-line" x1="608" y1="68" x2="608" y2="88" stroke="#94a3b8"/>
               <rect class="arch-box pipeline-box storage" data-component="s3_parquet" onclick="showComponentDetail('s3_parquet')" x="548" y="88" width="120" height="44" rx="8"/><title>Cold storage · Hive partitioning · Snappy compression · Athena</title>
-              <text x="608" y="115" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">S3 Parquet</text>
+              <text x="608" y="115" fill="#15803d" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">S3 Parquet</text>
             </g>
             <!-- Join annotation -->
             <line class="join-line" x1="476" y1="68" x2="476" y2="232"/>
-            <text x="476" y="152" fill="#b4c6e0" font-size="10" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">60s temporal join</text>
             <!-- News stream -->
             <g class="news-stream">
               <rect class="arch-box pipeline-box news" data-component="finnhub" onclick="showComponentDetail('finnhub')" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
-              <text x="80" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Finnhub API</text>
-              <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
+              <text x="80" y="259" fill="#6d28d9" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Finnhub API</text>
+              <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#94a3b8" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="kafka_news" onclick="showComponentDetail('kafka_news')" x="152" y="232" width="120" height="44" rx="8"/><title>Separate topic · low frequency · independent scaling</title>
-              <text x="212" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka market.news</text>
-              <line class="pipeline-line news" x1="272" y1="254" x2="284" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
+              <text x="212" y="259" fill="#6d28d9" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Kafka market.news</text>
+              <line class="pipeline-line news" x1="272" y1="254" x2="284" y2="254" stroke="#94a3b8" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="vader" onclick="showComponentDetail('vader')" x="284" y="232" width="120" height="44" rx="8"/><title>&lt;1ms inference · compound score -1.0 to +1.0</title>
-              <text x="344" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">VADER Sentiment</text>
-              <line class="pipeline-line news" x1="404" y1="254" x2="416" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
+              <text x="344" y="259" fill="#6d28d9" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">VADER Sentiment</text>
+              <line class="pipeline-line news" x1="404" y1="254" x2="416" y2="254" stroke="#94a3b8" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="correlator" onclick="showComponentDetail('correlator')" x="416" y="232" width="120" height="44" rx="8"/><title>Joins sentiment + volume z-score · 60s temporal window</title>
-              <text x="476" y="259" fill="white" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Correlator</text>
-              <line class="pipeline-line news" x1="536" y1="254" x2="548" y2="254" stroke="#a855f7" marker-end="url(#arrow-news)"/>
-              <rect class="arch-box pipeline-box news" data-component="dynamo_sentiment" onclick="showComponentDetail('dynamo_sentiment')" x="548" y="232" width="120" height="44" rx="8"/><title>Sentiment store · 30-day TTL · strong correlation flagging</title>
-              <text x="608" y="259" fill="white" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB market_sentiment</text>
+              <text x="476" y="259" fill="#6d28d9" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Correlator</text>
+              <line class="pipeline-line news" x1="536" y1="254" x2="548" y2="254" stroke="#94a3b8" marker-end="url(#arrow-news)"/>
+              <rect class="arch-box pipeline-box news" data-component="dynamo_sentiment" onclick="showComponentDetail('dynamo_sentiment')" x="548" y="232" width="200" height="44" rx="8"/><title>Sentiment store · 30-day TTL · strong correlation flagging</title>
+              <text x="648" y="259" fill="#6d28d9" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB market_sentiment</text>
             </g>
           </svg>
         </div>
@@ -615,8 +779,6 @@
         <div id="component-detail-panel" style="
     display: none;
     margin-top: 16px;
-    background: linear-gradient(135deg, #0d1424 0%, #111c33 100%);
-    border: 1px solid rgba(30, 58, 95, 0.8);
     border-radius: 12px;
     padding: 24px;
     animation: slideInTop 0.25s ease;
@@ -632,7 +794,7 @@
             right: 16px;
             background: transparent;
             border: none;
-            color: #b4c6e0;
+            color: #64748b;
             font-size: 18px;
             cursor: pointer;
             line-height: 1;
@@ -651,14 +813,14 @@
         "></div>
         <div>
             <div id="detail-title" style="
-                color: #ffffff;
+                color: #0f172a;
                 font-size: 16px;
                 font-weight: 600;
                 font-family: Inter, sans-serif;
                 margin-bottom: 2px;
             "></div>
             <div id="detail-role" style="
-                color: #b4c6e0;
+                color: #64748b;
                 font-size: 12px;
                 font-family: Inter, sans-serif;
             "></div>
@@ -668,7 +830,7 @@
     <!-- Why section -->
     <div style="margin-bottom:16px;">
         <div style="
-            color: #6b85a8;
+            color: #64748b;
             font-size: 11px;
             font-family: Inter, sans-serif;
             text-transform: uppercase;
@@ -676,7 +838,7 @@
             margin-bottom: 8px;
         ">Why this component</div>
         <div id="detail-why" style="
-            color: #cbd5e1;
+            color: #334155;
             font-size: 13px;
             font-family: Inter, sans-serif;
             line-height: 1.6;
@@ -686,7 +848,7 @@
     <!-- Technical details -->
     <div>
         <div style="
-            color: #6b85a8;
+            color: #64748b;
             font-size: 11px;
             font-family: Inter, sans-serif;
             text-transform: uppercase;
@@ -710,13 +872,13 @@
     display: none;
     text-align: center;
     padding: 80px 40px;
-    color: var(--text-secondary);
+    color: #64748b;
 ">
     <div style="
         width: 56px;
         height: 56px;
         border-radius: 50%;
-        background: rgba(148, 163, 184, 0.08);
+        background: #f1f5f9;
         border: 1px solid var(--border-color);
         display: flex;
         align-items: center;
@@ -724,21 +886,20 @@
         margin: 0 auto 20px;
         font-size: 22px;
     ">🔔</div>
-    <div style="
-        color: var(--text-primary);
+    <div class="title" style="
+        color: #0f172a;
         font-size: 16px;
         font-weight: 500;
         margin-bottom: 8px;
         font-family: Inter, sans-serif;
     ">Market Closed</div>
     <div id="next-open-message" style="
-        color: var(--text-secondary);
         font-size: 13px;
         font-family: Inter, sans-serif;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
     "></div>
-    <div style="
-        color: var(--text-secondary);
+    <div class="subtitle" style="
+        color: #64748b;
         font-size: 12px;
         font-family: Inter, sans-serif;
     ">Live data resumes automatically at market open</div>
@@ -941,7 +1102,7 @@ const COMPONENT_DETAILS = {
             'Partitions messages by ticker symbol so all AAPL events go to the same Kafka partition in order',
             'Emits ProducerThroughput metric to CloudWatch every 10 seconds'
         ],
-        color: '#00e5ff'
+        color: '#0ea5e9'
     },
     kafka: {
         title: 'Apache Kafka',
@@ -955,7 +1116,7 @@ const COMPONENT_DETAILS = {
             'Acts as shock absorber during 8-10x market open volume spikes',
             'Retains data for 7 days — full replay window for debugging'
         ],
-        color: '#00e5ff'
+        color: '#0ea5e9'
     },
     validation: {
         title: 'Schema Validation',
@@ -968,7 +1129,7 @@ const COMPONENT_DETAILS = {
             'Tracks per-field failure counts to identify upstream data quality patterns',
             'Emits ValidationFailures metric to CloudWatch per field per minute'
         ],
-        color: '#00e5ff'
+        color: '#0ea5e9'
     },
     faust: {
         title: 'Apache Faust',
@@ -983,7 +1144,7 @@ const COMPONENT_DETAILS = {
             'Backpressure: pauses consumption 500ms when DynamoDB write latency exceeds 100ms',
             'Updates z-score cache every event so sentiment correlator has fresh signal'
         ],
-        color: '#00e5ff'
+        color: '#0ea5e9'
     },
     dynamodb: {
         title: 'AWS DynamoDB',
@@ -997,7 +1158,7 @@ const COMPONENT_DETAILS = {
             'Four tables: market_trades, market_aggregations, market_anomalies, feature_store',
             'Backpressure threshold: if write p99 exceeds 100ms for 3 consecutive writes, pause Faust'
         ],
-        color: '#00e5ff'
+        color: '#0ea5e9'
     },
     fastapi: {
         title: 'FastAPI',
@@ -1013,7 +1174,7 @@ const COMPONENT_DETAILS = {
             'Rate limited to 100 requests per minute per IP',
             'CORS enabled for dashboard access from any origin'
         ],
-        color: '#00e5ff'
+        color: '#0ea5e9'
     },
     sqs_dlq: {
         title: 'SQS Dead Letter Queue',
@@ -1027,7 +1188,7 @@ const COMPONENT_DETAILS = {
             'After 5 DLQ retries: archive to s3://tradepulse-data/dead-letters/ for manual inspection',
             'CloudWatch alarm fires when DLQ depth exceeds 100 messages'
         ],
-        color: '#f43f5e'
+        color: '#dc2626'
     },
     anomaly_ml: {
         title: 'Isolation Forest',
@@ -1042,7 +1203,7 @@ const COMPONENT_DETAILS = {
             'Inference time: 0.3ms per event — adds negligible pipeline latency',
             'Anomalies written to DynamoDB market_anomalies and S3 with full feature vector'
         ],
-        color: '#fbbf24'
+        color: '#d97706'
     },
     s3_parquet: {
         title: 'S3 + Parquet',
@@ -1056,7 +1217,7 @@ const COMPONENT_DETAILS = {
             'Glue catalog updated after each flush so Athena queries new partitions immediately',
             'S3 path: tradepulse-data/trades/year=2025/month=02/day=22/hour=14/'
         ],
-        color: '#22c55e'
+        color: '#16a34a'
     },
     feature_store: {
         title: 'Feature Store',
@@ -1070,7 +1231,7 @@ const COMPONENT_DETAILS = {
             'TTL: 7 days — features have longer analytical value than raw trades',
             'API serves features at single-digit millisecond latency from DynamoDB'
         ],
-        color: '#fbbf24'
+        color: '#d97706'
     },
     finnhub: {
         title: 'Finnhub API',
@@ -1084,7 +1245,7 @@ const COMPONENT_DETAILS = {
             'Publishes to market.news Kafka topic partitioned by ticker symbol',
             'Free tier: 60 API calls per minute — well within polling budget'
         ],
-        color: '#a855f7'
+        color: '#7c3aed'
     },
     kafka_news: {
         title: 'Kafka market.news',
@@ -1097,7 +1258,7 @@ const COMPONENT_DETAILS = {
             'Independent consumer group — news processing falling behind does not affect trade processing',
             'Retention: 7 days matching equity stream'
         ],
-        color: '#a855f7'
+        color: '#7c3aed'
     },
     vader: {
         title: 'VADER Sentiment',
@@ -1111,7 +1272,7 @@ const COMPONENT_DETAILS = {
             'Summary context reduces ambiguity in short headlines',
             'Inference time: under 1ms — adds negligible latency to news processing pipeline'
         ],
-        color: '#a855f7'
+        color: '#7c3aed'
     },
     correlator: {
         title: 'News-Market Correlator',
@@ -1125,7 +1286,7 @@ const COMPONENT_DETAILS = {
             'Z-score cache: in-memory per ticker with timestamp for fast lookups without DynamoDB reads',
             'Why 60 seconds: algorithmic traders react within seconds, human traders within minutes'
         ],
-        color: '#a855f7'
+        color: '#7c3aed'
     },
     dynamo_sentiment: {
         title: 'DynamoDB market_sentiment',
@@ -1139,7 +1300,7 @@ const COMPONENT_DETAILS = {
             'Low write volume — news arrives ~100 articles per hour vs 15000 trades per second',
             'Hot partition risk is minimal at this write frequency'
         ],
-        color: '#a855f7'
+        color: '#7c3aed'
     }
 };
 
@@ -1178,8 +1339,8 @@ function showComponentDetail(key) {
             align-items: flex-start;
             gap: 8px;
             padding: 6px 0;
-            border-bottom: 1px solid rgba(30, 58, 95, 0.8);
-            color: #b4c6e0;
+            border-bottom: 1px solid var(--border-color);
+            color: #475569;
             font-size: 12px;
             font-family: JetBrains Mono, monospace;
             line-height: 1.5;
@@ -1315,30 +1476,26 @@ function hideComponentDetail() {
         const currentET = timeFormatter.format(new Date());
 
         if (open) {
-            // Green — market is open, data is live
-            bar.style.background = 'rgba(34, 197, 94, 0.06)';
-            bar.style.border = '1px solid rgba(34, 197, 94, 0.15)';
-            dot.style.background = '#22c55e';
-            dot.style.boxShadow = '0 0 6px rgba(34, 197, 94, 0.6)';
-            text.style.color = '#22c55e';
+            bar.classList.add('open');
+            bar.classList.remove('closed');
+            dot.style.background = '#16a34a';
+            dot.style.boxShadow = '0 0 6px rgba(22, 163, 74, 0.4)';
+            text.style.color = '';
             text.textContent = `Live data · Market open · ${currentET} ET`;
 
-            // Cards at full opacity — data is current
             const cards = document.querySelectorAll('.metric-card, .overview-card-item');
             cards.forEach(card => {
                 card.style.opacity = '1';
             });
 
         } else {
-            // Red — market is closed
-            bar.style.background = 'rgba(244, 63, 94, 0.06)';
-            bar.style.border = '1px solid rgba(244, 63, 94, 0.15)';
-            dot.style.background = '#f43f5e';
+            bar.classList.remove('open');
+            bar.classList.add('closed');
+            dot.style.background = '#dc2626';
             dot.style.boxShadow = 'none';
-            text.style.color = '#b4c6e0';
+            text.style.color = '';
             text.textContent = `Market closed · ${getNextMarketOpen()} · ${currentET} ET`;
 
-            // Cards at slightly reduced opacity — values are from last session
             const cards = document.querySelectorAll('.metric-card, .overview-card-item');
             cards.forEach(card => {
                 card.style.opacity = '0.6';
@@ -1428,10 +1585,10 @@ function hideComponentDetail() {
       const yMin = min - range * yPadPct;
       const yMax = max + range * yPadPct;
       const yRange = yMax - yMin || 1;
-      ctx.fillStyle = '#060b18';
+      ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, w, h);
       // Grid lines at 25%, 50%, 75%
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.lineWidth = 0.5;
       for (let i = 1; i < 4; i++) {
         const y = pad + plotH * (1 - i / 4);
@@ -1463,14 +1620,14 @@ function hideComponentDetail() {
       ctx.lineTo(firstX, chartBottom);
       ctx.closePath();
       const fillGradient = ctx.createLinearGradient(0, chartTop, 0, chartBottom);
-      fillGradient.addColorStop(0, 'rgba(0, 229, 255, 0.18)');
-      fillGradient.addColorStop(0.5, 'rgba(0, 229, 255, 0.06)');
-      fillGradient.addColorStop(1, 'rgba(0, 229, 255, 0)');
+      fillGradient.addColorStop(0, 'rgba(14, 165, 233, 0.15)');
+      fillGradient.addColorStop(0.6, 'rgba(14, 165, 233, 0.05)');
+      fillGradient.addColorStop(1, 'rgba(14, 165, 233, 0)');
       ctx.fillStyle = fillGradient;
       ctx.fill();
       // Redraw the line on top of the fill
-      ctx.strokeStyle = color || '#00e5ff';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = color || '#0ea5e9';
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(pts[0].x, pts[0].y);
       for (let i = 1; i < pts.length; i++) {
@@ -1483,7 +1640,10 @@ function hideComponentDetail() {
       ctx.stroke();
       // Price range label
       const rangeEl = document.getElementById('sparkline-range');
-      if (rangeEl) rangeEl.textContent = '$' + min.toFixed(2) + ' — $' + max.toFixed(2);
+      if (rangeEl) {
+        rangeEl.textContent = '$' + min.toFixed(2) + ' — $' + max.toFixed(2);
+        rangeEl.style.color = '#64748b';
+      }
     }
 
     function drawThroughputChart() {
@@ -1510,7 +1670,7 @@ function hideComponentDetail() {
       const chartHeight = height - padding.top - padding.bottom;
       const barWidth = (chartWidth / data.length) * 0.7;
       ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.06)';
       ctx.lineWidth = 0.5;
       [0.25, 0.5, 0.75, 1].forEach(ratio => {
         const y = padding.top + chartHeight * (1 - ratio);
@@ -1518,7 +1678,7 @@ function hideComponentDetail() {
         ctx.moveTo(padding.left, y);
         ctx.lineTo(width - padding.right, y);
         ctx.stroke();
-        ctx.fillStyle = 'rgba(180, 198, 224, 0.65)';
+        ctx.fillStyle = '#94a3b8';
         ctx.font = '10px Inter';
         ctx.textAlign = 'right';
         ctx.fillText(Math.round(maxVal * ratio / 1000) + 'k', padding.left - 6, y + 4);
@@ -1530,11 +1690,11 @@ function hideComponentDetail() {
         const isPeak = value === Math.max(...data);
         const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
         if (isPeak) {
-          grad.addColorStop(0, 'rgba(0, 229, 255, 1.0)');
-          grad.addColorStop(1, 'rgba(0, 229, 255, 0.5)');
+          grad.addColorStop(0, 'rgba(14, 165, 233, 1.0)');
+          grad.addColorStop(1, 'rgba(14, 165, 233, 0.6)');
         } else {
-          grad.addColorStop(0, 'rgba(0, 229, 255, 0.8)');
-          grad.addColorStop(1, 'rgba(0, 229, 255, 0.25)');
+          grad.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+          grad.addColorStop(1, 'rgba(14, 165, 233, 0.3)');
         }
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -1542,7 +1702,7 @@ function hideComponentDetail() {
         else ctx.rect(x, y, barWidth, barHeight);
         ctx.fill();
       });
-      ctx.fillStyle = 'rgba(180, 198, 224, 0.65)';
+      ctx.fillStyle = '#94a3b8';
       ctx.font = '10px Inter';
       ctx.textAlign = 'center';
       [0, 4, 9, 14, 19].forEach(i => {
@@ -1576,9 +1736,9 @@ function hideComponentDetail() {
       const radius = Math.min(width, height) * 0.35;
       const lagValue = window.demoConsumerLag || 42;
       let gaugeColor;
-      if (lagValue <= 1000) gaugeColor = '#22c55e';
-      else if (lagValue <= 5000) gaugeColor = '#fbbf24';
-      else gaugeColor = '#f43f5e';
+      if (lagValue <= 1000) gaugeColor = '#16a34a';
+      else if (lagValue <= 5000) gaugeColor = '#d97706';
+      else gaugeColor = '#dc2626';
       const maxLag = 10000;
       const fillRatio = Math.min(lagValue / maxLag, 1);
       const startAngle = (225 * Math.PI) / 180;
@@ -1587,7 +1747,7 @@ function hideComponentDetail() {
       ctx.clearRect(0, 0, width, height);
       ctx.beginPath();
       ctx.arc(cx, cy, radius, startAngle, startAngle + totalSweep);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
       ctx.lineWidth = 12;
       ctx.lineCap = 'round';
       ctx.stroke();
@@ -1602,12 +1762,12 @@ function hideComponentDetail() {
         ctx.stroke();
         ctx.shadowBlur = 0;
       }
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#0f172a';
       ctx.font = 'bold ' + Math.round(radius * 0.5) + 'px JetBrains Mono, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(lagValue.toLocaleString(), cx, cy - 4);
-      ctx.fillStyle = '#b4c6e0';
+      ctx.fillStyle = '#94a3b8';
       ctx.font = '12px Inter';
       ctx.fillText('messages', cx, cy + radius * 0.4);
       const statusLabel = lagValue <= 1000 ? '✓ normal' : lagValue <= 5000 ? '⚠ elevated' : '✗ critical';
@@ -1619,7 +1779,7 @@ function hideComponentDetail() {
         const markerRadius = radius + 18;
         const x = cx + Math.cos(angle) * markerRadius;
         const y = cy + Math.sin(angle) * markerRadius;
-        ctx.fillStyle = 'rgba(180, 198, 224, 0.55)';
+        ctx.fillStyle = '#94a3b8';
         ctx.font = '9px Inter';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1686,7 +1846,7 @@ function hideComponentDetail() {
       if (!state.priceHistory[t]) state.priceHistory[t] = [];
       state.priceHistory[t].push(price || prev);
       if (state.priceHistory[t].length > 60) state.priceHistory[t].shift();
-      drawSparkline('sparkline-canvas', state.priceHistory[t].filter(Boolean), '#00e5ff');
+      drawSparkline('sparkline-canvas', state.priceHistory[t].filter(Boolean), '#0ea5e9');
     }
 
     function renderAnomalies() {
