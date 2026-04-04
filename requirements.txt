@@ -1,5 +1,5 @@
 # Stream processing — Faust for exactly-once Kafka consumption; confluent-kafka for producer
-faust-streaming==0.10.14
+faust-streaming==0.11.3
 confluent-kafka==2.3.0
 
 # AWS SDK — DynamoDB, S3, SQS, CloudWatch

@@ -1,0 +1,22 @@
+# Faust stream processing worker.
+FROM python:3.11-slim
+
+WORKDIR /app
+ENV PYTHONPATH=/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc g++ libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir "faust-streaming-rocksdb>=0.8.0"
+
+COPY src ./src
+COPY infra ./infra
+
+# RocksDB store path for Faust table state (exactly-once checkpointing).
+RUN mkdir -p /var/lib/tradepulse/faust && chmod 777 /var/lib/tradepulse/faust
+ENV FAUST_STORE=rocksdb:///var/lib/tradepulse/faust
