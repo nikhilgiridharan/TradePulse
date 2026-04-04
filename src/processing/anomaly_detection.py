@@ -78,6 +78,7 @@ class AnomalyDetector:
         self._model = IsolationForest(
             contamination=self._settings.pipeline.anomaly_contamination,
             random_state=42,
+            n_jobs=-1,
         )
         self._model.fit(X_scaled)
         self._model_version += 1
@@ -116,8 +117,8 @@ class AnomalyDetector:
                 score = float(self._model.score_samples(X_scaled)[0])
                 pred = int(self._model.predict(X_scaled)[0])
                 is_anomaly = pred == -1
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("anomaly_score_failed", ticker=self.ticker, error=str(e))
         ts = getattr(event, "timestamp", None) or datetime.utcnow()
         if is_anomaly and self._settings.cloudwatch_enabled:
             self._metrics.emit_metric("AnomaliesDetected", 1.0, "Count", {"ticker": self.ticker})

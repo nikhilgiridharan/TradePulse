@@ -24,6 +24,7 @@ import json
 import logging
 import time
 import random
+from collections import deque
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -86,7 +87,7 @@ class NewsProducer:
         # across polling intervals. Uses a bounded set to prevent
         # unbounded memory growth — evict oldest entries after 10,000
         self.seen_ids: set = set()
-        self.seen_ids_order: list = []
+        self.seen_ids_order: deque[str] = deque()
         self.MAX_SEEN_IDS = 10_000
 
         self.running = False
@@ -128,7 +129,7 @@ class NewsProducer:
         self.seen_ids_order.append(article_id)
 
         if len(self.seen_ids_order) > self.MAX_SEEN_IDS:
-            oldest = self.seen_ids_order.pop(0)
+            oldest = self.seen_ids_order.popleft()
             self.seen_ids.discard(oldest)
 
         return False

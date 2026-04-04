@@ -11,6 +11,7 @@ import time
 from typing import Any
 
 import structlog
+from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 from pydantic import BaseModel
 
@@ -146,13 +147,13 @@ class DynamoWriter:
             "sequence_number": int(getattr(event, "sequence_number")),
         }
         start = time.perf_counter()
-        from boto3.dynamodb.conditions import Attr
         table = self._resource.Table(table_name)
         for attempt in range(THROTTLE_RETRIES):
             try:
                 table.put_item(
                     Item=item,
                     ConditionExpression=Attr(schema["partition_key"]).not_exists() & Attr(schema["sort_key"]).not_exists(),
+                    ReturnValues="NONE",
                 )
                 break
             except ClientError as e:

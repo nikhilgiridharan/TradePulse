@@ -39,6 +39,15 @@ except Exception as e:
 
 DEMO_MODE = os.getenv('DEMO_MODE', 'true').lower() == 'true'
 
+# Single source of truth for /market-prices yfinance fallbacks (same values as prior inline dict).
+FALLBACK_PRICES = {
+    "AAPL": {"price": 250.12, "change_pct": -2.21, "previous_close": 255.76},
+    "MSFT": {"price": 395.55, "change_pct": -1.84, "previous_close": 402.92},
+    "AMZN": {"price": 207.67, "change_pct": -2.10, "previous_close": 212.13},
+    "TSLA": {"price": 238.45, "change_pct": -3.92, "previous_close": 248.17},
+    "NVDA": {"price": 880.35, "change_pct": -3.44, "previous_close": 911.83},
+}
+
 # Required for remaining routes (limiter, Request, BaseModel, logger, time)
 import time
 from typing import Any, Optional
@@ -48,6 +57,8 @@ import structlog
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+
+from src.processing.feature_store import FeatureStore
 
 logger = structlog.get_logger(__name__)
 
@@ -183,7 +194,6 @@ async def get_quotes(request: Request, ticker: str) -> QuoteResponse:
     writer = _get_writer()
     table = writer._resource.Table(writer._table_name("market_trades"))
     # Query any shard; we want latest by timestamp. Use GSI or scan one shard.
-    from boto3.dynamodb.conditions import Key
     ticker_upper = ticker.upper()
     found = None
     for shard in range(8):
@@ -214,7 +224,6 @@ async def get_aggregations(request: Request, ticker: str) -> AggregationsRespons
     """Latest window aggregations. Cached 5s."""
     writer = _get_writer()
     table = writer._resource.Table(writer._table_name("market_aggregations"))
-    from boto3.dynamodb.conditions import Key
     ticker_upper = ticker.upper()
     # Table has pk = ticker, sort_key = window_start; one row per window with all metrics
     resp = table.query(
@@ -244,7 +253,6 @@ async def get_anomalies(request: Request, ticker: str, hours: int = 24) -> Anoma
     """Anomalies in last N hours. No cache."""
     writer = _get_writer()
     table = writer._resource.Table(writer._table_name("market_anomalies"))
-    from boto3.dynamodb.conditions import Key
     ticker_upper = ticker.upper()
     resp = table.query(
         KeyConditionExpression=Key("pk").eq(ticker_upper),
@@ -276,7 +284,6 @@ async def get_anomalies(request: Request, ticker: str, hours: int = 24) -> Anoma
 @limiter.limit("100/minute")
 async def get_features(request: Request, ticker: str) -> FeaturesResponse:
     """Current feature vector. Cached 1s."""
-    from src.processing.feature_store import FeatureStore
     store = FeatureStore()
     vec = store.get_features(ticker.upper())
     if not vec:
@@ -299,14 +306,6 @@ async def health():
 
 @app.get("/market-prices")
 async def get_market_prices():
-    FALLBACK_PRICES = {
-        "AAPL":  {"price": 250.12, "change_pct": -2.21, "previous_close": 255.76},
-        "MSFT":  {"price": 395.55, "change_pct": -1.84, "previous_close": 402.92},
-        "AMZN":  {"price": 207.67, "change_pct": -2.10, "previous_close": 212.13},
-        "TSLA":  {"price": 238.45, "change_pct": -3.92, "previous_close": 248.17},
-        "NVDA":  {"price": 880.35, "change_pct": -3.44, "previous_close": 911.83},
-    }
-
     if not YFINANCE_AVAILABLE:
         return FALLBACK_PRICES
 
@@ -327,10 +326,12 @@ async def get_market_prices():
                     "change_pct": change_pct,
                     "previous_close": previous_close,
                 }
-            except Exception:
+            except Exception as e:
+                logger.warning("market_prices_ticker_failed", ticker=ticker, error=str(e))
                 prices[ticker] = FALLBACK_PRICES[ticker]
         return prices
-    except Exception:
+    except Exception as e:
+        logger.warning("market_prices_fetch_failed", error=str(e))
         return FALLBACK_PRICES
 
 
@@ -368,8 +369,8 @@ async def get_sentiment(request: Request, ticker: str, hours: int = 24):
         }
 
     try:
-        dynamodb = boto3.resource("dynamodb", region_name=settings.aws.region)
-        table = dynamodb.Table(settings.dynamo.table_sentiment)
+        writer = _get_writer()
+        table = writer._resource.Table(settings.dynamo.table_sentiment)
 
         cutoff = (
             datetime.now(timezone.utc) - timedelta(hours=hours)

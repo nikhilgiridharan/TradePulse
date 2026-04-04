@@ -31,6 +31,7 @@ Documented metrics emitted across the codebase:
 """
 from __future__ import annotations
 
+import itertools
 import os
 import threading
 import time
@@ -131,9 +132,13 @@ class CloudWatchMetrics:
 
     def _flush_unsafe(self) -> None:
         """Must hold _lock. Sends buffer in batches of CLOUDWATCH_BATCH_SIZE."""
-        while self._buffer:
-            batch = self._buffer[:CLOUDWATCH_BATCH_SIZE]
-            self._buffer = self._buffer[CLOUDWATCH_BATCH_SIZE:]
+        buf = self._buffer
+        self._buffer = []
+        it = iter(buf)
+        while True:
+            batch = list(itertools.islice(it, CLOUDWATCH_BATCH_SIZE))
+            if not batch:
+                break
             try:
                 self._client.put_metric_data(
                     Namespace=self._namespace,

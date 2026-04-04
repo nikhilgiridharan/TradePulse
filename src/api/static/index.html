@@ -886,10 +886,6 @@
 
     const API_BASE = ''; // Same origin — FastAPI serves both API and static files
 
-    // Log environment for debugging
-    console.log('[TradePulse] Environment: ' + (IS_PRODUCTION ? 'production (Railway)' : 'local'));
-    console.log('[TradePulse] API base: ' + (API_BASE || 'same origin'));
-
     const DEMO_MODE = true;
     // Hardcoded fallback prices — used only if /market-prices API call fails.
     // Update these before any live demo or screen recording.
@@ -978,6 +974,53 @@
       pipelineStatus: {},
       metrics: {},
     };
+
+    /** Cached DOM refs for hot paths (poll, render, charts). */
+    const dom = {};
+    let sparklineCtxCached = null;
+
+    function initDomRefs() {
+      dom.ovEvents = document.getElementById('ov-events');
+      dom.ovLatency = document.getElementById('ov-latency');
+      dom.ovLag = document.getElementById('ov-lag');
+      dom.ovAnomalies = document.getElementById('ov-anomalies');
+      dom.liveTicker = document.getElementById('live-ticker');
+      dom.livePrice = document.getElementById('live-price');
+      dom.liveVol = document.getElementById('live-vol');
+      dom.liveVwap = document.getElementById('live-vwap');
+      dom.liveTime = document.getElementById('live-time');
+      dom.aggVwap1 = document.getElementById('agg-vwap1');
+      dom.aggVwap5 = document.getElementById('agg-vwap5');
+      dom.aggZscore = document.getElementById('agg-zscore');
+      dom.aggMom = document.getElementById('agg-mom');
+      dom.featVwap5 = document.getElementById('feat-vwap5');
+      dom.featZscore = document.getElementById('feat-zscore');
+      dom.featSpread = document.getElementById('feat-spread');
+      dom.featMom = document.getElementById('feat-mom');
+      dom.featFreq = document.getElementById('feat-freq');
+      dom.featUpdated = document.getElementById('feat-updated');
+      dom.anomalyFeed = document.getElementById('anomaly-feed');
+      dom.sparklineRange = document.getElementById('sparkline-range');
+      dom.sparklineCanvas = document.getElementById('sparkline-canvas');
+      dom.throughputCanvas = document.getElementById('throughput-chart');
+      dom.lagCanvas = document.getElementById('lag-gauge-canvas');
+      dom.overviewBar = document.getElementById('overview-market-status');
+      dom.overviewDot = document.getElementById('overview-status-dot');
+      dom.overviewText = document.getElementById('overview-status-text');
+      dom.liveWhenOpen = document.getElementById('live-data-when-open');
+      dom.marketClosedState = document.getElementById('market-closed-state');
+      dom.nextOpenMsg = document.getElementById('next-open-message');
+      dom.sentimentScore = document.getElementById('sentiment-score');
+      dom.sentimentItems = document.getElementById('sentiment-items');
+      dom.detailPanel = document.getElementById('component-detail-panel');
+      dom.detailTitle = document.getElementById('detail-title');
+      dom.detailRole = document.getElementById('detail-role');
+      dom.detailWhy = document.getElementById('detail-why');
+      dom.detailColorDot = document.getElementById('detail-color-dot');
+      dom.detailList = document.getElementById('detail-list');
+      if (dom.sparklineCanvas) sparklineCtxCached = dom.sparklineCanvas.getContext('2d');
+    }
+    initDomRefs();
 
 /**
  * Detail information for each pipeline component.
@@ -1208,7 +1251,7 @@ function showComponentDetail(key) {
     const data = COMPONENT_DETAILS[key];
     if (!data) return;
 
-    const panel = document.getElementById('component-detail-panel');
+    const panel = dom.detailPanel;
     if (!panel) return;
 
     // If same box clicked again — toggle off
@@ -1218,15 +1261,18 @@ function showComponentDetail(key) {
     }
 
     // Populate content
-    document.getElementById('detail-title').textContent = data.title;
-    document.getElementById('detail-role').textContent = data.role;
-    document.getElementById('detail-why').textContent = data.why;
-    document.getElementById('detail-color-dot').style.background = data.color;
-    document.getElementById('detail-color-dot').style.boxShadow =
-        `0 0 8px ${data.color}80`;
+    if (dom.detailTitle) dom.detailTitle.textContent = data.title;
+    if (dom.detailRole) dom.detailRole.textContent = data.role;
+    if (dom.detailWhy) dom.detailWhy.textContent = data.why;
+    if (dom.detailColorDot) {
+        dom.detailColorDot.style.background = data.color;
+        dom.detailColorDot.style.boxShadow =
+            `0 0 8px ${data.color}80`;
+    }
 
     // Build details list
-    const list = document.getElementById('detail-list');
+    const list = dom.detailList;
+    if (!list) return;
     list.innerHTML = data.details.map(detail => `
         <li style="
             display: flex;
@@ -1263,7 +1309,7 @@ function showComponentDetail(key) {
  * Hides the component detail panel and removes active state from all boxes.
  */
 function hideComponentDetail() {
-    const panel = document.getElementById('component-detail-panel');
+    const panel = dom.detailPanel;
     if (panel) {
         panel.style.display = 'none';
         panel.dataset.activeKey = '';
@@ -1354,9 +1400,9 @@ function hideComponentDetail() {
     function updateOverviewMarketStatus() {
         const open = isMarketOpen();
 
-        const bar = document.getElementById('overview-market-status');
-        const dot = document.getElementById('overview-status-dot');
-        const text = document.getElementById('overview-status-text');
+        const bar = dom.overviewBar;
+        const dot = dom.overviewDot;
+        const text = dom.overviewText;
 
         if (!bar || !dot || !text) return;
 
@@ -1437,8 +1483,6 @@ function hideComponentDetail() {
           state.priceHistory[ticker] = Array(60).fill(price);
         });
 
-        console.log('[TradePulse] Real market prices loaded:', data);
-
       } catch (err) {
         // Fall back to hardcoded baselines — pipeline still works correctly
         console.warn('[TradePulse] Could not fetch real prices, using hardcoded baselines:', err.message);
@@ -1464,9 +1508,9 @@ function hideComponentDetail() {
     }
 
     function drawSparkline(canvasId, priceArray, color) {
-      const canvas = document.getElementById(canvasId);
+      const canvas = (canvasId === 'sparkline-canvas' && dom.sparklineCanvas) ? dom.sparklineCanvas : document.getElementById(canvasId);
       if (!canvas || !priceArray.length) return;
-      const ctx = canvas.getContext('2d');
+      const ctx = sparklineCtxCached || canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
       const pad = 8;
@@ -1533,7 +1577,7 @@ function hideComponentDetail() {
       }
       ctx.stroke();
       // Price range label
-      const rangeEl = document.getElementById('sparkline-range');
+      const rangeEl = dom.sparklineRange;
       if (rangeEl) {
         rangeEl.textContent = '$' + min.toFixed(2) + ' — $' + max.toFixed(2);
         rangeEl.style.color = '#64748b';
@@ -1541,7 +1585,7 @@ function hideComponentDetail() {
     }
 
     function drawThroughputChart() {
-      const canvas = document.getElementById('throughput-chart');
+      const canvas = dom.throughputCanvas;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       canvas.width = canvas.offsetWidth * window.devicePixelRatio;
@@ -1617,7 +1661,7 @@ function hideComponentDetail() {
     }
 
     function drawLagGauge() {
-      const canvas = document.getElementById('lag-gauge-canvas');
+      const canvas = dom.lagCanvas;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       canvas.width = canvas.offsetWidth * window.devicePixelRatio;
@@ -1694,30 +1738,31 @@ function hideComponentDetail() {
     }
 
     function renderOverview() {
-      if (state.metrics.events !== undefined) document.getElementById('ov-events').textContent = Number(state.metrics.events).toLocaleString();
-      if (state.metrics.latency !== undefined) document.getElementById('ov-latency').textContent = state.metrics.latency + 'ms';
-      if (state.metrics.lag !== undefined) document.getElementById('ov-lag').textContent = state.metrics.lag;
-      if (state.metrics.anomalies !== undefined) document.getElementById('ov-anomalies').textContent = state.metrics.anomalies;
+      if (state.metrics.events !== undefined && dom.ovEvents) dom.ovEvents.textContent = Number(state.metrics.events).toLocaleString();
+      if (state.metrics.latency !== undefined && dom.ovLatency) dom.ovLatency.textContent = state.metrics.latency + 'ms';
+      if (state.metrics.lag !== undefined && dom.ovLag) dom.ovLag.textContent = state.metrics.lag;
+      if (state.metrics.anomalies !== undefined && dom.ovAnomalies) dom.ovAnomalies.textContent = state.metrics.anomalies;
     }
 
     function renderLiveData() {
       if (!isMarketOpen()) return;
       const t = state.activeTicker;
-      document.getElementById('live-ticker').textContent = t;
+      if (dom.liveTicker) dom.liveTicker.textContent = t;
       const price = state.lastPrice[t] || 0;
-      const priceEl = document.getElementById('live-price');
+      const priceEl = dom.livePrice;
+      if (!priceEl) return;
       const prev = parseFloat(priceEl.textContent.replace(/[$,]/g, '')) || price;
       if (price && prev && price !== prev) flashPrice(priceEl, price > prev ? 'up' : 'down');
       priceEl.textContent = '$' + (price ? price.toFixed(2) : '—');
-      document.getElementById('live-vol').textContent = (state.metrics.volume || 0).toLocaleString();
-      document.getElementById('live-vwap').textContent = (state.metrics.vwap != null ? state.metrics.vwap : (price * 0.998)).toFixed(2);
-      document.getElementById('live-time').textContent = new Date().toTimeString().slice(0, 8);
+      if (dom.liveVol) dom.liveVol.textContent = (state.metrics.volume || 0).toLocaleString();
+      if (dom.liveVwap) dom.liveVwap.textContent = (state.metrics.vwap != null ? state.metrics.vwap : (price * 0.998)).toFixed(2);
+      if (dom.liveTime) dom.liveTime.textContent = new Date().toTimeString().slice(0, 8);
       const agg = state.metrics.agg;
       if (agg) {
-        const v1 = document.getElementById('agg-vwap1');
-        const v5 = document.getElementById('agg-vwap5');
-        const zs = document.getElementById('agg-zscore');
-        const mom = document.getElementById('agg-mom');
+        const v1 = dom.aggVwap1;
+        const v5 = dom.aggVwap5;
+        const zs = dom.aggZscore;
+        const mom = dom.aggMom;
         if (v1) v1.textContent = '$' + (agg.vwap_1min != null ? agg.vwap_1min : '').toString();
         if (v5) v5.textContent = '$' + (agg.vwap_5min != null ? agg.vwap_5min : '').toString();
         if (zs) zs.textContent = (agg.volume_zscore != null ? (agg.volume_zscore >= 0 ? '+' : '') + agg.volume_zscore : '—');
@@ -1725,17 +1770,17 @@ function hideComponentDetail() {
       }
       const feat = DEMO_FEATURES[t] || DEMO_FEATURES['AAPL'];
       const agg2 = state.metrics.agg;
-      const fv5 = document.getElementById('feat-vwap5');
-      const fz = document.getElementById('feat-zscore');
-      const fsp = document.getElementById('feat-spread');
+      const fv5 = dom.featVwap5;
+      const fz = dom.featZscore;
+      const fsp = dom.featSpread;
       if (fv5) fv5.textContent = '$' + (agg2 && agg2.vwap_5min != null ? agg2.vwap_5min : feat.vwap_5min);
       if (fz) fz.textContent = (agg2 && agg2.volume_zscore != null ? (agg2.volume_zscore >= 0 ? '+' : '') + agg2.volume_zscore : (feat.volume_zscore >= 0 ? '+' : '') + feat.volume_zscore);
       if (fsp) fsp.textContent = '$' + (feat.bid_ask_spread != null ? feat.bid_ask_spread.toFixed(2) : '0.02');
-      const fm = document.getElementById('feat-mom');
-      const ff = document.getElementById('feat-freq');
+      const fm = dom.featMom;
+      const ff = dom.featFreq;
       if (fm && agg2) fm.textContent = (agg2.price_momentum != null ? (agg2.price_momentum >= 0 ? '+' : '') + agg2.price_momentum + '%' : '+0.18%');
       if (ff) ff.textContent = '47/min';
-      const fu = document.getElementById('feat-updated');
+      const fu = dom.featUpdated;
       if (fu) fu.textContent = new Date().toTimeString().slice(0, 8);
       if (!state.priceHistory[t]) state.priceHistory[t] = [];
       state.priceHistory[t].push(price || prev);
@@ -1744,7 +1789,8 @@ function hideComponentDetail() {
     }
 
     function renderAnomalies() {
-      const feed = document.getElementById('anomaly-feed');
+      const feed = dom.anomalyFeed;
+      if (!feed) return;
       const list = (state.anomalies || []).slice(0, 10);
       feed.innerHTML = list.map(a => '<div class="anomaly-card"><div class="header-row">⚠ ANOMALY DETECTED · ' + (a.ticker || '') + ' · ' + (a.timestamp || '').slice(11, 23) + '</div><div>Anomaly Score: ' + (a.anomaly_score || 0) + '</div><div class="score-bar"><svg width="100%" height="6"><rect fill="var(--accent-red)" width="' + Math.min(100, Math.abs((a.anomaly_score || 0) * 50)) + '%" height="6" rx="3"/></svg></div><div style="font-size:11px;color:var(--text-secondary);">Model: ' + (a.model_version || '—') + '</div></div>').join('') || '<p style="color:var(--text-secondary);">No anomalies in the current window.</p>';
     }
@@ -1807,9 +1853,9 @@ function hideComponentDetail() {
     function updateLiveDataSection() {
         const marketOpen = isMarketOpen();
 
-        const whenOpen = document.getElementById('live-data-when-open');
-        const closedState = document.getElementById('market-closed-state');
-        const nextOpenMsg = document.getElementById('next-open-message');
+        const whenOpen = dom.liveWhenOpen;
+        const closedState = dom.marketClosedState;
+        const nextOpenMsg = dom.nextOpenMsg;
 
         if (!closedState) return;
 
@@ -1899,7 +1945,7 @@ function hideComponentDetail() {
       const base = DEMO_SENTIMENT[ticker] || DEMO_SENTIMENT['AAPL'];
 
       // Deep clone to avoid mutating the constant on repeated calls
-      const demo = JSON.parse(JSON.stringify(base));
+      const demo = structuredClone(base);
 
       // Refresh timestamps so items always appear recent.
       // Offsets are staggered to simulate articles arriving over time.
@@ -1913,8 +1959,8 @@ function hideComponentDetail() {
     }
 
     function updateSentimentPanel(data) {
-      const scoreEl = document.getElementById('sentiment-score');
-      const itemsEl = document.getElementById('sentiment-items');
+      const scoreEl = dom.sentimentScore;
+      const itemsEl = dom.sentimentItems;
       if (!scoreEl || !itemsEl) return;
       if (!data.items || data.items.length === 0) {
         scoreEl.innerHTML = '<span class="muted">No recent news</span>';
@@ -2016,11 +2062,17 @@ function hideComponentDetail() {
     })();
     setInterval(updateLiveDataSection, 60000);
     setInterval(updateOverviewMarketStatus, 60000);
-    setInterval(() => pollSentiment(state.activeTicker), 30000);
+    function tickSentimentPoll() {
+      pollSentiment(state.activeTicker);
+    }
+    setInterval(tickSentimentPoll, 30000);
     // Populate sentiment panel immediately on load
     // (same pattern as other panels — don't wait for first 30s interval)
     pollSentiment(state.activeTicker);
-    setInterval(() => { if (state.activeSection === 'pipeline') poll(); }, 30000);
+    function tickPipelineSectionPoll() {
+      if (state.activeSection === 'pipeline') poll();
+    }
+    setInterval(tickPipelineSectionPoll, 30000);
     drawThroughputChart();
     setInterval(updateThroughputHistory, 30000);
     window.addEventListener('resize', drawThroughputChart);
