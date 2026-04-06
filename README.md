@@ -269,8 +269,3 @@ TradePulse/
 ├── railway.toml                     # Railway deployment config
 └── Makefile                         # make up · make test · make lint
 ```
-
----
-
-**Nikhil Giridharan** — Data Engineer
-
