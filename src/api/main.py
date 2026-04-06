@@ -41,11 +41,11 @@ DEMO_MODE = os.getenv('DEMO_MODE', 'true').lower() == 'true'
 
 # Single source of truth for /market-prices yfinance fallbacks (same values as prior inline dict).
 FALLBACK_PRICES = {
-    "AAPL": {"price": 250.12, "change_pct": -2.21, "previous_close": 255.76},
-    "MSFT": {"price": 395.55, "change_pct": -1.84, "previous_close": 402.92},
-    "AMZN": {"price": 207.67, "change_pct": -2.10, "previous_close": 212.13},
-    "TSLA": {"price": 238.45, "change_pct": -3.92, "previous_close": 248.17},
-    "NVDA": {"price": 880.35, "change_pct": -3.44, "previous_close": 911.83},
+    "AAPL": {"price": 188.38, "change_pct": -3.70, "previous_close": 195.64},
+    "MSFT": {"price": 371.91, "change_pct": -2.85, "previous_close": 382.79},
+    "AMZN": {"price": 179.68, "change_pct": -4.12, "previous_close": 187.41},
+    "TSLA": {"price": 231.28, "change_pct": -5.41, "previous_close": 244.49},
+    "NVDA": {"price": 177.35, "change_pct": -0.02, "previous_close": 177.39},
 }
 
 # Required for remaining routes (limiter, Request, BaseModel, logger, time)
