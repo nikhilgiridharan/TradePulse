@@ -21,12 +21,6 @@ except ImportError:
     BOTO3_AVAILABLE = False
 
 try:
-    import yfinance as yf
-    YFINANCE_AVAILABLE = True
-except ImportError:
-    YFINANCE_AVAILABLE = False
-
-try:
     from src.config import get_settings
     from src.monitoring.cloudwatch_metrics import get_metrics
     settings = get_settings()
@@ -39,13 +33,11 @@ except Exception as e:
 
 DEMO_MODE = os.getenv('DEMO_MODE', 'true').lower() == 'true'
 
-# Single source of truth for /market-prices yfinance fallbacks (same values as prior inline dict).
+# Finnhub /market-prices fallbacks — update manually when stale (Finnhub or network failure).
 FALLBACK_PRICES = {
-    "AAPL": {"price": 188.38, "change_pct": -3.70, "previous_close": 195.64},
-    "MSFT": {"price": 371.91, "change_pct": -2.85, "previous_close": 382.79},
-    "AMZN": {"price": 179.68, "change_pct": -4.12, "previous_close": 187.41},
-    "TSLA": {"price": 231.28, "change_pct": -5.41, "previous_close": 244.49},
-    "NVDA": {"price": 177.35, "change_pct": -0.02, "previous_close": 177.39},
+    "AAPL": {"price": 258.17, "change_pct": 1.84, "previous_close": 253.50},
+    "NVDA": {"price": 181.74, "change_pct": 2.05, "previous_close": 177.10},
+    "MSFT": {"price": 374.12, "change_pct": 0.49, "previous_close": 372.29},
 }
 
 # Required for remaining routes (limiter, Request, BaseModel, logger, time)
@@ -59,6 +51,8 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from src.processing.feature_store import FeatureStore
+
+import httpx
 
 logger = structlog.get_logger(__name__)
 
@@ -306,32 +300,57 @@ async def health():
 
 @app.get("/market-prices")
 async def get_market_prices():
-    if not YFINANCE_AVAILABLE:
+    """
+    Real-time stock prices via Finnhub REST /quote (same API key as news).
+    Reliable on Railway vs yfinance rate limits. Falls back to hardcoded prices if Finnhub fails.
+    """
+    finnhub_key = os.getenv("FINNHUB_API_KEY", "")
+
+    if not finnhub_key:
+        print("[TradePulse] No FINNHUB_API_KEY — returning fallback prices")
+        logger.warning("market_prices_no_finnhub_key")
         return FALLBACK_PRICES
 
+    tickers = ["AAPL", "NVDA", "MSFT"]
+    prices: dict[str, dict[str, float]] = {}
+
     try:
-        tickers = ["AAPL", "MSFT", "AMZN", "TSLA", "NVDA"]
-        prices = {}
-        for ticker in tickers:
-            try:
-                stock = yf.Ticker(ticker)
-                info = stock.fast_info
-                last_price = round(float(info.last_price), 2)
-                previous_close = round(float(info.previous_close), 2)
-                change_pct = round(
-                    (last_price - previous_close) / previous_close * 100, 2
-                )
-                prices[ticker] = {
-                    "price": last_price,
-                    "change_pct": change_pct,
-                    "previous_close": previous_close,
-                }
-            except Exception as e:
-                logger.warning("market_prices_ticker_failed", ticker=ticker, error=str(e))
-                prices[ticker] = FALLBACK_PRICES[ticker]
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            for ticker in tickers:
+                try:
+                    response = await client.get(
+                        "https://finnhub.io/api/v1/quote",
+                        params={"symbol": ticker, "token": finnhub_key},
+                    )
+                    if response.status_code != 200:
+                        raise ValueError(f"Finnhub returned {response.status_code}")
+
+                    data = response.json()
+                    current_price = round(float(data.get("c", 0)), 2)
+                    previous_close = round(float(data.get("pc", 0)), 2)
+                    change_pct = round(float(data.get("dp", 0)), 2)
+
+                    if current_price <= 0:
+                        raise ValueError(f"Invalid price {current_price} for {ticker}")
+
+                    prices[ticker] = {
+                        "price": current_price,
+                        "change_pct": change_pct,
+                        "previous_close": previous_close,
+                    }
+                    print(
+                        f"[TradePulse] Finnhub {ticker}: ${current_price} ({change_pct:+.2f}%)"
+                    )
+                except Exception as e:
+                    print(f"[TradePulse] Finnhub failed for {ticker}: {e} — using fallback")
+                    logger.warning("market_prices_finnhub_ticker_failed", ticker=ticker, error=str(e))
+                    fb = FALLBACK_PRICES.get(ticker)
+                    prices[ticker] = fb if fb else {"price": 100.0, "change_pct": 0.0, "previous_close": 100.0}
+
         return prices
     except Exception as e:
-        logger.warning("market_prices_fetch_failed", error=str(e))
+        print(f"[TradePulse] Finnhub entirely failed: {e} — returning fallbacks")
+        logger.warning("market_prices_finnhub_failed", error=str(e))
         return FALLBACK_PRICES
 
 

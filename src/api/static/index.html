@@ -615,7 +615,7 @@
             </defs>
             <!-- Main stream -->
             <g class="main-stream">
-              <rect class="arch-box pipeline-box main" data-component="polygon" onclick="showComponentDetail('polygon')" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 5 tickers</title>
+              <rect class="arch-box pipeline-box main" data-component="polygon" onclick="showComponentDetail('polygon')" x="20" y="24" width="120" height="44" rx="8"/><title>WebSocket feed · live trades &amp; quotes · 3 tickers</title>
               <text x="80" y="51" fill="#1d4ed8" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Polygon.io</text>
               <line class="pipeline-line" x1="140" y1="46" x2="152" y2="46" stroke="#94a3b8" marker-end="url(#arrow-main)"/>
               <rect class="arch-box pipeline-box main" data-component="kafka" onclick="showComponentDetail('kafka')" x="152" y="24" width="120" height="44" rx="8"/><title>6 partitions · idempotent producer · exactly-once</title>
@@ -652,7 +652,7 @@
             <line class="join-line" x1="476" y1="68" x2="476" y2="232"/>
             <!-- News stream -->
             <g class="news-stream">
-              <rect class="arch-box pipeline-box news" data-component="finnhub" onclick="showComponentDetail('finnhub')" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 5 tickers · deduplication</title>
+              <rect class="arch-box pipeline-box news" data-component="finnhub" onclick="showComponentDetail('finnhub')" x="20" y="232" width="120" height="44" rx="8"/><title>News polling · 60s interval · 3 tickers · deduplication</title>
               <text x="80" y="259" fill="#6d28d9" font-size="12" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">Finnhub API</text>
               <line class="pipeline-line news" x1="140" y1="254" x2="152" y2="254" stroke="#94a3b8" marker-end="url(#arrow-news)"/>
               <rect class="arch-box pipeline-box news" data-component="kafka_news" onclick="showComponentDetail('kafka_news')" x="152" y="232" width="120" height="44" rx="8"/><title>Separate topic · low frequency · independent scaling</title>
@@ -804,8 +804,6 @@
           <span class="ticker-pill active" data-ticker="AAPL">AAPL</span>
           <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
           <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
-          <span class="ticker-pill" data-ticker="GOOGL">GOOGL</span>
-          <span class="ticker-pill" data-ticker="META">META</span>
         </div>
         <div class="live-data-grid" id="live-data-panels">
           <div class="live-panel">
@@ -864,14 +862,12 @@
 
       <section id="section-anomalies" class="section">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Anomalies</h1>
-        <div class="anomaly-summary">Total Anomalies: <span id="anom-total">7</span> · High Severity: <span id="anom-high">3</span> · Most Active: <span id="anom-active">META (2)</span></div>
+        <div class="anomaly-summary">Total Anomalies: <span id="anom-total">7</span> · High Severity: <span id="anom-high">3</span> · Most Active: <span id="anom-active">AAPL (3)</span></div>
         <div class="ticker-pills" id="anomaly-tickers">
           <span class="ticker-pill active" data-filter="All">All</span>
           <span class="ticker-pill" data-filter="AAPL">AAPL</span>
           <span class="ticker-pill" data-filter="NVDA">NVDA</span>
           <span class="ticker-pill" data-filter="MSFT">MSFT</span>
-          <span class="ticker-pill" data-filter="GOOGL">GOOGL</span>
-          <span class="ticker-pill" data-filter="META">META</span>
         </div>
         <div class="anomaly-feed" id="anomaly-feed"></div>
       </section>
@@ -891,50 +887,38 @@
     // Update these before any live demo or screen recording.
     // Last updated: April 6, 2026 (tariff-driven sell-off; high volatility)
     const DEMO_BASE_PRICES = {
-      'AAPL':  188.38,
-      'NVDA':  177.35,
-      'MSFT':  371.91,
-      'GOOGL': 155.42,
-      'META':  524.81,
+      'AAPL':  258.17,
+      'NVDA':  181.74,
+      'MSFT':  374.12,
     };
-    /** Mirrors /market-prices-style fields for demo documentation. */
+    /** Mirrors /market-prices-style fields when API is unavailable. */
     const FALLBACK_PRICES = {
-      'AAPL':  { price: 188.38, change_pct: -3.70, previous_close: 195.64 },
-      'NVDA':  { price: 177.35, change_pct: -0.02, previous_close: 177.39 },
-      'MSFT':  { price: 371.91, change_pct: -2.85, previous_close: 382.79 },
-      'GOOGL': { price: 155.42, change_pct: -3.21, previous_close: 160.58 },
-      'META':  { price: 524.81, change_pct: -4.18, previous_close: 547.74 },
+      'AAPL':  { price: 258.17, change_pct: 1.84, previous_close: 253.50 },
+      'NVDA':  { price: 181.74, change_pct: 2.05, previous_close: 177.10 },
+      'MSFT':  { price: 374.12, change_pct: 0.49, previous_close: 372.29 },
     };
-    /** Per-ticker demo quote: price context, change %, volume, VWAP for Latest Quote panel. */
+    /** Per-ticker demo quote: volume/VWAP shape when Finnhub is not used (market closed / fallback). */
     const DEMO_QUOTE_BY_TICKER = {
-      'AAPL': { price: 188.38, change_pct: -3.70, volume: 4821, vwap: 188.12 },
-      'NVDA': { price: 177.35, change_pct: -0.02, volume: 6102, vwap: 177.12 },
-      'MSFT': { price: 371.91, change_pct: -2.85, volume: 2134, vwap: 371.64 },
-      'GOOGL': { price: 155.42, change_pct: -3.21, volume: 4150, vwap: 155.28 },
-      'META': { price: 524.81, change_pct: -4.18, volume: 2180, vwap: 524.55 },
+      'AAPL': { price: 258.17, change_pct: 1.84, volume: 4821, vwap: 257.80 },
+      'NVDA': { price: 181.74, change_pct: 2.05, volume: 6102, vwap: 181.40 },
+      'MSFT': { price: 374.12, change_pct: 0.49, volume: 2134, vwap: 373.80 },
     };
     /** Elevated intraday volatility — April 6, 2026 sell-off. */
     const TICKER_VOLATILITY = {
       'AAPL':  0.12,
       'NVDA':  0.09,
       'MSFT':  0.10,
-      'GOOGL': 0.11,
-      'META':  0.13,
     };
     // Demo mode aggregations (VWAP, rolling avg) per ticker — realistic ranges.
     const DEMO_AGG = {
       'AAPL': { vwap_1min: 188.12, vwap_5min: 187.84, rolling_avg: 188.01, volume_zscore: 2.41, price_momentum: -0.84, bid_ask_spread: 0.03 },
       'NVDA': { vwap_1min: 177.12, vwap_5min: 176.88, rolling_avg: 177.00, volume_zscore: 1.84, price_momentum: -0.18, bid_ask_spread: 0.04 },
       'MSFT': { vwap_1min: 371.64, vwap_5min: 371.22, rolling_avg: 371.43, volume_zscore: 2.18, price_momentum: -0.71, bid_ask_spread: 0.04 },
-      'GOOGL': { vwap_1min: 155.28, vwap_5min: 154.95, rolling_avg: 155.12, volume_zscore: 2.15, price_momentum: -0.68, bid_ask_spread: 0.03 },
-      'META': { vwap_1min: 524.55, vwap_5min: 523.90, rolling_avg: 524.22, volume_zscore: 2.72, price_momentum: -1.08, bid_ask_spread: 0.04 },
     };
     const DEMO_FEATURES = {
       'AAPL': { vwap_5min: 187.84, volume_zscore: 2.41, price_momentum: -0.84, bid_ask_spread: 0.03, trade_frequency: 89 },
       'NVDA': { vwap_5min: 176.88, volume_zscore: 1.84, price_momentum: -0.18, bid_ask_spread: 0.04, trade_frequency: 98 },
       'MSFT': { vwap_5min: 371.22, volume_zscore: 2.18, price_momentum: -0.71, bid_ask_spread: 0.04, trade_frequency: 64 },
-      'GOOGL': { vwap_5min: 154.95, volume_zscore: 2.15, price_momentum: -0.68, bid_ask_spread: 0.03, trade_frequency: 76 },
-      'META': { vwap_5min: 523.90, volume_zscore: 2.72, price_momentum: -1.08, bid_ask_spread: 0.04, trade_frequency: 58 },
     };
     // Demo mode fallback sentiment data — April 6, 2026 tariff-driven sell-off.
     // Displayed when the Finnhub news pipeline is not running or returns empty results.
@@ -1056,125 +1040,53 @@
                 correlation_strength: 'none'
             }
         ]
-    },
-    'GOOGL': {
-        ticker: 'GOOGL', hours: 4, count: 3,
-        summary: { positive: 0, negative: 2, neutral: 1, strong_correlations: 1 },
-        items: [
-            {
-                headline: 'Alphabet falls as ad market uncertainty grows on tariff economic fears',
-                source: 'Bloomberg',
-                published_at: new Date(Date.now() - 11 * 60000).toISOString(),
-                sentiment_score: -0.721,
-                sentiment_label: 'negative',
-                correlated_anomaly: true,
-                volume_zscore_at_publish: 3.2,
-                correlation_strength: 'strong'
-            },
-            {
-                headline: 'Google Cloud seen as resilient but ad revenue faces macro headwinds',
-                source: 'Reuters',
-                published_at: new Date(Date.now() - 44 * 60000).toISOString(),
-                sentiment_score: -0.187,
-                sentiment_label: 'neutral',
-                correlated_anomaly: false,
-                volume_zscore_at_publish: 1.1,
-                correlation_strength: 'none'
-            },
-            {
-                headline: 'Alphabet AI investments face scrutiny as growth spending questioned',
-                source: 'WSJ',
-                published_at: new Date(Date.now() - 82 * 60000).toISOString(),
-                sentiment_score: -0.412,
-                sentiment_label: 'negative',
-                correlated_anomaly: false,
-                volume_zscore_at_publish: 1.4,
-                correlation_strength: 'none'
-            }
-        ]
-    },
-    'META': {
-        ticker: 'META', hours: 4, count: 3,
-        summary: { positive: 0, negative: 2, neutral: 1, strong_correlations: 1 },
-        items: [
-            {
-                headline: 'Meta drops sharply as digital ad slowdown fears mount on tariff news',
-                source: 'CNBC',
-                published_at: new Date(Date.now() - 9 * 60000).toISOString(),
-                sentiment_score: -0.798,
-                sentiment_label: 'negative',
-                correlated_anomaly: true,
-                volume_zscore_at_publish: 3.6,
-                correlation_strength: 'strong'
-            },
-            {
-                headline: 'Meta AI infrastructure spending questioned as macro outlook dims',
-                source: 'Bloomberg',
-                published_at: new Date(Date.now() - 51 * 60000).toISOString(),
-                sentiment_score: -0.521,
-                sentiment_label: 'negative',
-                correlated_anomaly: false,
-                volume_zscore_at_publish: 1.8,
-                correlation_strength: 'none'
-            },
-            {
-                headline: 'Instagram and WhatsApp engagement metrics remain strong analysts say',
-                source: 'Barrons',
-                published_at: new Date(Date.now() - 87 * 60000).toISOString(),
-                sentiment_score: 0.187,
-                sentiment_label: 'neutral',
-                correlated_anomaly: false,
-                volume_zscore_at_publish: 0.9,
-                correlation_strength: 'none'
-            }
-        ]
     }
 };
     const DEMO_ANOMALIES = [
     {
-        ticker: 'META',
+        ticker: 'AAPL',
         timestamp: new Date(Date.now() - 3 * 60000).toISOString(),
-        anomaly_score: -0.798,
+        anomaly_score: -0.812,
         feature_vector: {
-            price: 524.81,
-            volume: 31204,
-            volume_zscore: 3.6,
-            price_momentum: -1.12,
-            vwap_deviation: -1.84,
-            trade_frequency: 108
+            price: 188.38,
+            volume: 44821,
+            volume_zscore: 3.8,
+            price_momentum: -0.84,
+            vwap_deviation: -0.74,
+            trade_frequency: 124
+        },
+        correlation_strength: 'strong',
+        model_version: 51
+    },
+    {
+        ticker: 'NVDA',
+        timestamp: new Date(Date.now() - 7 * 60000).toISOString(),
+        anomaly_score: -0.534,
+        feature_vector: {
+            price: 177.35,
+            volume: 24100,
+            volume_zscore: 2.6,
+            price_momentum: -0.22,
+            vwap_deviation: -0.35,
+            trade_frequency: 105
+        },
+        correlation_strength: 'moderate',
+        model_version: 41
+    },
+    {
+        ticker: 'MSFT',
+        timestamp: new Date(Date.now() - 14 * 60000).toISOString(),
+        anomaly_score: -0.698,
+        feature_vector: {
+            price: 371.91,
+            volume: 31847,
+            volume_zscore: 3.1,
+            price_momentum: -0.71,
+            vwap_deviation: -0.58,
+            trade_frequency: 89
         },
         correlation_strength: 'strong',
         model_version: 44
-    },
-    {
-        ticker: 'GOOGL',
-        timestamp: new Date(Date.now() - 7 * 60000).toISOString(),
-        anomaly_score: -0.689,
-        feature_vector: {
-            price: 155.42,
-            volume: 29840,
-            volume_zscore: 3.0,
-            price_momentum: -0.79,
-            vwap_deviation: -0.62,
-            trade_frequency: 88
-        },
-        correlation_strength: 'strong',
-        model_version: 47
-    },
-    {
-        ticker: 'GOOGL',
-        timestamp: new Date(Date.now() - 14 * 60000).toISOString(),
-        anomaly_score: -0.721,
-        feature_vector: {
-            price: 155.42,
-            volume: 28491,
-            volume_zscore: 3.2,
-            price_momentum: -0.84,
-            vwap_deviation: -0.68,
-            trade_frequency: 94
-        },
-        correlation_strength: 'strong',
-        model_version: 47
     },
     {
         ticker: 'AAPL',
@@ -1192,19 +1104,19 @@
         model_version: 51
     },
     {
-        ticker: 'META',
+        ticker: 'AAPL',
         timestamp: new Date(Date.now() - 22 * 60000).toISOString(),
-        anomaly_score: -0.798,
+        anomaly_score: -0.765,
         feature_vector: {
-            price: 524.81,
-            volume: 31204,
-            volume_zscore: 3.6,
-            price_momentum: -1.12,
-            vwap_deviation: -1.84,
-            trade_frequency: 108
+            price: 188.38,
+            volume: 39200,
+            volume_zscore: 3.4,
+            price_momentum: -0.79,
+            vwap_deviation: -0.68,
+            trade_frequency: 118
         },
         correlation_strength: 'strong',
-        model_version: 44
+        model_version: 50
     },
     {
         ticker: 'MSFT',
@@ -1323,7 +1235,7 @@ const COMPONENT_DETAILS = {
         role: 'Live equity data source',
         why: 'Polygon.io provides a free-tier WebSocket API streaming real trades and quotes with microsecond timestamps. Chosen over REST polling because WebSocket delivers events as they happen rather than requiring repeated HTTP requests every second.',
         details: [
-            'Subscribes to XT.* (trades) and XQ.* (quotes) for 5 tickers',
+            'Subscribes to XT.* (trades) and XQ.* (quotes) for 3 tickers',
             'Reconnects automatically with exponential backoff and jitter on disconnect',
             'Jitter prevents thundering herd when multiple producers reconnect simultaneously',
             'Partitions messages by ticker symbol so all AAPL events go to the same Kafka partition in order',
@@ -1480,7 +1392,7 @@ const COMPONENT_DETAILS = {
         why: 'A separate Kafka topic for news keeps the two streams independent. News arrives at roughly 100 articles per hour versus 15000 trades per second. Mixing them in one topic would require complex routing logic. Separate topics allow independent scaling, independent consumer groups, and independent failure domains.',
         details: [
             'Separate from market.trades — independent scaling and failure domain',
-            'Low frequency: roughly 100 articles per hour across all 5 tickers',
+            'Low frequency: roughly 100 articles per hour across all 3 tickers',
             'Same partitioning strategy as equity stream — partitioned by ticker',
             'Independent consumer group — news processing falling behind does not affect trade processing',
             'Retention: 7 days matching equity stream'
@@ -1733,56 +1645,87 @@ function hideComponentDetail() {
         }
     }
 
-    function rnd(prev, ticker) {
-      const vol = TICKER_VOLATILITY[ticker] || 0.1;
-      return prev + (Math.random() - 0.51) * vol;
+    window.realPriceCache = {};
+
+    function seedFromDemoBaselines() {
+      Object.keys(DEMO_BASE_PRICES).forEach(function (ticker) {
+        const price = DEMO_BASE_PRICES[ticker];
+        const q = DEMO_QUOTE_BY_TICKER[ticker] || DEMO_QUOTE_BY_TICKER['AAPL'];
+        state.lastPrice[ticker] = price;
+        state.priceHistory[ticker] = Array(60).fill(price);
+        window.realPriceCache[ticker] = {
+          price: price,
+          change_pct: q.change_pct,
+          previous_close: FALLBACK_PRICES[ticker] ? FALLBACK_PRICES[ticker].previous_close : price,
+        };
+      });
     }
-    function demoQuote(ticker) {
+
+    function applyDerivedMetricsFromCache(ticker) {
+      const c = window.realPriceCache[ticker];
+      if (!c) return;
+      const p = c.price;
+      const ch = c.change_pct;
       const q = DEMO_QUOTE_BY_TICKER[ticker] || DEMO_QUOTE_BY_TICKER['AAPL'];
-      if (!state.lastPrice[ticker]) state.lastPrice[ticker] = q.price;
-      state.lastPrice[ticker] = rnd(state.lastPrice[ticker], ticker);
-      return { ticker, price: Math.round(state.lastPrice[ticker] * 100) / 100, volume: q.volume, timestamp: new Date().toISOString(), sequence_number: Math.floor(Math.random() * 1e7) };
-    }
-    function demoAgg(ticker) {
-      const q = demoQuote(ticker);
-      return { ticker, vwap_1min: (state.lastPrice[ticker] * 0.998).toFixed(2), vwap_5min: (state.lastPrice[ticker] * 0.997).toFixed(2), volume_zscore: (Math.random() * 2.5).toFixed(2), price_momentum: (Math.random() * 0.4 - 0.1).toFixed(2) };
-    }
-    function demoHealth() {
-      return { status: 'healthy', consumer_lag: Math.floor(Math.random() * 80), dynamo_latency_p99: 18, uptime_seconds: 3600 + Math.floor(Math.random() * 86400), checked_at: new Date().toISOString() };
+      state.metrics.volume = q.volume;
+      state.metrics.vwap = p * 0.9992;
+      state.metrics.agg = {
+        vwap_1min: (p * 0.9992).toFixed(2),
+        vwap_5min: (p * 0.9985).toFixed(2),
+        volume_zscore: (1.2 + (Math.abs(ticker.charCodeAt(0) + p) % 18) / 10).toFixed(2),
+        price_momentum: (ch * 0.15).toFixed(2),
+      };
     }
 
     /**
-     * Fetches real current market prices from the TradePulse backend.
-     * The backend proxies Yahoo Finance via yfinance to avoid CORS restrictions.
-     * Seeds the demo mode random walk from accurate real-world baseline prices.
-     * Falls back to DEMO_BASE_PRICES if the API call fails.
+     * Real prices only — no random walk. Polls /market-prices (Finnhub on server) every 15s when market is open.
      */
-    async function fetchRealBasePrices() {
+    async function fetchAndDisplayRealPrices() {
+      if (!isMarketOpen()) {
+        seedFromDemoBaselines();
+        const t = state.activeTicker || 'AAPL';
+        applyDerivedMetricsFromCache(t);
+        renderLiveData();
+        const ph = state.priceHistory[t] || [];
+        drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
+        return;
+      }
       try {
         const response = await fetch('/market-prices');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
-
-        // Seed random walk state from real prices
-        Object.keys(data).forEach(ticker => {
-          const price = data[ticker].price;
-          state.lastPrice[ticker] = price;
-          // Initialize price history array with the real price
-          // so sparkline starts from the correct baseline
-          state.priceHistory[ticker] = Array(60).fill(price);
+        Object.keys(data).forEach(function (ticker) {
+          const item = data[ticker];
+          if (!item || item.price <= 0) return;
+          window.realPriceCache[ticker] = {
+            price: item.price,
+            change_pct: item.change_pct,
+            previous_close: item.previous_close,
+          };
+          state.lastPrice[ticker] = item.price;
+          if (!state.priceHistory[ticker]) {
+            state.priceHistory[ticker] = Array(60).fill(item.price);
+          } else {
+            const arr = state.priceHistory[ticker];
+            const last = arr[arr.length - 1];
+            if (last !== item.price) {
+              arr.push(item.price);
+              if (arr.length > 60) arr.shift();
+            }
+          }
         });
-
       } catch (err) {
-        // Fall back to hardcoded baselines — pipeline still works correctly
-        console.warn('[TradePulse] Could not fetch real prices, using hardcoded baselines:', err.message);
-
-        Object.keys(DEMO_BASE_PRICES).forEach(ticker => {
-          const price = DEMO_BASE_PRICES[ticker];
-          state.lastPrice[ticker] = price;
-          state.priceHistory[ticker] = Array(60).fill(price);
-        });
+        console.warn('[TradePulse] Could not fetch real prices, using baselines:', err.message);
+        seedFromDemoBaselines();
       }
+      const t = state.activeTicker || 'AAPL';
+      applyDerivedMetricsFromCache(t);
+      renderLiveData();
+      const ph = state.priceHistory[t] || [];
+      drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
+    }
+    function demoHealth() {
+      return { status: 'healthy', consumer_lag: Math.floor(Math.random() * 80), dynamo_latency_p99: 18, uptime_seconds: 3600 + Math.floor(Math.random() * 86400), checked_at: new Date().toISOString() };
     }
 
     async function apiGet(path) {
@@ -2047,10 +1990,15 @@ function hideComponentDetail() {
       if (dom.liveVol) dom.liveVol.textContent = (state.metrics.volume || 0).toLocaleString();
       if (dom.liveVwap) dom.liveVwap.textContent = (state.metrics.vwap != null ? state.metrics.vwap : (price * 0.998)).toFixed(2);
       if (dom.liveTime) dom.liveTime.textContent = new Date().toTimeString().slice(0, 8);
-      const qc = DEMO_QUOTE_BY_TICKER[t];
+      const qc = window.realPriceCache && window.realPriceCache[t];
+      const qf = DEMO_QUOTE_BY_TICKER[t];
       if (dom.liveChange && qc) {
-        dom.liveChange.textContent = (qc.change_pct < 0 ? '↓ ' : '↑ ') + qc.change_pct + '%';
-        dom.liveChange.className = qc.change_pct < 0 ? 'price-down' : 'price-up';
+        const cp = qc.change_pct;
+        dom.liveChange.textContent = (cp < 0 ? '↓ ' : '↑ ') + Math.abs(cp).toFixed(2) + '%';
+        dom.liveChange.className = cp < 0 ? 'price-down' : 'price-up';
+      } else if (dom.liveChange && qf) {
+        dom.liveChange.textContent = (qf.change_pct < 0 ? '↓ ' : '↑ ') + Math.abs(qf.change_pct).toFixed(2) + '%';
+        dom.liveChange.className = qf.change_pct < 0 ? 'price-down' : 'price-up';
       }
       const agg = state.metrics.agg;
       if (agg) {
@@ -2083,10 +2031,6 @@ function hideComponentDetail() {
       if (ff) ff.textContent = feat.trade_frequency + '/min';
       const fu = dom.featUpdated;
       if (fu) fu.textContent = new Date().toTimeString().slice(0, 8);
-      if (!state.priceHistory[t]) state.priceHistory[t] = [];
-      state.priceHistory[t].push(price || prev);
-      if (state.priceHistory[t].length > 60) state.priceHistory[t].shift();
-      drawSparkline('sparkline-canvas', state.priceHistory[t].filter(Boolean), '#0ea5e9');
     }
 
     function renderAnomalies() {
@@ -2103,15 +2047,7 @@ function hideComponentDetail() {
         state.metrics.latency = 12 + Math.floor(Math.random() * 10);
         state.metrics.lag = 42 + Math.floor(Math.random() * 20);
         state.metrics.anomalies = 7;
-        if (isMarketOpen()) {
-          const q = demoQuote(t);
-          state.lastPrice[t] = q.price;
-          state.metrics.volume = q.volume;
-        }
-        state.metrics.agg = DEMO_AGG[t] || DEMO_AGG['AAPL'];
-        state.metrics.vwap = state.metrics.agg.vwap_1min;
         renderOverview();
-        renderLiveData();
         if (state.activeSection === 'anomalies' && Math.random() > 0.95) {
           state.anomalies.unshift({ ticker: t, timestamp: new Date().toISOString(), anomaly_score: -0.5 - Math.random() * 0.5, model_version: 47 });
           renderAnomalies();
@@ -2180,17 +2116,34 @@ function hideComponentDetail() {
                 clearInterval(window.priceSimulationInterval);
                 window.priceSimulationInterval = null;
             }
+            if (window.demoMetricsInterval) {
+                clearInterval(window.demoMetricsInterval);
+                window.demoMetricsInterval = null;
+            }
         }
     }
 
     /**
-     * Wraps the existing demo simulation startup.
-     * Assigns the interval to window.priceSimulationInterval
-     * so market hours logic can pause and resume it.
+     * Demo: real /market-prices (Finnhub) every 15s — no random walk.
+     * Non-demo: unchanged 2s poll to backend APIs.
      */
     function startDemoSimulation() {
         if (window.priceSimulationInterval) return;
-        window.priceSimulationInterval = setInterval(poll, 2000);
+        if (DEMO_MODE) {
+            fetchAndDisplayRealPrices();
+            window.priceSimulationInterval = setInterval(function () {
+                if (typeof isMarketOpen === 'function' && isMarketOpen()) {
+                    fetchAndDisplayRealPrices();
+                }
+            }, 15000);
+            window.demoMetricsInterval = setInterval(function () {
+                if (typeof isMarketOpen === 'function' && isMarketOpen() && DEMO_MODE) {
+                    poll();
+                }
+            }, 2000);
+        } else {
+            window.priceSimulationInterval = setInterval(poll, 2000);
+        }
     }
 
     /**
@@ -2346,6 +2299,17 @@ function hideComponentDetail() {
         state.activeTicker = this.getAttribute('data-ticker');
         poll();
         pollSentiment(state.activeTicker);
+        if (DEMO_MODE) {
+          const c = window.realPriceCache[state.activeTicker];
+          if (c) {
+            applyDerivedMetricsFromCache(state.activeTicker);
+            renderLiveData();
+            const ph = state.priceHistory[state.activeTicker] || [];
+            drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
+          } else {
+            fetchAndDisplayRealPrices();
+          }
+        }
       });
     });
 
@@ -2353,20 +2317,13 @@ function hideComponentDetail() {
     // would otherwise leave Live Data panels visible with default HTML all weekend).
     updateLiveDataSection();
     updateOverviewMarketStatus();
-    // Call fetchRealBasePrices before starting the simulation
-    // so the random walk begins from accurate real market prices
     (async function () {
-      await fetchRealBasePrices();
+      await fetchAndDisplayRealPrices();
       poll();
       renderAnomalies();
       updateLiveDataSection();
       updateOverviewMarketStatus();
     })();
-    setInterval(async () => {
-      if (typeof isMarketOpen === 'function' && isMarketOpen()) {
-        await fetchRealBasePrices();
-      }
-    }, 60000);
     setInterval(updateLiveDataSection, 60000);
     setInterval(updateOverviewMarketStatus, 60000);
     function tickSentimentPoll() {
