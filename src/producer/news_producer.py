@@ -37,16 +37,14 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 # Tickers to track for news — matches the equity stream
-TRACKED_TICKERS = ["AAPL", "MSFT", "AMZN", "TSLA", "NVDA"]
+TRACKED_TICKERS = ["AAPL", "NVDA", "MSFT"]
 
 # Finnhub company symbols map to their news category identifiers
 # Finnhub uses full company names for some news filters
 TICKER_TO_CATEGORY = {
     "AAPL":  "AAPL",
-    "MSFT":  "MSFT",
-    "AMZN":  "AMZN",
-    "TSLA":  "TSLA",
     "NVDA":  "NVDA",
+    "MSFT":  "MSFT",
 }
 
 

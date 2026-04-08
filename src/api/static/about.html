@@ -347,7 +347,7 @@ cd TradePulse</pre></div>
           <div class="endpoint-card">
             <h4><span class="method-get">GET</span> /quotes/{ticker}</h4>
             <p class="desc">Returns the latest trade for a given ticker symbol.</p>
-            <table><tr><th>Parameter</th><th>Description</th></tr><tr><td>ticker (required)</td><td>Stock symbol e.g. AAPL, TSLA</td></tr></table>
+            <table><tr><th>Parameter</th><th>Description</th></tr><tr><td>ticker (required)</td><td>Stock symbol e.g. AAPL, NVDA</td></tr></table>
             <p class="cache">Cache: 1 second</p>
             <div class="code-block"><button class="copy-btn" data-copy="api1">Copy</button><pre id="api1">curl http://localhost:8000/quotes/AAPL</pre></div>
             <p class="cache">Response 200: ticker, price, volume, timestamp, sequence_number</p>
@@ -381,7 +381,7 @@ cd TradePulse</pre></div>
           <div class="endpoint-card">
             <h4><span class="method-get">GET</span> /sentiment/{ticker}?hours=24</h4>
             <p class="desc">Returns recent news sentiment analysis with market correlation data. Shows which headlines coincided with unusual volume activity — the output of the two-stream join.</p>
-            <table><tr><th>Parameter</th><th>Description</th></tr><tr><td>ticker (required)</td><td>Stock symbol (AAPL, MSFT, AMZN, TSLA, NVDA)</td></tr><tr><td>hours (optional)</td><td>Lookback window in hours (default 24, max 168)</td></tr></table>
+            <table><tr><th>Parameter</th><th>Description</th></tr><tr><td>ticker (required)</td><td>Stock symbol (AAPL, NVDA, MSFT)</td></tr><tr><td>hours (optional)</td><td>Lookback window in hours (default 24, max 168)</td></tr></table>
             <p class="cache">Cache: none (always fresh)</p>
             <div class="code-block"><button class="copy-btn" data-copy="api-sentiment">Copy</button><pre id="api-sentiment">curl http://localhost:8000/sentiment/NVDA?hours=4</pre></div>
             <p class="note">correlation_strength values: strong | moderate | weak | none. Strong correlations are the highest-signal events in the system.</p>

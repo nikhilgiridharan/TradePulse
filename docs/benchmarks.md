@@ -4,7 +4,7 @@
 
 - **Tool**: Custom Python script using `confluent-kafka` producer.
 - **Duration**: 10 minutes sustained load, 30-second burst at 3x.
-- **Tickers**: 5 (AAPL, GOOGL, MSFT, AMZN, TSLA).
+- **Tickers**: 3 (AAPL, NVDA, MSFT).
 - **Measurement**: End-to-end latency from WebSocket receive to DynamoDB write confirmed.
 
 ## Results
@@ -26,6 +26,6 @@
 1. Set up TradePulse with Kafka, DynamoDB, and Faust worker.
 2. Run load script (example):
    ```bash
-   python scripts/load_test.py --duration 600 --tickers AAPL,GOOGL,MSFT,AMZN,TSLA --rate 15000
+   python scripts/load_test.py --duration 600 --tickers AAPL,NVDA,MSFT --rate 15000
    ```
 3. Collect CloudWatch metrics (ProducerThroughput, DynamoWriteLatency, ConsumerLag) and application logs for latency percentiles.

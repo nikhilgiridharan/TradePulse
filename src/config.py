@@ -150,7 +150,7 @@ class Settings(BaseSettings):
     )
 
     polygon_api_key: str = Field(default="", alias="POLYGON_API_KEY")
-    tickers: str = Field(default="AAPL,GOOGL,MSFT,AMZN,TSLA", description="Comma-separated symbols")
+    tickers: str = Field(default="AAPL,NVDA,MSFT", description="Comma-separated symbols")
     cloudwatch_namespace: str = Field(default="TradePulse/Production", alias="CLOUDWATCH_NAMESPACE")
     cloudwatch_enabled: bool = Field(default=False, alias="CLOUDWATCH_ENABLED")
 

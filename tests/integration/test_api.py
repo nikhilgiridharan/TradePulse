@@ -180,26 +180,26 @@ def test_anomalies_200_and_404_mocked(client_mock_dynamo: TestClient) -> None:
 
 
 def test_features_200_and_404_mocked(client_mock_dynamo: TestClient) -> None:
-    r = client_mock_dynamo.get("/features/AMZN")
+    r = client_mock_dynamo.get("/features/AAPL")
     assert r.status_code == 200
-    assert r.json()["ticker"] == "AMZN"
+    assert r.json()["ticker"] == "AAPL"
 
     client_mock_dynamo.fake_writer.features_empty = True
     reset_api_cache()
-    r2 = client_mock_dynamo.get("/features/AMZN")
+    r2 = client_mock_dynamo.get("/features/AAPL")
     assert r2.status_code == 404
 
 
 def test_sentiment_200_and_404_mocked(client_mock_dynamo: TestClient) -> None:
-    r = client_mock_dynamo.get("/sentiment/TSLA")
+    r = client_mock_dynamo.get("/sentiment/NVDA")
     assert r.status_code == 200
     body = r.json()
-    assert body["ticker"] == "TSLA"
+    assert body["ticker"] == "NVDA"
     assert "summary" in body
 
     client_mock_dynamo.fake_writer.sentiment_empty = True
     reset_api_cache()
-    r2 = client_mock_dynamo.get("/sentiment/TSLA")
+    r2 = client_mock_dynamo.get("/sentiment/NVDA")
     assert r2.status_code == 404
 
 

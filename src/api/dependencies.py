@@ -14,7 +14,7 @@ from pydantic import BaseModel
 from src.config import get_settings
 from src.storage.dynamo_writer import AsyncDynamoWriter
 
-ALLOWED_TICKERS = frozenset({"AAPL", "NVDA", "MSFT", "AMZN", "TSLA"})
+ALLOWED_TICKERS = frozenset({"AAPL", "NVDA", "MSFT"})
 
 API_RATE_LIMIT_PER_MINUTE = f"{get_settings().api_rate_limit_per_minute}/minute"
 
