@@ -804,8 +804,8 @@
           <span class="ticker-pill active" data-ticker="AAPL">AAPL</span>
           <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
           <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
-          <span class="ticker-pill" data-ticker="AMZN">AMZN</span>
-          <span class="ticker-pill" data-ticker="TSLA">TSLA</span>
+          <span class="ticker-pill" data-ticker="GOOGL">GOOGL</span>
+          <span class="ticker-pill" data-ticker="META">META</span>
         </div>
         <div class="live-data-grid" id="live-data-panels">
           <div class="live-panel">
@@ -864,14 +864,14 @@
 
       <section id="section-anomalies" class="section">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Anomalies</h1>
-        <div class="anomaly-summary">Total Anomalies: <span id="anom-total">7</span> · High Severity: <span id="anom-high">3</span> · Most Active: <span id="anom-active">TSLA (3)</span></div>
+        <div class="anomaly-summary">Total Anomalies: <span id="anom-total">7</span> · High Severity: <span id="anom-high">3</span> · Most Active: <span id="anom-active">META (2)</span></div>
         <div class="ticker-pills" id="anomaly-tickers">
           <span class="ticker-pill active" data-filter="All">All</span>
           <span class="ticker-pill" data-filter="AAPL">AAPL</span>
           <span class="ticker-pill" data-filter="NVDA">NVDA</span>
           <span class="ticker-pill" data-filter="MSFT">MSFT</span>
-          <span class="ticker-pill" data-filter="AMZN">AMZN</span>
-          <span class="ticker-pill" data-filter="TSLA">TSLA</span>
+          <span class="ticker-pill" data-filter="GOOGL">GOOGL</span>
+          <span class="ticker-pill" data-filter="META">META</span>
         </div>
         <div class="anomaly-feed" id="anomaly-feed"></div>
       </section>
@@ -892,41 +892,49 @@
     // Last updated: April 6, 2026 (tariff-driven sell-off; high volatility)
     const DEMO_BASE_PRICES = {
       'AAPL':  188.38,
-      'MSFT':  371.91,
-      'AMZN':  179.68,
-      'TSLA':  231.28,
       'NVDA':  177.35,
+      'MSFT':  371.91,
+      'GOOGL': 155.42,
+      'META':  524.81,
+    };
+    /** Mirrors /market-prices-style fields for demo documentation. */
+    const FALLBACK_PRICES = {
+      'AAPL':  { price: 188.38, change_pct: -3.70, previous_close: 195.64 },
+      'NVDA':  { price: 177.35, change_pct: -0.02, previous_close: 177.39 },
+      'MSFT':  { price: 371.91, change_pct: -2.85, previous_close: 382.79 },
+      'GOOGL': { price: 155.42, change_pct: -3.21, previous_close: 160.58 },
+      'META':  { price: 524.81, change_pct: -4.18, previous_close: 547.74 },
     };
     /** Per-ticker demo quote: price context, change %, volume, VWAP for Latest Quote panel. */
     const DEMO_QUOTE_BY_TICKER = {
       'AAPL': { price: 188.38, change_pct: -3.70, volume: 4821, vwap: 188.12 },
-      'MSFT': { price: 371.91, change_pct: -2.85, volume: 2134, vwap: 371.64 },
-      'AMZN': { price: 179.68, change_pct: -4.12, volume: 3298, vwap: 179.52 },
-      'TSLA': { price: 231.28, change_pct: -5.41, volume: 8841, vwap: 230.91 },
       'NVDA': { price: 177.35, change_pct: -0.02, volume: 6102, vwap: 177.12 },
+      'MSFT': { price: 371.91, change_pct: -2.85, volume: 2134, vwap: 371.64 },
+      'GOOGL': { price: 155.42, change_pct: -3.21, volume: 4150, vwap: 155.28 },
+      'META': { price: 524.81, change_pct: -4.18, volume: 2180, vwap: 524.55 },
     };
     /** Elevated intraday volatility — April 6, 2026 sell-off. */
     const TICKER_VOLATILITY = {
       'AAPL':  0.12,
-      'MSFT':  0.10,
-      'AMZN':  0.14,
-      'TSLA':  0.22,
       'NVDA':  0.09,
+      'MSFT':  0.10,
+      'GOOGL': 0.11,
+      'META':  0.13,
     };
     // Demo mode aggregations (VWAP, rolling avg) per ticker — realistic ranges.
     const DEMO_AGG = {
       'AAPL': { vwap_1min: 188.12, vwap_5min: 187.84, rolling_avg: 188.01, volume_zscore: 2.41, price_momentum: -0.84, bid_ask_spread: 0.03 },
+      'NVDA': { vwap_1min: 177.12, vwap_5min: 176.88, rolling_avg: 177.00, volume_zscore: 1.84, price_momentum: -0.18, bid_ask_spread: 0.04 },
       'MSFT': { vwap_1min: 371.64, vwap_5min: 371.22, rolling_avg: 371.43, volume_zscore: 2.18, price_momentum: -0.71, bid_ask_spread: 0.04 },
-      'AMZN': { vwap_1min: 179.52, vwap_5min: 179.18, rolling_avg: 179.35, volume_zscore: 2.63, price_momentum: -1.02, bid_ask_spread: 0.03 },
-      'TSLA': { vwap_1min: 230.91, vwap_5min: 230.54, rolling_avg: 230.73, volume_zscore: 3.21, price_momentum: -1.34, bid_ask_spread: 0.05 },
-      'NVDA': { vwap_1min: 177.12, vwap_5min: 176.88, rolling_avg: 177.00, volume_zscore: 1.84, price_momentum: -0.18, bid_ask_spread: 0.04 }
+      'GOOGL': { vwap_1min: 155.28, vwap_5min: 154.95, rolling_avg: 155.12, volume_zscore: 2.15, price_momentum: -0.68, bid_ask_spread: 0.03 },
+      'META': { vwap_1min: 524.55, vwap_5min: 523.90, rolling_avg: 524.22, volume_zscore: 2.72, price_momentum: -1.08, bid_ask_spread: 0.04 },
     };
     const DEMO_FEATURES = {
       'AAPL': { vwap_5min: 187.84, volume_zscore: 2.41, price_momentum: -0.84, bid_ask_spread: 0.03, trade_frequency: 89 },
+      'NVDA': { vwap_5min: 176.88, volume_zscore: 1.84, price_momentum: -0.18, bid_ask_spread: 0.04, trade_frequency: 98 },
       'MSFT': { vwap_5min: 371.22, volume_zscore: 2.18, price_momentum: -0.71, bid_ask_spread: 0.04, trade_frequency: 64 },
-      'AMZN': { vwap_5min: 179.18, volume_zscore: 2.63, price_momentum: -1.02, bid_ask_spread: 0.03, trade_frequency: 71 },
-      'TSLA': { vwap_5min: 230.54, volume_zscore: 3.21, price_momentum: -1.34, bid_ask_spread: 0.05, trade_frequency: 127 },
-      'NVDA': { vwap_5min: 176.88, volume_zscore: 1.84, price_momentum: -0.18, bid_ask_spread: 0.04, trade_frequency: 98 }
+      'GOOGL': { vwap_5min: 154.95, volume_zscore: 2.15, price_momentum: -0.68, bid_ask_spread: 0.03, trade_frequency: 76 },
+      'META': { vwap_5min: 523.90, volume_zscore: 2.72, price_momentum: -1.08, bid_ask_spread: 0.04, trade_frequency: 58 },
     };
     // Demo mode fallback sentiment data — April 6, 2026 tariff-driven sell-off.
     // Displayed when the Finnhub news pipeline is not running or returns empty results.
@@ -977,6 +985,42 @@
             }
         ]
     },
+    'NVDA': {
+        ticker: 'NVDA', hours: 4, count: 3,
+        summary: { positive: 1, negative: 1, neutral: 1, strong_correlations: 1 },
+        items: [
+            {
+                headline: 'NVIDIA relatively resilient as AI chip demand seen tariff-insulated',
+                source: 'Bloomberg',
+                published_at: new Date(Date.now() - 19 * 60000).toISOString(),
+                sentiment_score: 0.412,
+                sentiment_label: 'positive',
+                correlated_anomaly: false,
+                volume_zscore_at_publish: 1.7,
+                correlation_strength: 'none'
+            },
+            {
+                headline: 'NVIDIA data center customers may delay orders amid macro uncertainty',
+                source: 'Reuters',
+                published_at: new Date(Date.now() - 52 * 60000).toISOString(),
+                sentiment_score: -0.387,
+                sentiment_label: 'negative',
+                correlated_anomaly: true,
+                volume_zscore_at_publish: 2.4,
+                correlation_strength: 'moderate'
+            },
+            {
+                headline: 'Blackwell GPU ramp on track despite broader semiconductor sector pressure',
+                source: 'CNBC',
+                published_at: new Date(Date.now() - 88 * 60000).toISOString(),
+                sentiment_score: 0.234,
+                sentiment_label: 'neutral',
+                correlated_anomaly: false,
+                volume_zscore_at_publish: 1.1,
+                correlation_strength: 'none'
+            }
+        ]
+    },
     'MSFT': {
         ticker: 'MSFT', hours: 4, count: 3,
         summary: { positive: 0, negative: 2, neutral: 1, strong_correlations: 1 },
@@ -1013,140 +1057,74 @@
             }
         ]
     },
-    'AMZN': {
-        ticker: 'AMZN', hours: 4, count: 4,
-        summary: { positive: 0, negative: 3, neutral: 1, strong_correlations: 2 },
+    'GOOGL': {
+        ticker: 'GOOGL', hours: 4, count: 3,
+        summary: { positive: 0, negative: 2, neutral: 1, strong_correlations: 1 },
         items: [
             {
-                headline: 'Amazon drops sharply as tariffs threaten third-party seller margins',
-                source: 'FT',
-                published_at: new Date(Date.now() - 6 * 60000).toISOString(),
-                sentiment_score: -0.834,
+                headline: 'Alphabet falls as ad market uncertainty grows on tariff economic fears',
+                source: 'Bloomberg',
+                published_at: new Date(Date.now() - 11 * 60000).toISOString(),
+                sentiment_score: -0.721,
                 sentiment_label: 'negative',
                 correlated_anomaly: true,
-                volume_zscore_at_publish: 4.2,
+                volume_zscore_at_publish: 3.2,
                 correlation_strength: 'strong'
             },
             {
-                headline: 'AWS revenue seen as largely tariff-immune but ad business at risk',
-                source: 'CNBC',
-                published_at: new Date(Date.now() - 41 * 60000).toISOString(),
-                sentiment_score: -0.213,
-                sentiment_label: 'negative',
+                headline: 'Google Cloud seen as resilient but ad revenue faces macro headwinds',
+                source: 'Reuters',
+                published_at: new Date(Date.now() - 44 * 60000).toISOString(),
+                sentiment_score: -0.187,
+                sentiment_label: 'neutral',
                 correlated_anomaly: false,
-                volume_zscore_at_publish: 1.6,
+                volume_zscore_at_publish: 1.1,
                 correlation_strength: 'none'
             },
             {
-                headline: 'Amazon logistics network faces cost headwinds from import tariffs',
-                source: 'Bloomberg',
-                published_at: new Date(Date.now() - 73 * 60000).toISOString(),
-                sentiment_score: -0.612,
+                headline: 'Alphabet AI investments face scrutiny as growth spending questioned',
+                source: 'WSJ',
+                published_at: new Date(Date.now() - 82 * 60000).toISOString(),
+                sentiment_score: -0.412,
                 sentiment_label: 'negative',
-                correlated_anomaly: true,
-                volume_zscore_at_publish: 2.8,
-                correlation_strength: 'strong'
-            },
-            {
-                headline: 'Amazon Prime membership growth steady despite macro uncertainty',
-                source: 'Reuters',
-                published_at: new Date(Date.now() - 98 * 60000).toISOString(),
-                sentiment_score: 0.187,
-                sentiment_label: 'neutral',
                 correlated_anomaly: false,
-                volume_zscore_at_publish: 0.8,
+                volume_zscore_at_publish: 1.4,
                 correlation_strength: 'none'
             }
         ]
     },
-    'TSLA': {
-        ticker: 'TSLA', hours: 4, count: 5,
-        summary: { positive: 0, negative: 4, neutral: 1, strong_correlations: 3 },
+    'META': {
+        ticker: 'META', hours: 4, count: 3,
+        summary: { positive: 0, negative: 2, neutral: 1, strong_correlations: 1 },
         items: [
             {
-                headline: 'Tesla plunges as tariffs hit both China sales and US battery supply chain',
-                source: 'Reuters',
-                published_at: new Date(Date.now() - 4 * 60000).toISOString(),
-                sentiment_score: -0.891,
-                sentiment_label: 'negative',
-                correlated_anomaly: true,
-                volume_zscore_at_publish: 4.8,
-                correlation_strength: 'strong'
-            },
-            {
-                headline: 'Elon Musk political exposure adding to Tesla investor uncertainty',
-                source: 'Bloomberg',
-                published_at: new Date(Date.now() - 28 * 60000).toISOString(),
-                sentiment_score: -0.734,
+                headline: 'Meta drops sharply as digital ad slowdown fears mount on tariff news',
+                source: 'CNBC',
+                published_at: new Date(Date.now() - 9 * 60000).toISOString(),
+                sentiment_score: -0.798,
                 sentiment_label: 'negative',
                 correlated_anomaly: true,
                 volume_zscore_at_publish: 3.6,
                 correlation_strength: 'strong'
             },
             {
-                headline: 'Tesla Q1 delivery miss adds to headwinds on tariff announcement day',
-                source: 'WSJ',
-                published_at: new Date(Date.now() - 55 * 60000).toISOString(),
-                sentiment_score: -0.812,
-                sentiment_label: 'negative',
-                correlated_anomaly: true,
-                volume_zscore_at_publish: 3.9,
-                correlation_strength: 'strong'
-            },
-            {
-                headline: 'Cybertruck production continues despite broader macro uncertainty',
-                source: 'Electrek',
-                published_at: new Date(Date.now() - 79 * 60000).toISOString(),
-                sentiment_score: 0.098,
-                sentiment_label: 'neutral',
-                correlated_anomaly: false,
-                volume_zscore_at_publish: 1.2,
-                correlation_strength: 'none'
-            },
-            {
-                headline: 'Tesla FSD revenue recognition could provide offset to hardware pressure',
-                source: 'Barrons',
-                published_at: new Date(Date.now() - 104 * 60000).toISOString(),
-                sentiment_score: -0.321,
-                sentiment_label: 'negative',
-                correlated_anomaly: false,
-                volume_zscore_at_publish: 1.5,
-                correlation_strength: 'none'
-            }
-        ]
-    },
-    'NVDA': {
-        ticker: 'NVDA', hours: 4, count: 3,
-        summary: { positive: 1, negative: 1, neutral: 1, strong_correlations: 1 },
-        items: [
-            {
-                headline: 'NVIDIA relatively resilient as AI chip demand seen tariff-insulated',
+                headline: 'Meta AI infrastructure spending questioned as macro outlook dims',
                 source: 'Bloomberg',
-                published_at: new Date(Date.now() - 19 * 60000).toISOString(),
-                sentiment_score: 0.412,
-                sentiment_label: 'positive',
+                published_at: new Date(Date.now() - 51 * 60000).toISOString(),
+                sentiment_score: -0.521,
+                sentiment_label: 'negative',
                 correlated_anomaly: false,
-                volume_zscore_at_publish: 1.7,
+                volume_zscore_at_publish: 1.8,
                 correlation_strength: 'none'
             },
             {
-                headline: 'NVIDIA data center customers may delay orders amid macro uncertainty',
-                source: 'Reuters',
-                published_at: new Date(Date.now() - 52 * 60000).toISOString(),
-                sentiment_score: -0.387,
-                sentiment_label: 'negative',
-                correlated_anomaly: true,
-                volume_zscore_at_publish: 2.4,
-                correlation_strength: 'moderate'
-            },
-            {
-                headline: 'Blackwell GPU ramp on track despite broader semiconductor sector pressure',
-                source: 'CNBC',
-                published_at: new Date(Date.now() - 88 * 60000).toISOString(),
-                sentiment_score: 0.234,
+                headline: 'Instagram and WhatsApp engagement metrics remain strong analysts say',
+                source: 'Barrons',
+                published_at: new Date(Date.now() - 87 * 60000).toISOString(),
+                sentiment_score: 0.187,
                 sentiment_label: 'neutral',
                 correlated_anomaly: false,
-                volume_zscore_at_publish: 1.1,
+                volume_zscore_at_publish: 0.9,
                 correlation_strength: 'none'
             }
         ]
@@ -1154,34 +1132,49 @@
 };
     const DEMO_ANOMALIES = [
     {
-        ticker: 'TSLA',
+        ticker: 'META',
         timestamp: new Date(Date.now() - 3 * 60000).toISOString(),
-        anomaly_score: -0.921,
+        anomaly_score: -0.798,
         feature_vector: {
-            price: 231.28,
-            volume: 68491,
-            volume_zscore: 4.8,
-            price_momentum: -1.34,
-            vwap_deviation: -1.21,
-            trade_frequency: 198
+            price: 524.81,
+            volume: 31204,
+            volume_zscore: 3.6,
+            price_momentum: -1.12,
+            vwap_deviation: -1.84,
+            trade_frequency: 108
         },
         correlation_strength: 'strong',
-        model_version: 52
+        model_version: 44
     },
     {
-        ticker: 'AMZN',
+        ticker: 'GOOGL',
         timestamp: new Date(Date.now() - 7 * 60000).toISOString(),
-        anomaly_score: -0.887,
+        anomaly_score: -0.689,
         feature_vector: {
-            price: 179.68,
-            volume: 51204,
-            volume_zscore: 4.2,
-            price_momentum: -1.02,
-            vwap_deviation: -0.84,
-            trade_frequency: 142
+            price: 155.42,
+            volume: 29840,
+            volume_zscore: 3.0,
+            price_momentum: -0.79,
+            vwap_deviation: -0.62,
+            trade_frequency: 88
         },
         correlation_strength: 'strong',
-        model_version: 48
+        model_version: 47
+    },
+    {
+        ticker: 'GOOGL',
+        timestamp: new Date(Date.now() - 14 * 60000).toISOString(),
+        anomaly_score: -0.721,
+        feature_vector: {
+            price: 155.42,
+            volume: 28491,
+            volume_zscore: 3.2,
+            price_momentum: -0.84,
+            vwap_deviation: -0.68,
+            trade_frequency: 94
+        },
+        correlation_strength: 'strong',
+        model_version: 47
     },
     {
         ticker: 'AAPL',
@@ -1199,19 +1192,19 @@
         model_version: 51
     },
     {
-        ticker: 'TSLA',
-        timestamp: new Date(Date.now() - 29 * 60000).toISOString(),
-        anomaly_score: -0.774,
+        ticker: 'META',
+        timestamp: new Date(Date.now() - 22 * 60000).toISOString(),
+        anomaly_score: -0.798,
         feature_vector: {
-            price: 232.14,
-            volume: 42817,
+            price: 524.81,
+            volume: 31204,
             volume_zscore: 3.6,
-            price_momentum: -0.91,
-            vwap_deviation: -0.94,
-            trade_frequency: 167
+            price_momentum: -1.12,
+            vwap_deviation: -1.84,
+            trade_frequency: 108
         },
         correlation_strength: 'strong',
-        model_version: 49
+        model_version: 44
     },
     {
         ticker: 'MSFT',
@@ -1242,21 +1235,6 @@
         },
         correlation_strength: 'moderate',
         model_version: 41
-    },
-    {
-        ticker: 'AMZN',
-        timestamp: new Date(Date.now() - 78 * 60000).toISOString(),
-        anomaly_score: -0.487,
-        feature_vector: {
-            price: 180.21,
-            volume: 18293,
-            volume_zscore: 2.8,
-            price_momentum: -0.62,
-            vwap_deviation: -0.44,
-            trade_frequency: 98
-        },
-        correlation_strength: 'moderate',
-        model_version: 38
     }
 ];
 
