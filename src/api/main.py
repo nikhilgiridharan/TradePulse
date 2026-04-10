@@ -354,6 +354,96 @@ async def get_market_prices():
         return FALLBACK_PRICES
 
 
+@app.get("/quote/{ticker}")
+async def get_single_quote(ticker: str):
+    """
+    Fetches real-time quote data for any valid US stock ticker.
+    Uses Finnhub /quote endpoint — supports any symbol on any exchange.
+
+    This powers the universal ticker search on the dashboard.
+    Users can look up any stock, not just the pre-configured tickers.
+
+    Args:
+        ticker: Any valid stock symbol e.g. AAPL, GOOGL, SPY, BRK.B
+
+    Returns:
+        price, change_pct, previous_close, high, low, open, name
+    """
+    ticker = ticker.upper().strip()
+
+    finnhub_key = os.getenv("FINNHUB_API_KEY", "")
+
+    if not finnhub_key:
+        raise HTTPException(
+            status_code=503,
+            detail="Quote service unavailable — FINNHUB_API_KEY not configured",
+        )
+
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            quote_response = await client.get(
+                "https://finnhub.io/api/v1/quote",
+                params={"symbol": ticker, "token": finnhub_key},
+            )
+
+            if quote_response.status_code != 200:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Ticker {ticker} not found",
+                )
+
+            quote = quote_response.json()
+
+            current_price = round(float(quote.get("c", 0)), 2)
+            previous_close = round(float(quote.get("pc", 0)), 2)
+            change = round(float(quote.get("d", 0)), 2)
+            change_pct = round(float(quote.get("dp", 0)), 2)
+            high = round(float(quote.get("h", 0)), 2)
+            low = round(float(quote.get("l", 0)), 2)
+            open_price = round(float(quote.get("o", 0)), 2)
+
+            if current_price <= 0:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No price data available for {ticker}",
+                )
+
+            name = ticker
+            try:
+                profile_response = await client.get(
+                    "https://finnhub.io/api/v1/stock/profile2",
+                    params={"symbol": ticker, "token": finnhub_key},
+                )
+                if profile_response.status_code == 200:
+                    profile = profile_response.json()
+                    name = profile.get("name", ticker)
+            except Exception:
+                pass
+
+            print(f"[TradePulse] Quote {ticker}: ${current_price} ({change_pct:+.2f}%)")
+
+            return {
+                "ticker": ticker,
+                "name": name,
+                "price": current_price,
+                "change": change,
+                "change_pct": change_pct,
+                "previous_close": previous_close,
+                "high": high,
+                "low": low,
+                "open": open_price,
+            }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[TradePulse] Quote fetch failed for {ticker}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch quote for {ticker}: {str(e)}",
+        )
+
+
 @app.get("/sentiment/{ticker}")
 @limiter.limit("100/minute")
 async def get_sentiment(request: Request, ticker: str, hours: int = 24):

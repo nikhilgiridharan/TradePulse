@@ -805,6 +805,99 @@
           <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
           <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
         </div>
+<!-- Universal ticker search -->
+<!-- Accepts any valid US stock symbol via Finnhub real-time quote API -->
+<div id="ticker-search-container" style="
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+">
+    <div style="
+        position: relative;
+        flex: 1;
+        max-width: 320px;
+    ">
+        <input
+            id="ticker-search-input"
+            type="text"
+            placeholder="Search any ticker — GOOGL, META, SPY, BRK.B..."
+            maxlength="10"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            style="
+                width: 100%;
+                padding: 8px 36px 8px 12px;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                font-size: 13px;
+                font-family: var(--font-sans);
+                outline: none;
+                box-sizing: border-box;
+                transition: border-color 0.15s ease;
+            "
+            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z.]/g, '')"
+            onkeydown="if(event.key === 'Enter') searchTicker()"
+            onfocus="this.style.borderColor = 'var(--accent-primary)'"
+            onblur="this.style.borderColor = 'var(--border-color)'"
+        />
+        <!-- Search icon inside input -->
+        <span style="
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        ">⌕</span>
+    </div>
+
+    <button
+        id="ticker-search-button"
+        onclick="searchTicker()"
+        style="
+            padding: 8px 16px;
+            background: var(--accent-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.15s ease;
+        "
+        onmouseover="this.style.opacity='0.85'"
+        onmouseout="this.style.opacity='1'"
+    >
+        Look Up
+    </button>
+
+    <!-- Error message shown on invalid ticker -->
+    <span id="ticker-search-error" style="
+        color: var(--accent-red);
+        font-size: 12px;
+        font-family: var(--font-sans);
+        display: none;
+    "></span>
+</div>
+
+<!-- Recent searches row — shows tickers the user has looked up -->
+<div id="recent-tickers-row" style="
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    min-height: 0;
+"></div>
+
         <div class="live-data-grid" id="live-data-panels">
           <div class="live-panel">
             <h4>Latest Quote — <span id="live-ticker">AAPL</span></h4>
@@ -1647,6 +1740,13 @@ function hideComponentDetail() {
 
     window.realPriceCache = {};
 
+    /** Maximum recent tickers to remember (session only). */
+    const MAX_RECENT_TICKERS = 8;
+    /** Session history — starts with default three. */
+    window.recentTickers = ['AAPL', 'NVDA', 'MSFT'];
+    /** /quote/{ticker} responses with fetched_at for TTL. */
+    window.quoteCache = {};
+
     function seedFromDemoBaselines() {
       Object.keys(DEMO_BASE_PRICES).forEach(function (ticker) {
         const price = DEMO_BASE_PRICES[ticker];
@@ -1666,8 +1766,9 @@ function hideComponentDetail() {
       if (!c) return;
       const p = c.price;
       const ch = c.change_pct;
-      const q = DEMO_QUOTE_BY_TICKER[ticker] || DEMO_QUOTE_BY_TICKER['AAPL'];
-      state.metrics.volume = q.volume;
+      const q = DEMO_QUOTE_BY_TICKER[ticker];
+      const vol = (q && q.volume) ? q.volume : (5000 + (Math.abs(String(ticker).charCodeAt(0) + p * 0.01) % 4000));
+      state.metrics.volume = vol;
       state.metrics.vwap = p * 0.9992;
       state.metrics.agg = {
         vwap_1min: (p * 0.9992).toFixed(2),
@@ -1724,6 +1825,189 @@ function hideComponentDetail() {
       const ph = state.priceHistory[t] || [];
       drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
     }
+
+    async function searchTicker() {
+      const input = document.getElementById('ticker-search-input');
+      const errorEl = document.getElementById('ticker-search-error');
+      const btn = document.getElementById('ticker-search-button');
+
+      if (!input) return;
+
+      const ticker = input.value.trim().toUpperCase();
+
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+
+      if (!ticker) {
+        showTickerError('Please enter a ticker symbol');
+        return;
+      }
+
+      if (ticker.length > 10) {
+        showTickerError('Ticker symbols are at most 10 characters');
+        return;
+      }
+
+      if (btn) {
+        btn.textContent = 'Loading...';
+        btn.disabled = true;
+      }
+
+      try {
+        const cached = window.quoteCache[ticker];
+        const cacheAge = cached ? (Date.now() - cached.fetched_at) : Infinity;
+
+        var quoteData;
+
+        if (cached && cacheAge < 15000) {
+          quoteData = cached;
+        } else {
+          const response = await fetch('/quote/' + encodeURIComponent(ticker));
+
+          if (response.status === 404) {
+            showTickerError('"' + ticker + '" not found — check the symbol and try again');
+            return;
+          }
+
+          if (!response.ok) {
+            showTickerError('Could not fetch data for ' + ticker);
+            return;
+          }
+
+          quoteData = await response.json();
+          quoteData.fetched_at = Date.now();
+          window.quoteCache[ticker] = quoteData;
+        }
+
+        await loadTickerFromSearch(ticker, quoteData);
+        addToRecentTickers(ticker);
+        input.value = '';
+
+      } catch (err) {
+        console.error('[TradePulse] Search failed:', err);
+        showTickerError('Search failed — please try again');
+      } finally {
+        if (btn) {
+          btn.textContent = 'Look Up';
+          btn.disabled = false;
+        }
+      }
+    }
+
+    function showTickerError(message) {
+      const errorEl = document.getElementById('ticker-search-error');
+      if (!errorEl) return;
+      errorEl.textContent = message;
+      errorEl.style.display = 'inline';
+      setTimeout(function () {
+        errorEl.style.display = 'none';
+      }, 4000);
+    }
+
+    async function loadTickerFromSearch(ticker, quoteData) {
+      state.activeTicker = ticker;
+      poll();
+
+      document.querySelectorAll('#live-data-when-open .ticker-pills .ticker-pill').forEach(function (btn) {
+        btn.classList.remove('active');
+      });
+      const matchingBtn = document.querySelector('#live-data-when-open .ticker-pill[data-ticker="' + ticker + '"]');
+      if (matchingBtn) matchingBtn.classList.add('active');
+
+      if (!state.priceHistory[ticker] || state.priceHistory[ticker].length === 0) {
+        state.priceHistory[ticker] = Array(60).fill(quoteData.price);
+      }
+
+      state.lastPrice[ticker] = quoteData.price;
+
+      if (dom.liveTicker) dom.liveTicker.textContent = ticker;
+
+      window.realPriceCache[ticker] = {
+        price: quoteData.price,
+        change_pct: quoteData.change_pct,
+        previous_close: quoteData.previous_close,
+      };
+
+      applyDerivedMetricsFromCache(ticker);
+      renderLiveData();
+      const ph = state.priceHistory[ticker] || [];
+      drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
+      pollSentiment(ticker);
+
+      const sign = quoteData.change_pct >= 0 ? '+' : '';
+      console.log('[TradePulse] Loaded ' + ticker + ': $' + quoteData.price + ' (' + sign + quoteData.change_pct.toFixed(2) + '%)');
+    }
+
+    function addToRecentTickers(ticker) {
+      window.recentTickers = window.recentTickers.filter(function (t) { return t !== ticker; });
+      window.recentTickers.unshift(ticker);
+      if (window.recentTickers.length > MAX_RECENT_TICKERS) {
+        window.recentTickers = window.recentTickers.slice(0, MAX_RECENT_TICKERS);
+      }
+      renderRecentTickers();
+    }
+
+    function renderRecentTickers() {
+      const container = document.getElementById('recent-tickers-row');
+      if (!container) return;
+
+      const defaultTickers = ['AAPL', 'NVDA', 'MSFT'];
+      const extraTickers = window.recentTickers.filter(function (t) { return defaultTickers.indexOf(t) === -1; });
+
+      if (extraTickers.length === 0) {
+        container.innerHTML = '';
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'flex';
+
+      container.innerHTML =
+        '<span style="color: var(--text-muted); font-size: 11px; font-family: var(--font-sans); align-self: center; white-space: nowrap;">Recent:</span>' +
+        extraTickers.map(function (tk) {
+          return '<button type="button" onclick="quickLoadTicker(\'' + tk.replace(/'/g, '') + '\')" style="padding: 3px 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-secondary); font-size: 12px; font-family: var(--font-sans); font-weight: 500; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.borderColor=\'var(--accent-primary)\';this.style.color=\'var(--accent-primary)\'" onmouseout="this.style.borderColor=\'var(--border-color)\';this.style.color=\'var(--text-secondary)\'">' + tk + '</button>';
+        }).join('');
+    }
+
+    async function quickLoadTicker(ticker) {
+      const cached = window.quoteCache[ticker];
+      const cacheAge = cached ? (Date.now() - cached.fetched_at) : Infinity;
+
+      if (cached && cacheAge < 15000) {
+        await loadTickerFromSearch(ticker, cached);
+        return;
+      }
+
+      const input = document.getElementById('ticker-search-input');
+      if (input) input.value = ticker;
+      await searchTicker();
+    }
+
+    function switchTicker(ticker) {
+      document.querySelectorAll('#live-data-when-open .ticker-pills .ticker-pill').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-ticker') === ticker);
+      });
+
+      state.activeTicker = ticker;
+      poll();
+      pollSentiment(ticker);
+
+      const cached = window.realPriceCache[ticker];
+      if (cached) {
+        applyDerivedMetricsFromCache(ticker);
+        renderLiveData();
+        const ph = state.priceHistory[ticker] || [];
+        drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
+      } else if (DEMO_MODE) {
+        fetchAndDisplayRealPrices();
+      }
+
+      const input = document.getElementById('ticker-search-input');
+      if (input) input.value = '';
+    }
+
     function demoHealth() {
       return { status: 'healthy', consumer_lag: Math.floor(Math.random() * 80), dynamo_latency_p99: 18, uptime_seconds: 3600 + Math.floor(Math.random() * 86400), checked_at: new Date().toISOString() };
     }
@@ -2291,24 +2575,15 @@ function hideComponentDetail() {
       });
     });
 
-    document.querySelectorAll('.ticker-pill').forEach(el => {
+    document.querySelectorAll('.ticker-pill').forEach(function (el) {
       el.addEventListener('click', function () {
-        if (this.closest('#anomaly-feed')) return;
-        document.querySelectorAll('.ticker-pills .ticker-pill').forEach(p => p.classList.remove('active'));
-        this.classList.add('active');
-        state.activeTicker = this.getAttribute('data-ticker');
-        poll();
-        pollSentiment(state.activeTicker);
-        if (DEMO_MODE) {
-          const c = window.realPriceCache[state.activeTicker];
-          if (c) {
-            applyDerivedMetricsFromCache(state.activeTicker);
-            renderLiveData();
-            const ph = state.priceHistory[state.activeTicker] || [];
-            drawSparkline('sparkline-canvas', ph.filter(Boolean), '#0ea5e9');
-          } else {
-            fetchAndDisplayRealPrices();
-          }
+        if (this.closest('#anomaly-tickers')) {
+          document.querySelectorAll('#anomaly-tickers .ticker-pill').forEach(function (p) { p.classList.remove('active'); });
+          this.classList.add('active');
+          return;
+        }
+        if (this.closest('#live-data-when-open') && this.getAttribute('data-ticker')) {
+          switchTicker(this.getAttribute('data-ticker'));
         }
       });
     });
@@ -2321,6 +2596,7 @@ function hideComponentDetail() {
       await fetchAndDisplayRealPrices();
       poll();
       renderAnomalies();
+      renderRecentTickers();
       updateLiveDataSection();
       updateOverviewMarketStatus();
     })();
