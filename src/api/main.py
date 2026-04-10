@@ -4,6 +4,16 @@ Serves custom dashboard at / and GET /quotes/{ticker}, /aggregations/{ticker},
 /anomalies/{ticker}, /features/{ticker}, /health. OpenAPI spec at /openapi.json.
 """
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load repo-root .env so FINNHUB_API_KEY (and other vars) are available for local runs
+# and when Docker passes no inline -e (use: docker run --env-file .env).
+_load_env = Path(__file__).resolve().parents[2] / ".env"
+if _load_env.is_file():
+    load_dotenv(_load_env)
+
 import random
 from datetime import datetime, timezone, timedelta
 
