@@ -1866,13 +1866,15 @@ function hideComponentDetail() {
         } else {
           const response = await fetch('/quote/' + encodeURIComponent(ticker));
 
-          if (response.status === 404) {
-            showTickerError('"' + ticker + '" not found — check the symbol and try again');
-            return;
-          }
-
           if (!response.ok) {
-            showTickerError('Could not fetch data for ' + ticker);
+            var errMsg = 'Could not fetch data for ' + ticker;
+            try {
+              const errBody = await response.json();
+              if (errBody.detail) {
+                errMsg = typeof errBody.detail === 'string' ? errBody.detail : JSON.stringify(errBody.detail);
+              }
+            } catch (e) { /* ignore */ }
+            showTickerError(errMsg);
             return;
           }
 

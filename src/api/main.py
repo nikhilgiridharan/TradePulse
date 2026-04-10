@@ -394,13 +394,29 @@ async def get_single_quote(ticker: str):
 
             quote = quote_response.json()
 
-            current_price = round(float(quote.get("c", 0)), 2)
-            previous_close = round(float(quote.get("pc", 0)), 2)
-            change = round(float(quote.get("d", 0)), 2)
-            change_pct = round(float(quote.get("dp", 0)), 2)
-            high = round(float(quote.get("h", 0)), 2)
-            low = round(float(quote.get("l", 0)), 2)
-            open_price = round(float(quote.get("o", 0)), 2)
+            def _f(key: str) -> float:
+                v = quote.get(key)
+                if v is None:
+                    return 0.0
+                try:
+                    return float(v)
+                except (TypeError, ValueError):
+                    return 0.0
+
+            current_price = round(_f("c"), 2)
+            previous_close = round(_f("pc"), 2)
+            change = round(_f("d"), 2)
+            change_pct = round(_f("dp"), 2)
+            high = round(_f("h"), 2)
+            low = round(_f("l"), 2)
+            open_price = round(_f("o"), 2)
+
+            # Finnhub often returns c=0 when the market is closed or before a trade prints;
+            # previous close (pc) is still valid — use it as the display price.
+            if current_price <= 0 and previous_close > 0:
+                current_price = previous_close
+                change = 0.0
+                change_pct = 0.0
 
             if current_price <= 0:
                 raise HTTPException(
