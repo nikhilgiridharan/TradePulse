@@ -1909,6 +1909,7 @@ function hideComponentDetail() {
     }
 
     async function loadTickerFromSearch(ticker, quoteData) {
+      // Must set activeTicker before pollSentiment so sentiment matches the searched symbol
       state.activeTicker = ticker;
       poll();
 
@@ -1994,7 +1995,6 @@ function hideComponentDetail() {
 
       state.activeTicker = ticker;
       poll();
-      pollSentiment(ticker);
 
       const cached = window.realPriceCache[ticker];
       if (cached) {
@@ -2005,6 +2005,8 @@ function hideComponentDetail() {
       } else if (DEMO_MODE) {
         fetchAndDisplayRealPrices();
       }
+
+      pollSentiment(ticker);
 
       const input = document.getElementById('ticker-search-input');
       if (input) input.value = '';
@@ -2433,63 +2435,60 @@ function hideComponentDetail() {
     }
 
     /**
-     * Polls the /sentiment/{ticker} endpoint for news sentiment data.
-     * Falls back to DEMO_SENTIMENT when the Finnhub pipeline is not running
-     * or the API returns empty results. Timestamps are regenerated on every
-     * call so demo headlines always appear recent rather than stale.
+     * Polls the sentiment endpoint for a specific ticker.
      *
-     * Why demo fallback rather than hiding the panel:
-     * An empty sentiment panel during a demo or interview looks broken.
-     * Realistic demo data communicates what the feature does and why it
-     * matters — which is the purpose of the dashboard in this context.
-     * The panel is clearly part of the demo mode simulation.
+     * Priority order:
+     * 1. Real API data from /sentiment/{ticker} if pipeline is running
+     * 2. DEMO_SENTIMENT[ticker] if ticker has pre-written headlines
+     * 3. generateGenericSentiment(ticker) for any other ticker
+     *
+     * The ticker parameter is always used — never defaults to AAPL.
+     *
+     * @param {string} ticker - The exact ticker to show sentiment for
      */
     async function pollSentiment(ticker) {
-      if (!isMarketOpen()) return;
+      const targetTicker = ticker || state.activeTicker || 'AAPL';
+
       try {
-        const response = await fetch(`/sentiment/${ticker}?hours=4`);
+        const response = await fetch(`/sentiment/${targetTicker}?hours=4`);
 
         if (response.ok) {
           const data = await response.json();
 
-          // Use real API data if it contains items
           if (data && data.items && data.items.length > 0) {
             updateSentimentPanel(data);
             return;
           }
         }
 
-        // API returned empty, non-200, or errored — fall back to demo data.
-        // Regenerate timestamps so headlines appear current, not stale.
-        useDemoSentiment(ticker);
+        useDemoSentiment(targetTicker);
 
       } catch (err) {
-        // Network error or API offline — use demo data silently.
-        // Sentiment is enrichment data, not core pipeline data.
-        // A failed sentiment poll should never surface as a visible error.
-        console.warn('[TradePulse] Sentiment poll failed, using demo data:', err.message);
-        useDemoSentiment(ticker);
+        console.warn('[TradePulse] Sentiment poll failed for ' + targetTicker + ':', err.message);
+        useDemoSentiment(targetTicker);
       }
     }
 
     /**
-     * Loads demo sentiment data for a ticker with freshened timestamps.
-     * Timestamps are offset from Date.now() so headlines always appear
-     * to have arrived recently regardless of when the page loaded.
+     * Generates demo sentiment data for any ticker.
      *
-     * Args:
-     *     ticker: Active ticker symbol e.g. 'AAPL'
+     * For tickers in DEMO_SENTIMENT: uses the pre-written headlines.
+     * For any other ticker: generates generic but accurate headlines
+     * using the actual ticker symbol so it never shows wrong company news.
+     *
+     * This fixes the bug where searched tickers like TSLA, GOOGL, META
+     * showed Apple headlines because DEMO_SENTIMENT only had AAPL/NVDA/MSFT.
      */
     function useDemoSentiment(ticker) {
-      // Get demo data for the active ticker, fall back to AAPL if not found
-      const base = DEMO_SENTIMENT[ticker] || DEMO_SENTIMENT['AAPL'];
+      let demo;
 
-      // Deep clone to avoid mutating the constant on repeated calls
-      const demo = structuredClone(base);
+      if (DEMO_SENTIMENT[ticker]) {
+        demo = JSON.parse(JSON.stringify(DEMO_SENTIMENT[ticker]));
+      } else {
+        demo = generateGenericSentiment(ticker);
+      }
 
-      // Refresh timestamps so items always appear recent.
-      // Offsets are staggered to simulate articles arriving over time.
-      const offsets = [7, 33, 68]; // minutes ago
+      const offsets = [7, 33, 68];
       demo.items.forEach((item, i) => {
         const offsetMs = (offsets[i] || (i * 25 + 10)) * 60 * 1000;
         item.published_at = new Date(Date.now() - offsetMs).toISOString();
@@ -2498,7 +2497,118 @@ function hideComponentDetail() {
       updateSentimentPanel(demo);
     }
 
+    /**
+     * Generates realistic generic sentiment headlines for any ticker
+     * that is not in DEMO_SENTIMENT.
+     *
+     * Uses the actual ticker symbol in headlines so the panel
+     * always shows relevant content for the searched stock.
+     *
+     * Sentiment direction reflects the current day's market conditions
+     * based on whether the stock is up or down from realPriceCache.
+     *
+     * @param {string} ticker - Any stock ticker symbol
+     * @returns {object} Sentiment data object matching DEMO_SENTIMENT structure
+     */
+    function generateGenericSentiment(ticker) {
+      const cached = window.realPriceCache && window.realPriceCache[ticker];
+      const changePct = cached ? cached.change_pct : 0;
+      const isUp = changePct >= 0;
+      const changeStr = cached
+        ? (isUp ? '+' : '') + changePct.toFixed(2) + '%'
+        : 'mixed';
+
+      if (isUp) {
+        return {
+          ticker: ticker,
+          hours: 4,
+          count: 3,
+          summary: { positive: 2, negative: 0, neutral: 1, strong_correlations: 1 },
+          items: [
+            {
+              headline: ticker + ' advances ' + changeStr + ' as investors respond positively to market conditions',
+              source: 'Reuters',
+              published_at: new Date(Date.now() - 7 * 60000).toISOString(),
+              sentiment_score: 0.612,
+              sentiment_label: 'positive',
+              correlated_anomaly: true,
+              volume_zscore_at_publish: 2.8,
+              correlation_strength: 'strong'
+            },
+            {
+              headline: ticker + ' sees elevated volume as institutional buying activity increases',
+              source: 'Bloomberg',
+              published_at: new Date(Date.now() - 33 * 60000).toISOString(),
+              sentiment_score: 0.487,
+              sentiment_label: 'positive',
+              correlated_anomaly: false,
+              volume_zscore_at_publish: 1.6,
+              correlation_strength: 'none'
+            },
+            {
+              headline: ticker + ' technical outlook positive as price holds above key support levels',
+              source: 'Barrons',
+              published_at: new Date(Date.now() - 68 * 60000).toISOString(),
+              sentiment_score: 0.134,
+              sentiment_label: 'neutral',
+              correlated_anomaly: false,
+              volume_zscore_at_publish: 0.9,
+              correlation_strength: 'none'
+            }
+          ]
+        };
+      } else {
+        return {
+          ticker: ticker,
+          hours: 4,
+          count: 3,
+          summary: { positive: 0, negative: 2, neutral: 1, strong_correlations: 1 },
+          items: [
+            {
+              headline: ticker + ' declines ' + changeStr + ' amid broader market uncertainty and sector pressure',
+              source: 'Reuters',
+              published_at: new Date(Date.now() - 7 * 60000).toISOString(),
+              sentiment_score: -0.587,
+              sentiment_label: 'negative',
+              correlated_anomaly: true,
+              volume_zscore_at_publish: 2.9,
+              correlation_strength: 'strong'
+            },
+            {
+              headline: ticker + ' faces headwinds as macro environment weighs on investor sentiment',
+              source: 'Bloomberg',
+              published_at: new Date(Date.now() - 33 * 60000).toISOString(),
+              sentiment_score: -0.412,
+              sentiment_label: 'negative',
+              correlated_anomaly: false,
+              volume_zscore_at_publish: 1.4,
+              correlation_strength: 'none'
+            },
+            {
+              headline: ticker + ' analysts maintain outlook despite near-term volatility concerns',
+              source: 'WSJ',
+              published_at: new Date(Date.now() - 68 * 60000).toISOString(),
+              sentiment_score: 0.041,
+              sentiment_label: 'neutral',
+              correlated_anomaly: false,
+              volume_zscore_at_publish: 0.8,
+              correlation_strength: 'none'
+            }
+          ]
+        };
+      }
+    }
+
     function updateSentimentPanel(data) {
+      const panelHeader = document.querySelector('[data-panel="sentiment"] .panel-header, #sentiment-panel .panel-header, .sentiment-panel-header');
+      if (panelHeader) {
+        panelHeader.textContent = 'News Sentiment — ' + data.ticker;
+      }
+      const tickerLabel = document.getElementById('sentiment-ticker-label');
+      if (tickerLabel) {
+        tickerLabel.textContent = data.ticker;
+      }
+
       const scoreEl = dom.sentimentScore;
       const itemsEl = dom.sentimentItems;
       if (!scoreEl || !itemsEl) return;
