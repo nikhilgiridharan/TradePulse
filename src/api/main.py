@@ -46,9 +46,9 @@ DEMO_MODE = os.getenv('DEMO_MODE', 'true').lower() == 'true'
 
 # Finnhub /market-prices fallbacks — update manually when stale (Finnhub or network failure).
 FALLBACK_PRICES = {
-    "AAPL": {"price": 258.17, "change_pct": 1.84, "previous_close": 253.50},
-    "NVDA": {"price": 181.74, "change_pct": 2.05, "previous_close": 177.10},
-    "MSFT": {"price": 374.12, "change_pct": 0.49, "previous_close": 372.29},
+    "AAPL": {"price": 207.94, "change_pct": -0.27, "previous_close": 208.50},
+    "NVDA": {"price": 109.02, "change_pct": -1.84, "previous_close": 111.06},
+    "MSFT": {"price": 389.30, "change_pct": 0.42, "previous_close": 387.67},
 }
 
 # Required for remaining routes (limiter, Request, BaseModel, logger, time)
