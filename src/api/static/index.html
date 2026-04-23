@@ -563,6 +563,11 @@
     <main class="main-content">
       <section id="section-overview" class="section active">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Overview</h1>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px;">
+          <span id="header-pill-requests" style="font-size:12px;">⚡ 0 req/min</span>
+          <span id="header-pill-latency" style="font-size:12px;">⏱ 0ms p50</span>
+          <span id="header-pill-status" style="font-size:12px;color:var(--accent-green);">✓ All Systems Operational</span>
+        </div>
         <!-- Market status bar — shown in Overview section -->
         <!-- Updates automatically based on market hours -->
         <div id="overview-market-status" style="
@@ -588,11 +593,25 @@
     "></span>
 </div>
         <div class="metric-grid">
-          <div class="metric-card metric-card-cyan"><div class="label">Events/sec</div><div class="value font-mono" id="ov-events">14,832</div><div class="trend up metric-trend-up">↑ +2.3%</div></div>
-          <div class="metric-card metric-card-purple"><div class="label">p99 Latency</div><div class="value font-mono" id="ov-latency">67ms</div><div class="status metric-status-healthy">✓ healthy</div></div>
-          <div class="metric-card metric-card-blue"><div class="label">Consumer Lag</div><div class="value font-mono" id="ov-lag">42</div><div class="status metric-status-normal">✓ normal</div></div>
-          <div class="metric-card metric-card-amber"><div class="label">Anomalies Today</div><div class="value font-mono" id="ov-anomalies">7</div><div class="trend metric-status-warning">⚠ 2 active</div></div>
+          <div class="metric-card metric-card-cyan"><div class="label">API Requests/min</div><div class="value font-mono" id="metric-requests-per-min">—</div><div class="trend" id="metric-total-requests">↑ 0 total</div></div>
+          <div class="metric-card metric-card-purple"><div class="label">p99 Latency</div><div class="value font-mono" id="metric-p99-latency">—</div><div class="status" id="metric-latency-status">✓ healthy</div></div>
+          <div class="metric-card metric-card-blue"><div class="label">Uptime</div><div class="value font-mono" id="metric-uptime">—</div><div class="status metric-status-healthy">✓ running</div></div>
+          <div class="metric-card metric-card-amber"><div class="label">Total Requests</div><div class="value font-mono" id="metric-total-requests-card">—</div><div class="trend" id="metric-error-rate">0.0% errors</div></div>
         </div>
+<div style="
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    margin-top: 4px;
+    margin-bottom: 16px;
+">
+    ✓ Real metrics from Railway deployment · Updates every 15s ·
+    <a href="/metrics" target="_blank" rel="noopener noreferrer"
+       style="color: var(--accent-primary); text-decoration: none;">
+        View raw
+    </a>
+</div>
         <div class="pipeline-diagram">
           <h3 style="margin-bottom:16px;">Pipeline Architecture</h3>
           <svg viewBox="0 0 820 320" style="min-height:320px;">
@@ -943,6 +962,14 @@
 
       <section id="section-pipeline" class="section">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Pipeline Status</h1>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-sans);">GET /health example response · use <a href="/metrics" style="color:var(--accent-primary);text-decoration:none;">GET /metrics</a> for live API operational data (p99, uptime, request counts)</p>
+        <pre style="font-size:11px;font-family:var(--font-mono);background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:12px;overflow-x:auto;margin-bottom:16px;">{
+  "status": "healthy",
+  "mode": "demo",
+  "uptime_seconds": 3600,
+  "checked_at": "2026-04-08T14:32:01.123Z",
+  "note": "Running in demo mode — simulated data"
+}</pre>
         <div class="component-grid" id="component-grid">
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Polygon.io</div><div class="detail">WebSocket: UP · Events: 14,832/sec</div></div>
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Kafka Broker</div><div class="detail">Lag: 42 msgs · 6 partitions</div></div>
@@ -1276,10 +1303,6 @@
     let sparklineCtxCached = null;
 
     function initDomRefs() {
-      dom.ovEvents = document.getElementById('ov-events');
-      dom.ovLatency = document.getElementById('ov-latency');
-      dom.ovLag = document.getElementById('ov-lag');
-      dom.ovAnomalies = document.getElementById('ov-anomalies');
       dom.liveTicker = document.getElementById('live-ticker');
       dom.livePrice = document.getElementById('live-price');
       dom.liveVol = document.getElementById('live-vol');
@@ -1318,6 +1341,107 @@
       if (dom.sparklineCanvas) sparklineCtxCached = dom.sparklineCanvas.getContext('2d');
     }
     initDomRefs();
+
+/**
+ * Updates the header stat pills with real metrics.
+ * Called alongside fetchAndUpdateRealMetrics every 15 seconds.
+ */
+function updateHeaderPills(data) {
+  const reqPill = document.getElementById('header-pill-requests');
+  if (reqPill) {
+    reqPill.textContent = '⚡ ' + data.requests_per_minute + ' req/min';
+  }
+
+  const latencyPill = document.getElementById('header-pill-latency');
+  if (latencyPill) {
+    latencyPill.textContent = '⏱ ' + data.p50_latency_ms + 'ms p50';
+  }
+
+  const statusPill = document.getElementById('header-pill-status');
+  if (statusPill) {
+    const isHealthy = data.p99_latency_ms < 200 && data.error_rate_pct < 5;
+    statusPill.textContent = isHealthy
+      ? '✓ All Systems Operational'
+      : '⚠ Degraded Performance';
+    statusPill.style.color = isHealthy
+      ? 'var(--accent-green)'
+      : 'var(--accent-yellow)';
+  }
+}
+
+/**
+ * Fetches real API metrics from the /metrics endpoint.
+ * Updates all four Overview metric cards with genuine measurements.
+ *
+ * These are real numbers from the Railway deployment:
+ * - p99 latency is measured from actual HTTP requests
+ * - uptime is measured from app startup time
+ * - request counts are from the middleware counter
+ *
+ * Called on page load and every 15 seconds.
+ * Falls back gracefully if /metrics is unreachable.
+ */
+async function fetchAndUpdateRealMetrics() {
+  try {
+    const response = await fetch('/metrics');
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+
+    const reqCard = document.getElementById('metric-requests-per-min');
+    if (reqCard) {
+      reqCard.textContent = data.requests_per_minute.toLocaleString();
+      reqCard.style.color = data.requests_per_minute > 0
+        ? 'var(--accent-green)'
+        : 'var(--text-muted)';
+    }
+    const reqSubtext = document.getElementById('metric-total-requests');
+    if (reqSubtext) {
+      reqSubtext.textContent = '↑ ' + data.total_requests.toLocaleString() + ' total';
+    }
+
+    const latencyCard = document.getElementById('metric-p99-latency');
+    if (latencyCard) {
+      latencyCard.textContent = data.p99_latency_ms + 'ms';
+    }
+    const latencyStatus = document.getElementById('metric-latency-status');
+    if (latencyStatus) {
+      const isHealthy = data.p99_latency_ms < 200;
+      latencyStatus.textContent = isHealthy ? '✓ healthy' : '⚠ elevated';
+      latencyStatus.style.color = isHealthy
+        ? 'var(--accent-green)'
+        : 'var(--accent-yellow)';
+    }
+
+    const uptimeCard = document.getElementById('metric-uptime');
+    if (uptimeCard) {
+      uptimeCard.textContent = data.uptime_formatted;
+    }
+
+    const totalCard = document.getElementById('metric-total-requests-card');
+    if (totalCard) {
+      totalCard.textContent = data.total_requests.toLocaleString();
+    }
+    const errorRate = document.getElementById('metric-error-rate');
+    if (errorRate) {
+      const isClean = data.error_rate_pct < 1;
+      errorRate.textContent = data.error_rate_pct + '% errors';
+      errorRate.style.color = isClean
+        ? 'var(--accent-green)'
+        : 'var(--accent-yellow)';
+    }
+
+    updateHeaderPills(data);
+
+    console.log('[TradePulse] Real metrics updated:', {
+      req_per_min: data.requests_per_minute,
+      p99: data.p99_latency_ms,
+      uptime: data.uptime_formatted,
+      total: data.total_requests
+    });
+  } catch (err) {
+    console.warn('[TradePulse] Metrics fetch failed:', err.message);
+  }
+}
 
 /**
  * Detail information for each pipeline component.
@@ -1404,7 +1528,8 @@ const COMPONENT_DETAILS = {
             'GET /anomalies/{ticker} — Isolation Forest detections, no cache',
             'GET /features/{ticker} — feature vector, cached 1 second',
             'GET /sentiment/{ticker} — news sentiment with correlation data, no cache',
-            'GET /health — pipeline health, no cache',
+            'GET /health — basic health; for live API stats see GET /metrics',
+            'GET /metrics — real p99, uptime, request counts, error rate (Overview dashboard)',
             'Rate limited to 100 requests per minute per IP',
             'CORS enabled for dashboard access from any origin'
         ],
@@ -2260,13 +2385,6 @@ function hideComponentDetail() {
       setTimeout(() => el.classList.remove('flash-green', 'flash-red'), 300);
     }
 
-    function renderOverview() {
-      if (state.metrics.events !== undefined && dom.ovEvents) dom.ovEvents.textContent = Number(state.metrics.events).toLocaleString();
-      if (state.metrics.latency !== undefined && dom.ovLatency) dom.ovLatency.textContent = state.metrics.latency + 'ms';
-      if (state.metrics.lag !== undefined && dom.ovLag) dom.ovLag.textContent = state.metrics.lag;
-      if (state.metrics.anomalies !== undefined && dom.ovAnomalies) dom.ovAnomalies.textContent = state.metrics.anomalies;
-    }
-
     function renderLiveData() {
       if (!isMarketOpen()) return;
       const t = state.activeTicker;
@@ -2333,24 +2451,13 @@ function hideComponentDetail() {
     function poll() {
       const t = state.activeTicker;
       if (DEMO_MODE) {
-        state.metrics.events = 14832 + Math.floor(Math.random() * 200);
-        state.metrics.latency = 12 + Math.floor(Math.random() * 10);
-        state.metrics.lag = 42 + Math.floor(Math.random() * 20);
-        state.metrics.anomalies = 7;
-        renderOverview();
         if (state.activeSection === 'anomalies' && Math.random() > 0.95) {
           state.anomalies.unshift({ ticker: t, timestamp: new Date().toISOString(), anomaly_score: -0.5 - Math.random() * 0.5, model_version: 47 });
           renderAnomalies();
         }
         return;
       }
-      apiGet('/health').then(r => {
-        if (r.data) {
-          state.metrics.lag = r.data.consumer_lag;
-          state.metrics.latency = r.data.dynamo_latency_p99;
-        }
-        renderOverview();
-      });
+      apiGet('/health');
       apiGet('/quotes/' + t).then(r => {
         if (r.data) {
           const prev = state.lastPrice[t];
@@ -2706,6 +2813,8 @@ function hideComponentDetail() {
     // would otherwise leave Live Data panels visible with default HTML all weekend).
     updateLiveDataSection();
     updateOverviewMarketStatus();
+    fetchAndUpdateRealMetrics();
+    setInterval(fetchAndUpdateRealMetrics, 15000);
     (async function () {
       await fetchAndDisplayRealPrices();
       poll();

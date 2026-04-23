@@ -15,6 +15,7 @@ if _load_env.is_file():
     load_dotenv(_load_env)
 
 import random
+from collections import deque
 from datetime import datetime, timezone, timedelta
 
 from fastapi import FastAPI, HTTPException
@@ -65,6 +66,90 @@ from src.processing.feature_store import FeatureStore
 import httpx
 
 logger = structlog.get_logger(__name__)
+
+
+# Real-time API metrics tracker
+# Measures actual request counts, response times, and uptime
+# These replace the simulated demo metrics on the Overview dashboard
+class APIMetrics:
+    """
+    Tracks real API performance metrics for the TradePulse dashboard.
+
+    All metrics are measured from actual requests hitting this FastAPI
+    instance on Railway — not simulated values.
+
+    Design decisions:
+    - deque with maxlen for rolling windows — O(1) append/popleft
+    - Module-level singleton — shared across all requests
+    - No external dependencies — pure Python stdlib
+    """
+
+    def __init__(self) -> None:
+        self.start_time = time.time()
+        # Rolling window of last 100 response times in milliseconds
+        self.response_times: deque = deque(maxlen=100)
+        # Total request count since startup
+        self.total_requests = 0
+        # Requests in the last 60 seconds for req/min calculation
+        self.recent_request_times: deque = deque(maxlen=1000)
+        # Count of non-200 responses
+        self.error_count = 0
+
+    def record_request(self, response_time_ms: float, status_code: int) -> None:
+        """Records a completed request."""
+        self.response_times.append(response_time_ms)
+        self.total_requests += 1
+        self.recent_request_times.append(time.time())
+        if status_code >= 400:
+            self.error_count += 1
+
+    def get_p99_latency(self) -> float:
+        """Returns p99 response time in milliseconds."""
+        if not self.response_times:
+            return 0.0
+        sorted_times = sorted(self.response_times)
+        idx = int(len(sorted_times) * 0.99)
+        return float(round(sorted_times[min(idx, len(sorted_times) - 1)], 1))
+
+    def get_p50_latency(self) -> float:
+        """Returns p50 (median) response time in milliseconds."""
+        if not self.response_times:
+            return 0.0
+        sorted_times = sorted(self.response_times)
+        idx = len(sorted_times) // 2
+        return float(round(sorted_times[idx], 1))
+
+    def get_requests_per_minute(self) -> int:
+        """Returns requests in the last 60 seconds."""
+        now = time.time()
+        cutoff = now - 60
+        return len([t for t in self.recent_request_times if t > cutoff])
+
+    def get_uptime_seconds(self) -> int:
+        """Returns seconds since app startup."""
+        return int(time.time() - self.start_time)
+
+    def get_uptime_formatted(self) -> str:
+        """Returns human-readable uptime string."""
+        seconds = self.get_uptime_seconds()
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        secs = seconds % 60
+        if hours > 0:
+            return f"{hours}h {minutes}m {secs}s"
+        if minutes > 0:
+            return f"{minutes}m {secs}s"
+        return f"{secs}s"
+
+    def get_avg_latency(self) -> float:
+        """Returns average response time in milliseconds."""
+        if not self.response_times:
+            return 0.0
+        return float(round(sum(self.response_times) / len(self.response_times), 1))
+
+
+# Module-level singleton — shared across all requests
+metrics = APIMetrics()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -137,6 +222,25 @@ async def log_requests(request, call_next):
         if response.status_code >= 400:
             get_metrics().emit_metric("APIErrors", 1.0, "Count", {"path": request.url.path, "status": str(response.status_code)})
     return response
+
+
+@app.middleware("http")
+async def track_metrics(request: Request, call_next):
+    """
+    Middleware that measures response time for every request.
+    Records to the module-level APIMetrics singleton.
+    Adds X-Response-Time header to every response.
+    """
+    start = time.time()
+    response = await call_next(request)
+    duration_ms = (time.time() - start) * 1000.0
+
+    if not request.url.path.startswith("/static"):
+        metrics.record_request(duration_ms, response.status_code)
+
+    response.headers["X-Response-Time"] = f"{duration_ms:.1f}ms"
+    return response
+
 
 _start_time = time.time()
 
@@ -306,6 +410,51 @@ async def get_features(request: Request, ticker: str) -> FeaturesResponse:
 @app.get("/health")
 async def health():
     return {"status": "healthy", "mode": "demo"}
+
+
+@app.get("/metrics")
+async def read_api_metrics():
+    """
+    Returns real performance metrics for the TradePulse dashboard.
+
+    All values are measured from actual API requests on this Railway
+    instance — not simulated or hardcoded.
+
+    Used by the Overview dashboard to replace demo mode fake numbers
+    with genuinely accurate operational data.
+
+    Returns:
+        uptime_seconds:      Seconds since app startup on Railway
+        uptime_formatted:    Human readable uptime e.g. "2h 34m 12s"
+        total_requests:      Total API requests since startup
+        requests_per_minute: Requests in the last 60 seconds
+        p50_latency_ms:      Median API response time in milliseconds
+        p99_latency_ms:      99th percentile response time in ms
+        avg_latency_ms:      Average response time in milliseconds
+        error_count:         Total non-200 responses since startup
+        error_rate_pct:      Percentage of requests that errored
+        status:              healthy / degraded based on p99 latency
+    """
+    total = metrics.total_requests
+    error_rate = round(
+        (metrics.error_count / total * 100) if total > 0 else 0, 2
+    )
+
+    p99 = metrics.get_p99_latency()
+    status = "healthy" if p99 < 200 else "degraded"
+
+    return {
+        "uptime_seconds": metrics.get_uptime_seconds(),
+        "uptime_formatted": metrics.get_uptime_formatted(),
+        "total_requests": total,
+        "requests_per_minute": metrics.get_requests_per_minute(),
+        "p50_latency_ms": metrics.get_p50_latency(),
+        "p99_latency_ms": p99,
+        "avg_latency_ms": metrics.get_avg_latency(),
+        "error_count": metrics.error_count,
+        "error_rate_pct": error_rate,
+        "status": status,
+    }
 
 
 @app.get("/market-prices")
