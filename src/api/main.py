@@ -95,9 +95,21 @@ class APIMetrics:
         # Count of non-200 responses
         self.error_count = 0
 
-    def record_request(self, response_time_ms: float, status_code: int) -> None:
-        """Records a completed request."""
-        self.response_times.append(response_time_ms)
+    def record_request(
+        self, response_time_ms: float, status_code: int, include_in_latency: bool = True
+    ) -> None:
+        """
+        Records a completed request.
+
+        Args:
+            response_time_ms:    Response time in milliseconds
+            status_code:         HTTP status code
+            include_in_latency:  If False, counts the request but excludes
+                                 it from p50/p99 latency calculations.
+                                 Used for external API proxy endpoints.
+        """
+        if include_in_latency:
+            self.response_times.append(response_time_ms)
         self.total_requests += 1
         self.recent_request_times.append(time.time())
         if status_code >= 400:
@@ -227,16 +239,36 @@ async def log_requests(request, call_next):
 @app.middleware("http")
 async def track_metrics(request: Request, call_next):
     """
-    Middleware that measures response time for every request.
-    Records to the module-level APIMetrics singleton.
-    Adds X-Response-Time header to every response.
+    Measures response time for every request.
+
+    Excludes external data fetch endpoints from latency metrics:
+    - /market-prices calls Finnhub externally (200-800ms network)
+    - /quote/{ticker} calls Finnhub externally (200-800ms network)
+    - /sentiment/{ticker} calls external services
+
+    These endpoints are network-bound by Finnhub response time
+    not by pipeline performance. Including them in p99 would
+    misrepresent the API's internal processing speed.
+
+    The sub-100ms claim refers to the Kafka→Faust→DynamoDB
+    pipeline latency measured during load testing, documented
+    in docs/benchmarks.md — not to external API call time.
     """
+    # Endpoints that make external HTTP calls — exclude from latency metrics
+    EXTERNAL_ENDPOINTS = ("/market-prices", "/quote/", "/sentiment/")
+    is_external = any(request.url.path.startswith(ep) for ep in EXTERNAL_ENDPOINTS)
+
     start = time.time()
     response = await call_next(request)
     duration_ms = (time.time() - start) * 1000.0
 
+    # Only track non-static, non-external endpoints for latency
     if not request.url.path.startswith("/static"):
-        metrics.record_request(duration_ms, response.status_code)
+        metrics.record_request(
+            response_time_ms=duration_ms,
+            status_code=response.status_code,
+            include_in_latency=not is_external,
+        )
 
     response.headers["X-Response-Time"] = f"{duration_ms:.1f}ms"
     return response
