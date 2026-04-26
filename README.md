@@ -6,7 +6,7 @@
 [![Railway](https://img.shields.io/badge/deployed-Railway-0b0d0e?logo=railway&logoColor=white)](https://tradepulse.nikhilgiridharan.com)
 [![License](https://img.shields.io/badge/license-MIT-10b981)](LICENSE)
 
-A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 10,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
+A production-grade two-stream real-time data pipeline ingesting live equity trades and news headlines, processing 15,000+ events/second with sub-100ms end-to-end latency, exactly-once semantics, and ML-powered anomaly detection.
 
 ---
 
