@@ -195,16 +195,6 @@ make test    # Run unit + integration tests
 make down    # Stop all services
 ```
 
----
-
-## Production Incident — Hot Partition Postmortem
-
-On February 3rd, 2025 at 9:32 AM EST, consumer lag spiked to 45 seconds at market open. Root cause: bare ticker partition key routing all AAPL writes to a single DynamoDB partition, causing 847 throttled writes/minute. Resolution: implemented write sharding pattern. Fix took 4 minutes to deploy. Zero data lost — Kafka buffered all events during the 26-minute degradation.
-
-Full timeline, root cause, and follow-up action items: [docs/postmortem.md](docs/postmortem.md)
-
----
-
 ## Documentation
 
 | Document | Description |
