@@ -95,6 +95,13 @@
       font-size: 15px;
       color: #0f172a;
     }
+    .sidebar a.wordmark,
+    .sidebar a.sidebar-title {
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      display: block;
+    }
     .nav-item {
       display: flex;
       align-items: center;
@@ -944,7 +951,10 @@ body.tp-splash-active {
 <!-- End TradePulse Intro Splash Screen -->
   <div class="app-layout">
     <aside class="sidebar">
-      <div class="wordmark sidebar-title">TradePulse</div>
+      <a href="#"
+         class="wordmark sidebar-title"
+         title="Show intro"
+         onclick="sessionStorage.removeItem('tp-splash-seen'); location.reload(); return false;">TradePulse</a>
       <div class="nav-item active" data-section="overview"><span>Overview</span></div>
       <div class="nav-item" data-section="live"><span>Live Data</span></div>
       <div class="nav-item" data-section="pipeline"><span>Pipeline Status</span></div>
