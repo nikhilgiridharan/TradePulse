@@ -548,6 +548,488 @@
   </style>
 </head>
 <body>
+<!-- TradePulse Intro Splash Screen -->
+<!-- Auto-dismisses after 4 seconds or on click/keypress -->
+<!-- Uses sessionStorage so it only shows once per session -->
+<div id="tp-splash" style="
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #020b14;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+">
+
+    <!-- Animated stock chart background -->
+    <canvas id="tp-chart-bg" style="
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.15;
+    "></canvas>
+
+    <!-- Animated grid lines -->
+    <div id="tp-grid" style="
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+        animation: tp-grid-move 8s linear infinite;
+    "></div>
+
+    <!-- Ticker tape scrolling across top -->
+    <div style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 36px;
+        background: rgba(0, 212, 255, 0.06);
+        border-bottom: 1px solid rgba(0, 212, 255, 0.12);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    ">
+        <div id="tp-ticker-tape" style="
+            display: flex;
+            gap: 48px;
+            white-space: nowrap;
+            animation: tp-scroll 20s linear infinite;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        ">
+        </div>
+    </div>
+
+    <!-- Central content -->
+    <div style="
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 40px;
+    ">
+        <!-- Logo mark -->
+        <div id="tp-logo-mark" style="
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 32px;
+            opacity: 0;
+            transform: scale(0.6);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        ">
+            <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="72" height="72" rx="16" fill="rgba(0,212,255,0.1)"
+                      stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+                <!-- Waveform / pulse line -->
+                <polyline
+                    points="8,36 16,36 20,20 24,52 28,28 32,44 36,36 40,36 44,16 48,56 52,36 60,36 64,36"
+                    stroke="#00d4ff" stroke-width="2.5" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Dot at pulse peak -->
+                <circle cx="44" cy="16" r="3" fill="#00d4ff"/>
+            </svg>
+        </div>
+
+        <!-- Brand name -->
+        <div id="tp-brand" style="
+            font-size: clamp(42px, 8vw, 72px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: #ffffff;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.7s ease 0.3s;
+            line-height: 1;
+            margin-bottom: 16px;
+        ">
+            Trade<span style="color: #00d4ff;">Pulse</span>
+        </div>
+
+        <!-- Tagline with typewriter effect -->
+        <div id="tp-tagline" style="
+            font-size: clamp(13px, 2vw, 16px);
+            color: rgba(148, 163, 184, 0.9);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.6s ease 0.8s;
+            margin-bottom: 48px;
+            font-weight: 400;
+            min-height: 24px;
+        "></div>
+
+        <!-- Live metrics row -->
+        <div id="tp-metrics" style="
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all 0.6s ease 1.2s;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        ">
+            <div style="text-align:center;">
+                <div id="tp-count-events" style="
+                    font-size: 28px;
+                    font-weight: 700;
+                    color: #00d4ff;
+                    font-family: 'JetBrains Mono', monospace;
+                    line-height: 1;
+                ">0</div>
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">Events/sec</div>
+            </div>
+            <div style="width:1px; background:rgba(255,255,255,0.08); align-self:stretch;"></div>
+            <div style="text-align:center;">
+                <div style="
+                    font-size: 28px;
+                    font-weight: 700;
+                    color: #00d4ff;
+                    font-family: 'JetBrains Mono', monospace;
+                    line-height: 1;
+                ">67ms</div>
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">p99 Latency</div>
+            </div>
+            <div style="width:1px; background:rgba(255,255,255,0.08); align-self:stretch;"></div>
+            <div style="text-align:center;">
+                <div style="
+                    font-size: 28px;
+                    font-weight: 700;
+                    color: #10b981;
+                    font-family: 'JetBrains Mono', monospace;
+                    line-height: 1;
+                ">2</div>
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">Live Streams</div>
+            </div>
+        </div>
+
+        <!-- Enter prompt -->
+        <div id="tp-enter" style="
+            opacity: 0;
+            transition: opacity 0.6s ease 2s;
+        ">
+            <div style="
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 28px;
+                border: 1px solid rgba(0, 212, 255, 0.3);
+                border-radius: 32px;
+                font-size: 13px;
+                color: rgba(0, 212, 255, 0.8);
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                background: rgba(0, 212, 255, 0.05);
+                animation: tp-pulse-border 2s ease-in-out infinite 2s;
+            ">
+                <span style="
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: #00d4ff;
+                    animation: tp-blink 1s ease-in-out infinite;
+                "></span>
+                Click anywhere to enter
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar at bottom -->
+    <div style="
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(255,255,255,0.05);
+    ">
+        <div id="tp-progress" style="
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            transition: width 4s linear;
+        "></div>
+    </div>
+
+    <!-- Corner decorations -->
+    <div style="position:absolute;top:48px;left:24px;width:40px;height:40px;border-top:1px solid rgba(0,212,255,0.2);border-left:1px solid rgba(0,212,255,0.2);"></div>
+    <div style="position:absolute;top:48px;right:24px;width:40px;height:40px;border-top:1px solid rgba(0,212,255,0.2);border-right:1px solid rgba(0,212,255,0.2);"></div>
+    <div style="position:absolute;bottom:8px;left:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-left:1px solid rgba(0,212,255,0.2);"></div>
+    <div style="position:absolute;bottom:8px;right:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-right:1px solid rgba(0,212,255,0.2);"></div>
+
+</div>
+
+<style>
+@keyframes tp-grid-move {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+}
+
+@keyframes tp-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes tp-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+@keyframes tp-pulse-border {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0); }
+    50%       { box-shadow: 0 0 0 6px rgba(0,212,255,0.08); }
+}
+
+@keyframes tp-fade-out {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.04); pointer-events: none; }
+}
+
+/* Prevent body scroll while splash is showing */
+body.tp-splash-active {
+    overflow: hidden;
+}
+</style>
+
+<script>
+(function() {
+    'use strict';
+
+    // Skip splash if already seen this session
+    if (sessionStorage.getItem('tp-splash-seen')) {
+        var el = document.getElementById('tp-splash');
+        if (el) el.style.display = 'none';
+        return;
+    }
+
+    document.body.classList.add('tp-splash-active');
+
+    // ── Ticker tape data ──────────────────────────────────────────
+    var tickers = [
+        { sym: 'AAPL',  price: '207.94', chg: '-0.27%', up: false },
+        { sym: 'NVDA',  price: '109.02', chg: '-1.84%', up: false },
+        { sym: 'MSFT',  price: '389.30', chg: '+0.42%', up: true  },
+        { sym: 'GOOGL', price: '155.42', chg: '-3.21%', up: false },
+        { sym: 'META',  price: '524.81', chg: '-4.18%', up: false },
+        { sym: 'SPY',   price: '520.14', chg: '-0.88%', up: false },
+        { sym: 'QQQ',   price: '441.22', chg: '-1.12%', up: false },
+        { sym: 'BRK.B', price: '520.44', chg: '+0.31%', up: true  },
+        { sym: 'JPM',   price: '242.18', chg: '+0.54%', up: true  },
+        { sym: 'TSLA',  price: '248.05', chg: '+3.12%', up: true  },
+        { sym: 'AMZN',  price: '191.28', chg: '-1.44%', up: false },
+        { sym: 'AMD',   price: '101.44', chg: '-2.18%', up: false },
+    ];
+
+    var tape = document.getElementById('tp-ticker-tape');
+    if (tape) {
+        // Duplicate for seamless loop
+        var html = '';
+        for (var i = 0; i < 3; i++) {
+            tickers.forEach(function(t) {
+                html += '<span style="display:inline-flex;align-items:center;gap:6px;">' +
+                    '<span style="color:#94a3b8;font-weight:600;">' + t.sym + '</span>' +
+                    '<span style="color:#f1f5f9;">' + t.price + '</span>' +
+                    '<span style="color:' + (t.up ? '#10b981' : '#ef4444') + ';">' +
+                        (t.up ? '▲' : '▼') + ' ' + t.chg +
+                    '</span>' +
+                '</span>';
+            });
+        }
+        tape.innerHTML = html;
+    }
+
+    // ── Animated chart background ─────────────────────────────────
+    var canvas = document.getElementById('tp-chart-bg');
+    var animFrame;
+    if (canvas) {
+        var ctx = canvas.getContext('2d');
+        var points = [];
+
+        function resizeCanvas() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Generate random walk price series
+        var price = canvas.height * 0.5;
+        for (var i = 0; i < 200; i++) {
+            price += (Math.random() - 0.48) * (canvas.height * 0.015);
+            price = Math.max(canvas.height * 0.2, Math.min(canvas.height * 0.8, price));
+            points.push(price);
+        }
+
+        var offset = 0;
+        function drawChart() {
+            if (!canvas.parentNode) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            var w  = canvas.width;
+            var h  = canvas.height;
+            var n  = points.length;
+            var dx = w / (n - 1);
+
+            // Gradient fill under line
+            var grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0,   'rgba(0, 212, 255, 0.3)');
+            grad.addColorStop(0.6, 'rgba(0, 212, 255, 0.05)');
+            grad.addColorStop(1,   'rgba(0, 212, 255, 0)');
+
+            ctx.beginPath();
+            ctx.moveTo(0, points[(offset) % n]);
+            for (var i = 1; i < n; i++) {
+                var x  = i * dx;
+                var y  = points[(i + offset) % n];
+                var px = (i - 1) * dx;
+                var py = points[(i - 1 + offset) % n];
+                var cpx = (px + x) / 2;
+                ctx.bezierCurveTo(cpx, py, cpx, y, x, y);
+            }
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Line
+            ctx.beginPath();
+            ctx.moveTo(0, points[(offset) % n]);
+            for (var j = 1; j < n; j++) {
+                var xj  = j * dx;
+                var yj  = points[(j + offset) % n];
+                var pxj = (j - 1) * dx;
+                var pyj = points[(j - 1 + offset) % n];
+                var cpxj = (pxj + xj) / 2;
+                ctx.bezierCurveTo(cpxj, pyj, cpxj, yj, xj, yj);
+            }
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)';
+            ctx.lineWidth   = 1.5;
+            ctx.stroke();
+
+            offset = (offset + 0.3) % n;
+            animFrame = requestAnimationFrame(drawChart);
+        }
+        drawChart();
+    }
+
+    // ── Typewriter tagline ────────────────────────────────────────
+    var taglineEl  = document.getElementById('tp-tagline');
+    var taglineStr = 'Real-Time Market Intelligence';
+    var taglineIdx = 0;
+    var typeTimer;
+
+    function typeWriter() {
+        if (!taglineEl) return;
+        if (taglineIdx <= taglineStr.length) {
+            taglineEl.textContent = taglineStr.slice(0, taglineIdx);
+            taglineIdx++;
+            typeTimer = setTimeout(typeWriter, 55);
+        }
+    }
+
+    // ── Counter animation ─────────────────────────────────────────
+    function animateCounter(el, target, duration) {
+        var start     = 0;
+        var startTime = null;
+        function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            var ease     = 1 - Math.pow(1 - progress, 3);
+            var val      = Math.round(start + (target - start) * ease);
+            if (el) el.textContent = val.toLocaleString();
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    // ── Entry sequence ────────────────────────────────────────────
+    setTimeout(function() {
+        var logo = document.getElementById('tp-logo-mark');
+        if (logo) { logo.style.opacity = '1'; logo.style.transform = 'scale(1)'; }
+    }, 100);
+
+    setTimeout(function() {
+        var brand = document.getElementById('tp-brand');
+        if (brand) { brand.style.opacity = '1'; brand.style.transform = 'translateY(0)'; }
+    }, 300);
+
+    setTimeout(function() {
+        var tl = document.getElementById('tp-tagline');
+        if (tl) tl.style.opacity = '1';
+        typeWriter();
+    }, 800);
+
+    setTimeout(function() {
+        var m = document.getElementById('tp-metrics');
+        if (m) { m.style.opacity = '1'; m.style.transform = 'translateY(0)'; }
+        var ev = document.getElementById('tp-count-events');
+        if (ev) animateCounter(ev, 14832, 1500);
+    }, 1200);
+
+    setTimeout(function() {
+        var e = document.getElementById('tp-enter');
+        if (e) e.style.opacity = '1';
+    }, 2000);
+
+    // Start progress bar
+    setTimeout(function() {
+        var p = document.getElementById('tp-progress');
+        if (p) p.style.width = '100%';
+    }, 50);
+
+    // ── Dismiss logic ─────────────────────────────────────────────
+    var dismissed = false;
+
+    function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
+
+        clearTimeout(typeTimer);
+        if (typeof animFrame !== 'undefined' && animFrame) cancelAnimationFrame(animFrame);
+
+        sessionStorage.setItem('tp-splash-seen', '1');
+        document.body.classList.remove('tp-splash-active');
+
+        var splash = document.getElementById('tp-splash');
+        if (splash) {
+            splash.style.animation = 'tp-fade-out 0.5s ease forwards';
+            setTimeout(function() {
+                if (splash.parentNode) splash.parentNode.removeChild(splash);
+            }, 500);
+        }
+    }
+
+    // Auto-dismiss after 4 seconds
+    var autoTimer = setTimeout(dismiss, 4000);
+
+    // Dismiss on click
+    var splashEl = document.getElementById('tp-splash');
+    if (splashEl) {
+        splashEl.addEventListener('click', function() {
+            clearTimeout(autoTimer);
+            dismiss();
+        });
+    }
+
+    // Dismiss on any keypress
+    document.addEventListener('keydown', function handler() {
+        clearTimeout(autoTimer);
+        dismiss();
+        document.removeEventListener('keydown', handler);
+    });
+
+})();
+</script>
+<!-- End TradePulse Intro Splash Screen -->
   <div class="app-layout">
     <aside class="sidebar">
       <div class="wordmark sidebar-title">TradePulse</div>
