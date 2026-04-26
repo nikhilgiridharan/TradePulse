@@ -549,7 +549,6 @@
 </head>
 <body>
 <!-- TradePulse Intro Splash Screen -->
-<!-- Auto-dismisses after 4 seconds or on click/keypress -->
 <!-- Uses sessionStorage so it only shows once per session -->
 <div id="tp-splash" style="
     position: fixed;
@@ -560,7 +559,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: default;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 ">
@@ -716,47 +715,49 @@
             opacity: 0;
             transition: opacity 0.6s ease 2s;
         ">
-            <div style="
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-                padding: 12px 28px;
-                border: 1px solid rgba(0, 212, 255, 0.3);
-                border-radius: 32px;
-                font-size: 13px;
-                color: rgba(0, 212, 255, 0.8);
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                background: rgba(0, 212, 255, 0.05);
-                animation: tp-pulse-border 2s ease-in-out infinite 2s;
-            ">
-                <span style="
-                    width: 6px;
-                    height: 6px;
-                    border-radius: 50%;
-                    background: #00d4ff;
-                    animation: tp-blink 1s ease-in-out infinite;
-                "></span>
-                Click anywhere to enter
-            </div>
+<button
+    id="tp-open-btn"
+    onclick="window.tpDismiss()"
+    style="
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 40px;
+        background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+        border: none;
+        border-radius: 50px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #000000;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        box-shadow:
+            0 0 32px rgba(0, 212, 255, 0.4),
+            0 4px 16px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+        animation: tp-pulse-border 2s ease-in-out infinite 2s;
+    "
+    onmouseover="
+        this.style.transform='scale(1.05)';
+        this.style.boxShadow='0 0 48px rgba(0,212,255,0.6), 0 4px 24px rgba(0,0,0,0.4)';
+    "
+    onmouseout="
+        this.style.transform='scale(1)';
+        this.style.boxShadow='0 0 32px rgba(0,212,255,0.4), 0 4px 16px rgba(0,0,0,0.3)';
+    "
+>
+    <!-- Arrow icon -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 12H19M19 12L13 6M19 12L13 18"
+              stroke="#000000" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Open TradePulse
+</button>
         </div>
-    </div>
-
-    <!-- Progress bar at bottom -->
-    <div style="
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: rgba(255,255,255,0.05);
-    ">
-        <div id="tp-progress" style="
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #00d4ff, #7c3aed);
-            transition: width 4s linear;
-        "></div>
     </div>
 
     <!-- Corner decorations -->
@@ -980,12 +981,6 @@ body.tp-splash-active {
         if (e) e.style.opacity = '1';
     }, 2000);
 
-    // Start progress bar
-    setTimeout(function() {
-        var p = document.getElementById('tp-progress');
-        if (p) p.style.width = '100%';
-    }, 50);
-
     // ── Dismiss logic ─────────────────────────────────────────────
     var dismissed = false;
 
@@ -1008,24 +1003,8 @@ body.tp-splash-active {
         }
     }
 
-    // Auto-dismiss after 4 seconds
-    var autoTimer = setTimeout(dismiss, 4000);
-
-    // Dismiss on click
-    var splashEl = document.getElementById('tp-splash');
-    if (splashEl) {
-        splashEl.addEventListener('click', function() {
-            clearTimeout(autoTimer);
-            dismiss();
-        });
-    }
-
-    // Dismiss on any keypress
-    document.addEventListener('keydown', function handler() {
-        clearTimeout(autoTimer);
-        dismiss();
-        document.removeEventListener('keydown', handler);
-    });
+    // Expose dismiss globally so the Open button onclick can call it
+    window.tpDismiss = dismiss;
 
 })();
 </script>
