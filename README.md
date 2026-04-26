@@ -146,21 +146,6 @@ Isolation Forest runs inside the Faust agent at 0.3ms per event. The model train
 | Deployment | Railway | FastAPI dashboard in demo mode |
 | Observability | AWS CloudWatch | Metrics, alarms, dashboards |
 
----
-
-## Cost Analysis
-
-| Component | ~15k events/sec | ~150k events/sec | ~1.5M events/sec |
-|---|---|---|---|
-| Amazon MSK | ~$0.21/hr | ~$0.84/hr | ~$8.40/hr |
-| DynamoDB | ~$12/mo | ~$120/mo | ~$1,200/mo |
-| S3 | ~$2/mo | ~$20/mo | ~$200/mo |
-| SQS (DLQ) | <$1/mo | ~$3/mo | ~$30/mo |
-| CloudWatch | ~$3/mo | ~$8/mo | ~$25/mo |
-| **Total** | **~$20/mo** | **~$175/mo** | **~$1,600/mo** |
-
----
-
 ## Scale Considerations
 
 **At 10x (150k events/sec):** Move from local Kafka to Amazon MSK, switch DynamoDB to on-demand capacity mode, run 3 Faust worker instances in parallel, reduce S3 flush interval from 5min to 2min.
