@@ -665,51 +665,6 @@
             min-height: 24px;
         "></div>
 
-        <!-- Live metrics row -->
-        <div id="tp-metrics" style="
-            display: flex;
-            gap: 32px;
-            justify-content: center;
-            opacity: 0;
-            transform: translateY(16px);
-            transition: all 0.6s ease 1.2s;
-            margin-bottom: 48px;
-            flex-wrap: wrap;
-        ">
-            <div style="text-align:center;">
-                <div id="tp-count-events" style="
-                    font-size: 28px;
-                    font-weight: 700;
-                    color: #00d4ff;
-                    font-family: 'JetBrains Mono', monospace;
-                    line-height: 1;
-                ">0</div>
-                <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">Events/sec</div>
-            </div>
-            <div style="width:1px; background:rgba(255,255,255,0.08); align-self:stretch;"></div>
-            <div style="text-align:center;">
-                <div style="
-                    font-size: 28px;
-                    font-weight: 700;
-                    color: #00d4ff;
-                    font-family: 'JetBrains Mono', monospace;
-                    line-height: 1;
-                ">67ms</div>
-                <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">p99 Latency</div>
-            </div>
-            <div style="width:1px; background:rgba(255,255,255,0.08); align-self:stretch;"></div>
-            <div style="text-align:center;">
-                <div style="
-                    font-size: 28px;
-                    font-weight: 700;
-                    color: #10b981;
-                    font-family: 'JetBrains Mono', monospace;
-                    line-height: 1;
-                ">2</div>
-                <div style="font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">Live Streams</div>
-            </div>
-        </div>
-
         <!-- Enter prompt -->
         <div id="tp-enter" style="
             opacity: 0;
@@ -937,21 +892,6 @@ body.tp-splash-active {
         }
     }
 
-    // ── Counter animation ─────────────────────────────────────────
-    function animateCounter(el, target, duration) {
-        var start     = 0;
-        var startTime = null;
-        function step(ts) {
-            if (!startTime) startTime = ts;
-            var progress = Math.min((ts - startTime) / duration, 1);
-            var ease     = 1 - Math.pow(1 - progress, 3);
-            var val      = Math.round(start + (target - start) * ease);
-            if (el) el.textContent = val.toLocaleString();
-            if (progress < 1) requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-    }
-
     // ── Entry sequence ────────────────────────────────────────────
     setTimeout(function() {
         var logo = document.getElementById('tp-logo-mark');
@@ -968,13 +908,6 @@ body.tp-splash-active {
         if (tl) tl.style.opacity = '1';
         typeWriter();
     }, 800);
-
-    setTimeout(function() {
-        var m = document.getElementById('tp-metrics');
-        if (m) { m.style.opacity = '1'; m.style.transform = 'translateY(0)'; }
-        var ev = document.getElementById('tp-count-events');
-        if (ev) animateCounter(ev, 14832, 1500);
-    }, 1200);
 
     setTimeout(function() {
         var e = document.getElementById('tp-enter');
@@ -1019,15 +952,6 @@ body.tp-splash-active {
       <a class="nav-item" href="https://www.youtube.com/watch?v=BupQapP_J0k" target="_blank" rel="noopener noreferrer"><span>Demo</span></a>
       <a class="nav-item" href="https://github.com/nikhilgiridharan" target="_blank" rel="noopener noreferrer"><span>GitHub</span></a>
       <a class="nav-item" href="https://nikhilgiridharan.medium.com/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10" target="_blank" rel="noopener noreferrer"><span>Medium Article</span></a>
-      <a href="/about"
-         class="nav-item"
-         id="nav-about"
-         style="display:flex; align-items:center; gap:10px; padding:10px 16px; text-decoration:none; color:var(--text-secondary); border-left:2px solid transparent; transition:all 0.15s ease;"
-         onmouseover="this.style.background='var(--bg-hover)';this.style.color='var(--text-primary)'"
-         onmouseout="this.style.background='';this.style.color='var(--text-secondary)'">
-        <span>📖</span>
-        <span class="nav-label">About</span>
-      </a>
       <div class="sidebar-footer"><div class="dot pipeline-active-dot"></div><span class="pipeline-active">Pipeline Active</span></div>
     </aside>
 
