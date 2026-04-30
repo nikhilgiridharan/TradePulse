@@ -734,7 +734,7 @@
     <source src="/static/splash-intro-fallback.mp3" type="audio/mpeg">
 </audio>
 
-    <button type="button" id="tp-audio-toggle" aria-pressed="false" aria-label="Turn sound on" title="Sound off — click for retro trading-floor jazz"
+    <button type="button" id="tp-audio-toggle" aria-pressed="true" aria-label="Turn sound off" title="Sound on — click to mute retro jazz"
         style="
             position: absolute;
             bottom: 46px;
@@ -760,10 +760,10 @@
         <span id="tp-audio-toggle-icon" aria-hidden="true" style="display:flex;width:20px;height:20px;align-items:center;justify-content:center;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a9 9 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
         </span>
-        <span id="tp-audio-toggle-label">Sound off</span>
+        <span id="tp-audio-toggle-label">Sound on</span>
     </button>
 
     <div style="
@@ -996,7 +996,7 @@ body.tp-splash-active {
         var on = !introMusic.paused;
         audioToggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
         audioToggleBtn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
-        audioToggleBtn.title = on ? 'Sound on — retro jazz (click to mute)' : 'Sound off — click for retro trading-floor jazz';
+        audioToggleBtn.title = on ? 'Sound on — retro jazz (click to mute)' : 'Tap anywhere or click for retro jazz';
         if (audioToggleLabel) audioToggleLabel.textContent = on ? 'Sound on' : 'Sound off';
         if (audioToggleIcon) {
             audioToggleIcon.innerHTML = on
@@ -1040,14 +1040,30 @@ body.tp-splash-active {
         });
     }
 
-    syncIntroAudioButton();
+    // Default sound on: first tap/click anywhere on splash starts playback if autoplay was blocked (mute button excluded)
+    var splashAudioRoot = document.getElementById('tp-splash');
+    if (splashAudioRoot && introMusic && !audioLoadFailed) {
+        var splashAudioUnlock = function(ev) {
+            if (audioLoadFailed || dismissed) return;
+            if (ev.target.closest && ev.target.closest('#tp-audio-toggle')) return;
+            if (!splashAudioRoot.contains(ev.target)) return;
+            introMusic.play().then(function() {
+                splashAudioRoot.removeEventListener('pointerdown', splashAudioUnlock, true);
+                syncIntroAudioButton();
+            }).catch(function() {});
+        };
+        splashAudioRoot.addEventListener('pointerdown', splashAudioUnlock, true);
+    }
 
-    // Try autoplay where allowed (Chrome may still block until gesture — toggle always works)
     if (introMusic && !audioLoadFailed) {
         var introPlayTry = introMusic.play();
         if (introPlayTry !== undefined) {
             introPlayTry.then(function() { syncIntroAudioButton(); }).catch(function() { syncIntroAudioButton(); });
+        } else {
+            syncIntroAudioButton();
         }
+    } else {
+        syncIntroAudioButton();
     }
 
     function dismiss() {
