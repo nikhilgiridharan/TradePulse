@@ -728,14 +728,16 @@
     <div style="position:absolute;bottom:8px;left:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-left:1px solid rgba(0,212,255,0.2);"></div>
     <div style="position:absolute;bottom:8px;right:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-right:1px solid rgba(0,212,255,0.2);"></div>
 
+<!-- Splash music: Kevin MacLeod — Jazz Brunch (incompetech.com, CC BY 4.0 — incompetech.com/music/royalty-free/music.html). Short Pixabay clip fallback if primary fails to load. -->
 <audio id="tp-intro-music" loop preload="auto" playsinline>
-    <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mpeg">
+    <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jazz%20Brunch.mp3" type="audio/mpeg">
+    <source src="/static/splash-intro-fallback.mp3" type="audio/mpeg">
 </audio>
 
-    <button type="button" id="tp-audio-toggle" aria-pressed="false" aria-label="Turn sound on" title="Sound off — click for ambient music"
+    <button type="button" id="tp-audio-toggle" aria-pressed="false" aria-label="Turn sound on" title="Sound off — click for retro trading-floor jazz"
         style="
             position: absolute;
-            bottom: 22px;
+            bottom: 46px;
             left: 22px;
             z-index: 12;
             display: inline-flex;
@@ -763,6 +765,21 @@
         </span>
         <span id="tp-audio-toggle-label">Sound off</span>
     </button>
+
+    <div style="
+        position: absolute;
+        bottom: 14px;
+        left: 22px;
+        z-index: 12;
+        font-size: 9px;
+        color: rgba(148, 163, 184, 0.45);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        max-width: 240px;
+        line-height: 1.35;
+        pointer-events: none;
+    ">
+        Music: Kevin MacLeod · Jazz Brunch (CC BY)
+    </div>
 
 </div>
 
@@ -979,7 +996,7 @@ body.tp-splash-active {
         var on = !introMusic.paused;
         audioToggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
         audioToggleBtn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
-        audioToggleBtn.title = on ? 'Sound on — click to mute' : 'Sound off — click for ambient music';
+        audioToggleBtn.title = on ? 'Sound on — retro jazz (click to mute)' : 'Sound off — click for retro trading-floor jazz';
         if (audioToggleLabel) audioToggleLabel.textContent = on ? 'Sound on' : 'Sound off';
         if (audioToggleIcon) {
             audioToggleIcon.innerHTML = on
@@ -995,11 +1012,15 @@ body.tp-splash-active {
     }
 
     if (introMusic) {
-        introMusic.volume = 0.4;
+        introMusic.volume = 1;
         introMusic.load();
         introMusic.addEventListener('error', function() {
-            audioLoadFailed = true;
-            syncIntroAudioButton();
+            window.setTimeout(function() {
+                if (introMusic.networkState === 3) {
+                    audioLoadFailed = true;
+                    syncIntroAudioButton();
+                }
+            }, 250);
         });
         introMusic.addEventListener('play', syncIntroAudioButton);
         introMusic.addEventListener('pause', syncIntroAudioButton);
