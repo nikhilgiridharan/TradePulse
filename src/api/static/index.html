@@ -728,6 +728,10 @@
     <div style="position:absolute;bottom:8px;left:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-left:1px solid rgba(0,212,255,0.2);"></div>
     <div style="position:absolute;bottom:8px;right:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-right:1px solid rgba(0,212,255,0.2);"></div>
 
+<audio id="tp-intro-music" loop preload="auto">
+    <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mpeg">
+</audio>
+
 </div>
 
 <style>
@@ -924,9 +928,36 @@ body.tp-splash-active {
     // ── Dismiss logic ─────────────────────────────────────────────
     var dismissed = false;
 
+    // Autoplay music — browsers require user gesture first
+    // Attempt autoplay immediately, fall back to playing on first interaction
+    var music = document.getElementById('tp-intro-music');
+    if (music) {
+        music.volume = 0.18;
+        var playPromise = music.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(function() {
+                // Autoplay blocked — play on first mousemove or touch
+                var startOnInteraction = function() {
+                    music.play();
+                    document.removeEventListener('mousemove', startOnInteraction);
+                    document.removeEventListener('touchstart', startOnInteraction);
+                };
+                document.addEventListener('mousemove', startOnInteraction);
+                document.addEventListener('touchstart', startOnInteraction);
+            });
+        }
+    }
+
     function dismiss() {
         if (dismissed) return;
         dismissed = true;
+
+        // Stop and reset music when splash closes
+        var music = document.getElementById('tp-intro-music');
+        if (music) {
+            music.pause();
+            music.currentTime = 0;
+        }
 
         clearTimeout(typeTimer);
         if (typeof animFrame !== 'undefined' && animFrame) cancelAnimationFrame(animFrame);
