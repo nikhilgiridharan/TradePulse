@@ -732,6 +732,38 @@
     <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mpeg">
 </audio>
 
+    <button type="button" id="tp-audio-toggle" aria-pressed="false" aria-label="Turn sound on" title="Sound off — click for ambient music"
+        style="
+            position: absolute;
+            bottom: 22px;
+            left: 22px;
+            z-index: 12;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            background: rgba(2, 11, 20, 0.88);
+            color: rgba(0, 212, 255, 0.95);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        ">
+        <span id="tp-audio-toggle-icon" aria-hidden="true" style="display:flex;width:20px;height:20px;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </span>
+        <span id="tp-audio-toggle-label">Sound off</span>
+    </button>
+
 </div>
 
 <style>
@@ -928,27 +960,72 @@ body.tp-splash-active {
     // ── Dismiss logic ─────────────────────────────────────────────
     var dismissed = false;
 
-    // Autoplay music — browsers require user gesture first
-    // Attempt autoplay immediately, fall back to playing on first interaction
+    // Intro music — browsers usually block autoplay; explicit toggle is reliable
     var introMusic = document.getElementById('tp-intro-music');
+    var audioToggleBtn = document.getElementById('tp-audio-toggle');
+    var audioToggleIcon = document.getElementById('tp-audio-toggle-icon');
+    var audioToggleLabel = document.getElementById('tp-audio-toggle-label');
+    var audioLoadFailed = false;
+
+    function syncIntroAudioButton() {
+        if (!audioToggleBtn || !introMusic) return;
+        if (audioLoadFailed) {
+            audioToggleBtn.setAttribute('aria-pressed', 'false');
+            audioToggleBtn.setAttribute('aria-label', 'Audio unavailable');
+            audioToggleBtn.title = 'Audio could not load';
+            if (audioToggleLabel) audioToggleLabel.textContent = 'Unavailable';
+            return;
+        }
+        var on = !introMusic.paused;
+        audioToggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        audioToggleBtn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
+        audioToggleBtn.title = on ? 'Sound on — click to mute' : 'Sound off — click for ambient music';
+        if (audioToggleLabel) audioToggleLabel.textContent = on ? 'Sound on' : 'Sound off';
+        if (audioToggleIcon) {
+            audioToggleIcon.innerHTML = on
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                  '<path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' +
+                  '<path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a9 9 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+                  '</svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                  '<path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' +
+                  '<path d="M23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+                  '</svg>';
+        }
+    }
+
     if (introMusic) {
-        introMusic.volume = 0.18;
-        var playPromise = introMusic.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(function() {
-                // Autoplay blocked — unlock on any pointer click/tap or movement
-                var startOnInteraction = function() {
-                    introMusic.play().catch(function() {});
-                    document.removeEventListener('pointerdown', startOnInteraction, true);
-                    document.removeEventListener('mousemove', startOnInteraction);
-                    document.removeEventListener('touchstart', startOnInteraction);
-                    document.removeEventListener('keydown', startOnInteraction);
-                };
-                document.addEventListener('pointerdown', startOnInteraction, true);
-                document.addEventListener('mousemove', startOnInteraction);
-                document.addEventListener('touchstart', startOnInteraction);
-                document.addEventListener('keydown', startOnInteraction);
-            });
+        introMusic.volume = 0.4;
+        introMusic.load();
+        introMusic.addEventListener('error', function() {
+            audioLoadFailed = true;
+            syncIntroAudioButton();
+        });
+        introMusic.addEventListener('play', syncIntroAudioButton);
+        introMusic.addEventListener('pause', syncIntroAudioButton);
+    }
+
+    if (audioToggleBtn && introMusic) {
+        audioToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (audioLoadFailed) return;
+            if (introMusic.paused) {
+                introMusic.play().catch(function() { syncIntroAudioButton(); });
+            } else {
+                introMusic.pause();
+                syncIntroAudioButton();
+            }
+        });
+    }
+
+    syncIntroAudioButton();
+
+    // Try autoplay where allowed (Chrome may still block until gesture — toggle always works)
+    if (introMusic && !audioLoadFailed) {
+        var introPlayTry = introMusic.play();
+        if (introPlayTry !== undefined) {
+            introPlayTry.then(function() { syncIntroAudioButton(); }).catch(function() { syncIntroAudioButton(); });
         }
     }
 
