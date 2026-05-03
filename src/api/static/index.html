@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tradepulse</title>
   <link rel="icon" href="/static/favicon.png" type="image/png" />
+  <link rel="preload" href="/static/splash-intro-fallback.mp3" as="audio" type="audio/mpeg" />
   <link rel="preload" href="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jazz%20Brunch.mp3" as="audio" type="audio/mpeg" />
   <link rel="preconnect" href="https://incompetech.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -612,7 +613,7 @@
             gap: 48px;
             white-space: nowrap;
             flex-shrink: 0;
-            animation: tp-scroll 20s linear infinite;
+            animation: tp-scroll 20s linear infinite reverse;
             font-size: 12px;
             font-family: 'JetBrains Mono', 'Courier New', monospace;
             will-change: transform;
@@ -733,10 +734,12 @@
     <div style="position:absolute;bottom:8px;left:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-left:1px solid rgba(0,212,255,0.2);"></div>
     <div style="position:absolute;bottom:8px;right:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-right:1px solid rgba(0,212,255,0.2);"></div>
 
-<!-- Splash music: Kevin MacLeod — Jazz Brunch primary (incompetech.com, CC BY). Local clip if jazz fails. -->
-<audio id="tp-intro-music" loop preload="auto" playsinline>
-    <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jazz%20Brunch.mp3" type="audio/mpeg">
+<!-- Splash: short same-origin clip starts instantly; Jazz Brunch when ready (Kevin MacLeod, CC BY). -->
+<audio id="tp-intro-instant" loop preload="auto" playsinline>
     <source src="/static/splash-intro-fallback.mp3" type="audio/mpeg">
+</audio>
+<audio id="tp-intro-jazz" loop preload="auto" playsinline>
+    <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jazz%20Brunch.mp3" type="audio/mpeg">
 </audio>
 
     <button type="button" id="tp-audio-toggle" aria-pressed="true" aria-label="Turn sound off" title="Sound on — click to mute retro jazz"
@@ -783,7 +786,7 @@
         line-height: 1.35;
         pointer-events: none;
     ">
-        Music: Kevin MacLeod · Jazz Brunch (CC BY). Fallback clip: Pixabay.
+        Music: starts instantly · then Kevin MacLeod Jazz Brunch (CC BY). Bed: Pixabay.
     </div>
 
 </div>
@@ -982,16 +985,90 @@ body.tp-splash-active {
     // ── Dismiss logic ─────────────────────────────────────────────
     var dismissed = false;
 
-    // Intro music — browsers usually block autoplay; explicit toggle is reliable
-    var introMusic = document.getElementById('tp-intro-music');
+    // Intro music: instant local clip, then Jazz Brunch when buffered
+    var introInstant = document.getElementById('tp-intro-instant');
+    var introJazz = document.getElementById('tp-intro-jazz');
     var audioToggleBtn = document.getElementById('tp-audio-toggle');
     var audioToggleIcon = document.getElementById('tp-audio-toggle-icon');
     var audioToggleLabel = document.getElementById('tp-audio-toggle-label');
     var audioLoadFailed = false;
     var audioPrefersOn = true;
+    var jazzHandoffDone = false;
+    var introHandoffTimer = null;
+
+    function clearIntroHandoffTimer() {
+        if (introHandoffTimer) {
+            window.clearInterval(introHandoffTimer);
+            introHandoffTimer = null;
+        }
+    }
+
+    function isAnyIntroPlaying() {
+        return (introInstant && !introInstant.paused) || (introJazz && !introJazz.paused);
+    }
+
+    function pauseAllIntroAudio() {
+        clearIntroHandoffTimer();
+        if (introInstant) {
+            introInstant.pause();
+            introInstant.currentTime = 0;
+        }
+        if (introJazz) {
+            introJazz.pause();
+            introJazz.currentTime = 0;
+        }
+        jazzHandoffDone = false;
+    }
+
+    function startIntroPlayback() {
+        if (audioLoadFailed || !audioPrefersOn || dismissed) return;
+        if (!introInstant) return;
+        clearIntroHandoffTimer();
+        jazzHandoffDone = false;
+        if (introJazz && introJazz.readyState >= 3 && !introJazz.error) {
+            introInstant.pause();
+            introInstant.currentTime = 0;
+            jazzHandoffDone = true;
+            introJazz.play().catch(function() {
+                jazzHandoffDone = false;
+                introInstant.play().catch(function() { syncIntroAudioButton(); });
+            });
+            return;
+        }
+        introInstant.play().catch(function() {
+            if (!audioPrefersOn || dismissed) return;
+            if (introJazz && introJazz.readyState >= 3 && !introJazz.error) {
+                jazzHandoffDone = true;
+                introJazz.play().catch(function() { syncIntroAudioButton(); });
+            } else {
+                syncIntroAudioButton();
+            }
+        });
+        if (!introJazz) return;
+        introHandoffTimer = window.setInterval(function() {
+            if (dismissed || !audioPrefersOn) {
+                clearIntroHandoffTimer();
+                return;
+            }
+            if (jazzHandoffDone || !introJazz || introJazz.error) {
+                clearIntroHandoffTimer();
+                return;
+            }
+            if (introJazz.readyState < 3) return;
+            if (introInstant.paused) return;
+            jazzHandoffDone = true;
+            clearIntroHandoffTimer();
+            introInstant.pause();
+            introInstant.currentTime = 0;
+            introJazz.play().catch(function() {
+                jazzHandoffDone = false;
+                introInstant.play().catch(function() {});
+            });
+        }, 80);
+    }
 
     function syncIntroAudioButton() {
-        if (!audioToggleBtn || !introMusic) return;
+        if (!audioToggleBtn) return;
         if (audioLoadFailed) {
             audioToggleBtn.setAttribute('aria-pressed', 'false');
             audioToggleBtn.setAttribute('aria-label', 'Audio unavailable');
@@ -1002,8 +1079,8 @@ body.tp-splash-active {
         var showOn = audioPrefersOn;
         audioToggleBtn.setAttribute('aria-pressed', showOn ? 'true' : 'false');
         audioToggleBtn.setAttribute('aria-label', showOn ? 'Turn sound off' : 'Turn sound on');
-        if (showOn && introMusic.paused) {
-            audioToggleBtn.title = 'Sound on — tap the page or wait a moment if you hear nothing yet (click to mute)';
+        if (showOn && !isAnyIntroPlaying()) {
+            audioToggleBtn.title = 'Sound on — tap the page if silent (clip starts instantly, then jazz)';
         } else if (showOn) {
             audioToggleBtn.title = 'Sound on — retro jazz (click to mute)';
         } else {
@@ -1023,66 +1100,67 @@ body.tp-splash-active {
         }
     }
 
-    if (introMusic) {
-        introMusic.volume = 1;
-        introMusic.load();
-        introMusic.addEventListener('error', function() {
+    if (introInstant) {
+        introInstant.volume = 1;
+        introInstant.load();
+        introInstant.addEventListener('error', function() {
             window.setTimeout(function() {
-                if (introMusic.networkState === 3) {
+                if (introInstant.networkState === 3) {
                     audioLoadFailed = true;
+                    clearIntroHandoffTimer();
                     syncIntroAudioButton();
                 }
             }, 0);
         });
-        introMusic.addEventListener('play', syncIntroAudioButton);
-        introMusic.addEventListener('pause', syncIntroAudioButton);
+        introInstant.addEventListener('play', syncIntroAudioButton);
+        introInstant.addEventListener('pause', syncIntroAudioButton);
+    }
+    if (introJazz) {
+        introJazz.volume = 1;
+        introJazz.load();
+        introJazz.addEventListener('play', syncIntroAudioButton);
+        introJazz.addEventListener('pause', syncIntroAudioButton);
     }
 
-    if (audioToggleBtn && introMusic) {
+    if (audioToggleBtn && introInstant) {
         audioToggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             if (audioLoadFailed) return;
             audioPrefersOn = !audioPrefersOn;
             if (audioPrefersOn) {
-                introMusic.play().catch(function() { syncIntroAudioButton(); });
+                startIntroPlayback();
             } else {
-                introMusic.pause();
+                pauseAllIntroAudio();
             }
             syncIntroAudioButton();
         });
     }
 
-    // First click/tap on splash: start audio immediately (no waiting on play() promises)
     var splashAudioRoot = document.getElementById('tp-splash');
-    if (splashAudioRoot && introMusic && !audioLoadFailed) {
+    if (splashAudioRoot && introInstant && !audioLoadFailed) {
         var splashAudioUnlock = function(ev) {
             if (audioLoadFailed || dismissed) return;
             if (!audioPrefersOn) return;
             if (ev.target.closest && ev.target.closest('#tp-audio-toggle')) return;
             if (!splashAudioRoot.contains(ev.target)) return;
-            introMusic.play().then(function() {
-                splashAudioRoot.removeEventListener('pointerdown', splashAudioUnlock, true);
-            }).catch(function() {});
+            splashAudioRoot.removeEventListener('pointerdown', splashAudioUnlock, true);
+            startIntroPlayback();
         };
         splashAudioRoot.addEventListener('pointerdown', splashAudioUnlock, true);
     }
 
     var introOpenBtn = document.getElementById('tp-open-btn');
-    if (introOpenBtn && introMusic && !audioLoadFailed) {
+    if (introOpenBtn && introInstant && !audioLoadFailed) {
         introOpenBtn.addEventListener('pointerdown', function() {
             if (audioLoadFailed || dismissed || !audioPrefersOn) return;
-            introMusic.play().catch(function() {});
+            startIntroPlayback();
         }, true);
     }
 
-    if (introMusic && !audioLoadFailed) {
-        var introPlayTry = introMusic.play();
-        if (introPlayTry !== undefined) {
-            introPlayTry.then(function() { syncIntroAudioButton(); }).catch(function() { syncIntroAudioButton(); });
-        } else {
-            syncIntroAudioButton();
-        }
+    if (introInstant && !audioLoadFailed) {
+        startIntroPlayback();
+        syncIntroAudioButton();
     } else {
         syncIntroAudioButton();
     }
@@ -1093,6 +1171,7 @@ body.tp-splash-active {
 
         clearTimeout(typeTimer);
         if (typeof animFrame !== 'undefined' && animFrame) cancelAnimationFrame(animFrame);
+        clearIntroHandoffTimer();
 
         sessionStorage.setItem('tp-splash-seen', '1');
         document.body.classList.remove('tp-splash-active');
@@ -1101,10 +1180,15 @@ body.tp-splash-active {
         if (splash) {
             splash.style.animation = 'tp-fade-out 0.5s ease forwards';
             setTimeout(function() {
-                var audioEl = document.getElementById('tp-intro-music');
-                if (audioEl) {
-                    audioEl.pause();
-                    audioEl.currentTime = 0;
+                var elI = document.getElementById('tp-intro-instant');
+                var elJ = document.getElementById('tp-intro-jazz');
+                if (elI) {
+                    elI.pause();
+                    elI.currentTime = 0;
+                }
+                if (elJ) {
+                    elJ.pause();
+                    elJ.currentTime = 0;
                 }
                 if (splash.parentNode) splash.parentNode.removeChild(splash);
             }, 500);
