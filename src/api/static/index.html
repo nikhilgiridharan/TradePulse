@@ -1008,6 +1008,7 @@ body.tp-splash-active {
     }
 
     function pauseAllIntroAudio() {
+        if (introGestureCleanup) introGestureCleanup();
         clearIntroHandoffTimer();
         if (introInstant) {
             introInstant.pause();
@@ -1023,6 +1024,7 @@ body.tp-splash-active {
     function startIntroPlayback() {
         if (audioLoadFailed || !audioPrefersOn || dismissed) return;
         if (!introInstant) return;
+        if (isAnyIntroPlaying()) return;
         clearIntroHandoffTimer();
         jazzHandoffDone = false;
         if (introJazz && introJazz.readyState >= 3 && !introJazz.error) {
@@ -1122,6 +1124,43 @@ body.tp-splash-active {
         introJazz.addEventListener('pause', syncIntroAudioButton);
     }
 
+    var introGestureCleanup = null;
+
+    function attachGestureUnlockUntilPlaying() {
+        if (introGestureCleanup || dismissed || !audioPrefersOn || audioLoadFailed) return;
+        var ptr = function(ev) {
+            if (dismissed || !audioPrefersOn || audioLoadFailed) return;
+            if (ev.target.closest && ev.target.closest('#tp-audio-toggle')) return;
+            startIntroPlayback();
+        };
+        var keyGo = function() {
+            if (dismissed || !audioPrefersOn || audioLoadFailed) return;
+            startIntroPlayback();
+        };
+        var mmOnce = function(ev) {
+            document.removeEventListener('mousemove', mmOnce, true);
+            ptr(ev);
+        };
+        document.addEventListener('pointerdown', ptr, true);
+        document.addEventListener('touchstart', ptr, true);
+        document.addEventListener('keydown', keyGo, true);
+        document.addEventListener('mousemove', mmOnce, true);
+        var onPlaying = function() {
+            if (introGestureCleanup) introGestureCleanup();
+        };
+        if (introInstant) introInstant.addEventListener('playing', onPlaying);
+        if (introJazz) introJazz.addEventListener('playing', onPlaying);
+        introGestureCleanup = function() {
+            document.removeEventListener('pointerdown', ptr, true);
+            document.removeEventListener('touchstart', ptr, true);
+            document.removeEventListener('keydown', keyGo, true);
+            document.removeEventListener('mousemove', mmOnce, true);
+            if (introInstant) introInstant.removeEventListener('playing', onPlaying);
+            if (introJazz) introJazz.removeEventListener('playing', onPlaying);
+            introGestureCleanup = null;
+        };
+    }
+
     if (audioToggleBtn && introInstant) {
         audioToggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1130,24 +1169,16 @@ body.tp-splash-active {
             audioPrefersOn = !audioPrefersOn;
             if (audioPrefersOn) {
                 startIntroPlayback();
+                window.setTimeout(function() {
+                    if (dismissed || !audioPrefersOn || audioLoadFailed) return;
+                    if (isAnyIntroPlaying()) return;
+                    attachGestureUnlockUntilPlaying();
+                }, 120);
             } else {
                 pauseAllIntroAudio();
             }
             syncIntroAudioButton();
         });
-    }
-
-    var splashAudioRoot = document.getElementById('tp-splash');
-    if (splashAudioRoot && introInstant && !audioLoadFailed) {
-        var splashAudioUnlock = function(ev) {
-            if (audioLoadFailed || dismissed) return;
-            if (!audioPrefersOn) return;
-            if (ev.target.closest && ev.target.closest('#tp-audio-toggle')) return;
-            if (!splashAudioRoot.contains(ev.target)) return;
-            splashAudioRoot.removeEventListener('pointerdown', splashAudioUnlock, true);
-            startIntroPlayback();
-        };
-        splashAudioRoot.addEventListener('pointerdown', splashAudioUnlock, true);
     }
 
     var introOpenBtn = document.getElementById('tp-open-btn');
@@ -1161,6 +1192,11 @@ body.tp-splash-active {
     if (introInstant && !audioLoadFailed) {
         startIntroPlayback();
         syncIntroAudioButton();
+        window.setTimeout(function() {
+            if (dismissed || !audioPrefersOn || audioLoadFailed) return;
+            if (isAnyIntroPlaying()) return;
+            attachGestureUnlockUntilPlaying();
+        }, 120);
     } else {
         syncIntroAudioButton();
     }
@@ -1172,6 +1208,7 @@ body.tp-splash-active {
         clearTimeout(typeTimer);
         if (typeof animFrame !== 'undefined' && animFrame) cancelAnimationFrame(animFrame);
         clearIntroHandoffTimer();
+        if (introGestureCleanup) introGestureCleanup();
 
         sessionStorage.setItem('tp-splash-seen', '1');
         document.body.classList.remove('tp-splash-active');
