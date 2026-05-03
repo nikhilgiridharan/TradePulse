@@ -983,6 +983,7 @@ body.tp-splash-active {
     var audioToggleIcon = document.getElementById('tp-audio-toggle-icon');
     var audioToggleLabel = document.getElementById('tp-audio-toggle-label');
     var audioLoadFailed = false;
+    var audioPrefersOn = true;
 
     function syncIntroAudioButton() {
         if (!audioToggleBtn || !introMusic) return;
@@ -993,13 +994,19 @@ body.tp-splash-active {
             if (audioToggleLabel) audioToggleLabel.textContent = 'Unavailable';
             return;
         }
-        var on = !introMusic.paused;
-        audioToggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-        audioToggleBtn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
-        audioToggleBtn.title = on ? 'Sound on — retro jazz (click to mute)' : 'Tap anywhere or click for retro jazz';
-        if (audioToggleLabel) audioToggleLabel.textContent = on ? 'Sound on' : 'Sound off';
+        var showOn = audioPrefersOn;
+        audioToggleBtn.setAttribute('aria-pressed', showOn ? 'true' : 'false');
+        audioToggleBtn.setAttribute('aria-label', showOn ? 'Turn sound off' : 'Turn sound on');
+        if (showOn && introMusic.paused) {
+            audioToggleBtn.title = 'Sound on — tap the page or wait a moment if you hear nothing yet (click to mute)';
+        } else if (showOn) {
+            audioToggleBtn.title = 'Sound on — retro jazz (click to mute)';
+        } else {
+            audioToggleBtn.title = 'Sound off — click for retro jazz';
+        }
+        if (audioToggleLabel) audioToggleLabel.textContent = showOn ? 'Sound on' : 'Sound off';
         if (audioToggleIcon) {
-            audioToggleIcon.innerHTML = on
+            audioToggleIcon.innerHTML = showOn
                 ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
                   '<path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' +
                   '<path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a9 9 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
@@ -1031,12 +1038,13 @@ body.tp-splash-active {
             e.preventDefault();
             e.stopPropagation();
             if (audioLoadFailed) return;
-            if (introMusic.paused) {
+            audioPrefersOn = !audioPrefersOn;
+            if (audioPrefersOn) {
                 introMusic.play().catch(function() { syncIntroAudioButton(); });
             } else {
                 introMusic.pause();
-                syncIntroAudioButton();
             }
+            syncIntroAudioButton();
         });
     }
 
@@ -1045,6 +1053,7 @@ body.tp-splash-active {
     if (splashAudioRoot && introMusic && !audioLoadFailed) {
         var splashAudioUnlock = function(ev) {
             if (audioLoadFailed || dismissed) return;
+            if (!audioPrefersOn) return;
             if (ev.target.closest && ev.target.closest('#tp-audio-toggle')) return;
             if (!splashAudioRoot.contains(ev.target)) return;
             introMusic.play().then(function() {
