@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TradePulse — Real-Time Market Data Pipeline</title>
+  <title>Tradepulse</title>
+  <link rel="icon" href="/static/favicon.png" type="image/png" />
+  <link rel="preload" href="/static/splash-intro-fallback.mp3" as="audio" type="audio/mpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -728,10 +730,10 @@
     <div style="position:absolute;bottom:8px;left:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-left:1px solid rgba(0,212,255,0.2);"></div>
     <div style="position:absolute;bottom:8px;right:24px;width:40px;height:40px;border-bottom:1px solid rgba(0,212,255,0.2);border-right:1px solid rgba(0,212,255,0.2);"></div>
 
-<!-- Splash music: Kevin MacLeod — Jazz Brunch (incompetech.com, CC BY 4.0 — incompetech.com/music/royalty-free/music.html). Short Pixabay clip fallback if primary fails to load. -->
+<!-- Splash music: same-origin clip loads first for instant playback on click; Kevin MacLeod Jazz Brunch if clip unavailable. -->
 <audio id="tp-intro-music" loop preload="auto" playsinline>
-    <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jazz%20Brunch.mp3" type="audio/mpeg">
     <source src="/static/splash-intro-fallback.mp3" type="audio/mpeg">
+    <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jazz%20Brunch.mp3" type="audio/mpeg">
 </audio>
 
     <button type="button" id="tp-audio-toggle" aria-pressed="true" aria-label="Turn sound off" title="Sound on — click to mute retro jazz"
@@ -778,7 +780,7 @@
         line-height: 1.35;
         pointer-events: none;
     ">
-        Music: Kevin MacLeod · Jazz Brunch (CC BY)
+        Music: Pixabay clip · Kevin MacLeod Jazz Brunch (CC BY)
     </div>
 
 </div>
@@ -1020,14 +1022,13 @@ body.tp-splash-active {
 
     if (introMusic) {
         introMusic.volume = 1;
-        introMusic.load();
         introMusic.addEventListener('error', function() {
             window.setTimeout(function() {
                 if (introMusic.networkState === 3) {
                     audioLoadFailed = true;
                     syncIntroAudioButton();
                 }
-            }, 250);
+            }, 0);
         });
         introMusic.addEventListener('play', syncIntroAudioButton);
         introMusic.addEventListener('pause', syncIntroAudioButton);
@@ -1048,7 +1049,7 @@ body.tp-splash-active {
         });
     }
 
-    // Default sound on: first tap/click anywhere on splash starts playback if autoplay was blocked (mute button excluded)
+    // First click/tap on splash: start audio immediately (no waiting on play() promises)
     var splashAudioRoot = document.getElementById('tp-splash');
     if (splashAudioRoot && introMusic && !audioLoadFailed) {
         var splashAudioUnlock = function(ev) {
@@ -1056,12 +1057,22 @@ body.tp-splash-active {
             if (!audioPrefersOn) return;
             if (ev.target.closest && ev.target.closest('#tp-audio-toggle')) return;
             if (!splashAudioRoot.contains(ev.target)) return;
-            introMusic.play().then(function() {
-                splashAudioRoot.removeEventListener('pointerdown', splashAudioUnlock, true);
-                syncIntroAudioButton();
-            }).catch(function() {});
+            splashAudioRoot.removeEventListener('pointerdown', splashAudioUnlock, true);
+            try {
+                introMusic.play();
+            } catch (ignore) {}
         };
         splashAudioRoot.addEventListener('pointerdown', splashAudioUnlock, true);
+    }
+
+    var introOpenBtn = document.getElementById('tp-open-btn');
+    if (introOpenBtn && introMusic && !audioLoadFailed) {
+        introOpenBtn.addEventListener('pointerdown', function() {
+            if (audioLoadFailed || dismissed || !audioPrefersOn) return;
+            try {
+                introMusic.play();
+            } catch (ignore) {}
+        }, true);
     }
 
     if (introMusic && !audioLoadFailed) {
