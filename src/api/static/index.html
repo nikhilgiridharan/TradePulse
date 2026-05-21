@@ -541,23 +541,327 @@
       .live-data-grid { grid-template-columns: 1fr; }
       .component-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 768px) {
-      .sidebar { width: 60px; min-width: 60px; padding: 16px 0; }
-      .sidebar .wordmark, .sidebar .nav-item span { display: none; }
-      .main-content { margin-left: 60px; }
-      .metric-grid { grid-template-columns: 1fr; }
-    }
-
     /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #dde5f0; }
     ::-webkit-scrollbar-thumb { background: #a8bcd4; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #7a96b8; }
+
+    /* ── Responsive base ── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+      html, body {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+      }
+    }
+
+    /* ── Sidebar responsive ── */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 200 !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.25s ease !important;
+        width: 240px !important;
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+
+      .main-layout {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+
+      .mobile-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 199;
+      }
+
+      .mobile-overlay.active {
+        display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #mobile-menu-btn {
+        display: block !important;
+      }
+      #sidebar-close-btn {
+        display: block !important;
+      }
+    }
+
+    /* ── Main content responsive ── */
+    @media (max-width: 768px) {
+      #main-content {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin-left: 0 !important;
+        padding: 16px !important;
+        padding-top: 56px !important;
+      }
+    }
+
+    /* ── Header responsive ── */
+    @media (max-width: 768px) {
+      #main-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 8px 12px 8px 56px !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        height: auto !important;
+        min-height: 48px !important;
+      }
+
+      #header-pills {
+        display: none !important;
+      }
+
+      #header-actions {
+        display: none !important;
+      }
+    }
+
+    /* ── Overview responsive ── */
+    @media (max-width: 768px) {
+      #overview-metric-cards {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+
+      #pipeline-diagram {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      #pipeline-diagram svg {
+        min-width: 600px !important;
+      }
+
+      #overview-bottom-row {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+    }
+
+    /* ── Live Data responsive ── */
+    @media (max-width: 768px) {
+      #live-data-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+
+      #sparkline-container {
+        height: 160px !important;
+      }
+
+      .ticker-btn {
+        padding: 5px 12px !important;
+        font-size: 12px !important;
+      }
+
+      #ticker-search-container {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+
+      #ticker-search-input {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+
+    /* ── Pipeline Status responsive ── */
+    @media (max-width: 768px) {
+      #pipeline-health-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+      }
+
+      #throughput-chart-container {
+        height: 160px !important;
+      }
+
+      #lag-gauge-container canvas {
+        width: 160px !important;
+        height: 160px !important;
+      }
+    }
+
+    /* ── Anomalies responsive ── */
+    @media (max-width: 768px) {
+      #anomaly-filters {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+
+      .anomaly-filter-btn {
+        padding: 4px 10px !important;
+        font-size: 12px !important;
+      }
+
+      #anomaly-summary {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        font-size: 12px !important;
+      }
+    }
+
+    /* ── API Reference responsive ── */
+    @media (max-width: 768px) {
+      #api-reference-layout {
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+
+      #endpoint-list {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        max-height: 200px !important;
+        overflow-y: auto !important;
+      }
+
+      #endpoint-detail {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .code-block {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        font-size: 11px !important;
+      }
+    }
+
+    /* ── Component detail panel responsive ── */
+    @media (max-width: 768px) {
+      #component-detail-panel {
+        padding: 16px !important;
+      }
+
+      #component-detail-panel #detail-list li {
+        font-size: 11px !important;
+        padding: 4px 0 !important;
+      }
+    }
+
+    /* ── Demo banner responsive ── */
+    @media (max-width: 768px) {
+      #demo-banner {
+        flex-direction: column !important;
+        gap: 4px !important;
+        padding: 6px 12px !important;
+        font-size: 11px !important;
+        text-align: center !important;
+      }
+    }
+
+    /* ── Market closed state responsive ── */
+    @media (max-width: 768px) {
+      #market-closed-state {
+        padding: 40px 20px !important;
+      }
+
+      #next-open-message {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+      }
+    }
+
+    /* ── Recent tickers responsive ── */
+    @media (max-width: 768px) {
+      #recent-tickers-row {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+    }
+
+    /* ── Typography responsive ── */
+    @media (max-width: 768px) {
+      .metric-value {
+        font-size: 22px !important;
+      }
+
+      .metric-label {
+        font-size: 10px !important;
+      }
+
+      .section-title,
+      h1, h2 {
+        font-size: 20px !important;
+      }
+
+      .panel-header {
+        font-size: 11px !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="app-layout">
+  <div id="demo-banner" style="display: none;" aria-hidden="true"></div>
+  <button
+    id="mobile-menu-btn"
+    onclick="document.querySelector('.sidebar').classList.toggle('mobile-open');
+             document.getElementById('mobile-overlay').classList.toggle('active')"
+    style="
+        display: none;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 300;
+        background: var(--bg-card, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 18px;
+        box-shadow: var(--shadow-sm);
+    "
+>☰</button>
+
+<div
+    id="mobile-overlay"
+    class="mobile-overlay"
+    onclick="document.querySelector('.sidebar').classList.remove('mobile-open');
+             this.classList.remove('active')"
+></div>
+
+  <div class="app-layout main-layout">
     <aside class="sidebar">
+      <button
+    id="sidebar-close-btn"
+    onclick="document.querySelector('.sidebar').classList.remove('mobile-open');
+             document.getElementById('mobile-overlay').classList.remove('active')"
+    style="
+        display: none;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary, #475569);
+        z-index: 201;
+    "
+>✕</button>
       <a href="#"
          class="wordmark sidebar-title"
          onclick="return false;">TradePulse</a>
@@ -571,14 +875,17 @@
       <div class="sidebar-footer"><div class="dot pipeline-active-dot"></div><span class="pipeline-active">Pipeline Active</span></div>
     </aside>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content">
       <section id="section-overview" class="section active">
+        <header id="main-header" style="display:block;margin-bottom:0;">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Overview</h1>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px;">
+        <div id="header-pills" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px;">
           <span id="header-pill-requests" style="font-size:12px;">⚡ 0 req/min</span>
           <span id="header-pill-latency" style="font-size:12px;">⏱ 0ms p50</span>
           <span id="header-pill-status" style="font-size:12px;color:var(--accent-green);">✓ All Systems Operational</span>
         </div>
+        <div id="header-actions"></div>
+        </header>
         <!-- Market status bar — shown in Overview section -->
         <!-- Updates automatically based on market hours -->
         <div id="overview-market-status" style="
@@ -603,12 +910,13 @@
         font-size: 12px;
     "></span>
 </div>
-        <div class="metric-grid">
+        <div class="metric-grid" id="overview-metric-cards">
           <div class="metric-card metric-card-cyan"><div class="label">API Requests/min</div><div class="value font-mono" id="metric-requests-per-min">—</div><div class="trend" id="metric-total-requests">↑ 0 total</div></div>
           <div class="metric-card metric-card-purple"><div id="metric-latency-label" class="label">P99 LATENCY</div><div class="value font-mono" id="metric-p99-latency">—</div><div class="status" id="metric-latency-status">✓ healthy</div></div>
           <div class="metric-card metric-card-blue"><div class="label">Uptime</div><div class="value font-mono" id="metric-uptime">—</div><div class="status metric-status-healthy" id="metric-uptime-status">✓ running</div></div>
           <div class="metric-card metric-card-amber"><div class="label">Total Requests</div><div class="value font-mono" id="metric-total-requests-card">—</div><div class="trend" id="metric-error-rate">0.0% errors</div></div>
         </div>
+        <div id="overview-bottom-row">
 <div style="
     text-align: right;
     font-size: 11px;
@@ -624,7 +932,7 @@
         View raw metrics
     </a>
 </div>
-        <div class="pipeline-diagram">
+        <div class="pipeline-diagram" id="pipeline-diagram">
           <h3 style="margin-bottom:16px;">Pipeline Architecture</h3>
           <svg viewBox="0 0 820 320" style="min-height:320px;">
             <defs>
@@ -701,6 +1009,7 @@
               <text x="648" y="259" fill="#6d28d9" font-size="11" font-family="Inter,sans-serif" text-anchor="middle" pointer-events="none">DynamoDB market_sentiment</text>
             </g>
           </svg>
+        </div>
         </div>
         <!-- Component detail panel — slides in when a diagram box is clicked -->
         <div id="component-detail-panel" style="
@@ -834,9 +1143,9 @@
         <!-- Ticker, quote panels, sentiment, sparkline — hidden together when market is closed -->
         <div id="live-data-when-open">
         <div class="ticker-pills">
-          <span class="ticker-pill active" data-ticker="AAPL">AAPL</span>
-          <span class="ticker-pill" data-ticker="NVDA">NVDA</span>
-          <span class="ticker-pill" data-ticker="MSFT">MSFT</span>
+          <span class="ticker-pill ticker-btn active" data-ticker="AAPL">AAPL</span>
+          <span class="ticker-pill ticker-btn" data-ticker="NVDA">NVDA</span>
+          <span class="ticker-pill ticker-btn" data-ticker="MSFT">MSFT</span>
         </div>
 <!-- Universal ticker search -->
 <!-- Accepts any valid US stock symbol via Finnhub real-time quote API -->
@@ -931,7 +1240,7 @@
     min-height: 0;
 "></div>
 
-        <div class="live-data-grid" id="live-data-panels">
+        <div class="live-data-grid" id="live-data-grid">
           <div class="live-panel">
             <h4>Latest Quote — <span id="live-ticker">AAPL</span></h4>
             <div class="price font-mono" id="live-price">$207.94</div>
@@ -990,7 +1299,7 @@
   "timestamp": "2026-04-23T14:32:01.123Z",
   "sequence_number": 8472910
 }</pre>
-        <div class="component-grid" id="component-grid">
+        <div class="component-grid" id="pipeline-health-grid">
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Polygon.io</div><div class="detail">WebSocket: UP · Events: 14,832/sec</div></div>
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Kafka Broker</div><div class="detail">Lag: 42 msgs · 6 partitions</div></div>
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Faust Worker</div><div class="detail">Processing · 14,832 e/s</div></div>
@@ -998,18 +1307,18 @@
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>S3 Storage</div><div class="detail">Last flush: 3m · 2.3 GB</div></div>
           <div class="component-card"><div class="name"><span class="status-dot healthy"></span>Dead Letter Q</div><div class="detail">Depth: 0 · Retries: 0</div></div>
         </div>
-        <div class="pipeline-diagram"><h4 style="margin-bottom:8px;">Throughput (last 10 min)</h4><canvas id="throughput-chart" width="800" height="120"></canvas></div>
-        <div class="pipeline-diagram" style="text-align:center;"><h4 style="margin-bottom:8px;">Consumer Lag</h4><div style="display:flex; justify-content:center; align-items:center; padding: 16px 0;"><canvas id="lag-gauge-canvas" style="width:220px; height:220px;"></canvas></div></div>
+        <div class="pipeline-diagram" id="throughput-chart-container"><h4 style="margin-bottom:8px;">Throughput (last 10 min)</h4><canvas id="throughput-chart" width="800" height="120"></canvas></div>
+        <div class="pipeline-diagram" style="text-align:center;" id="lag-gauge-container"><h4 style="margin-bottom:8px;">Consumer Lag</h4><div style="display:flex; justify-content:center; align-items:center; padding: 16px 0;"><canvas id="lag-gauge-canvas" style="width:220px; height:220px;"></canvas></div></div>
       </section>
 
       <section id="section-anomalies" class="section">
         <h1 style="margin-bottom:24px;font-size:1.5rem;">Anomalies</h1>
-        <div class="anomaly-summary">Total Anomalies: <span id="anom-total">7</span> · High Severity: <span id="anom-high">3</span> · Most Active: <span id="anom-active">AAPL (3)</span></div>
-        <div class="ticker-pills" id="anomaly-tickers">
-          <span class="ticker-pill active" data-filter="All">All</span>
-          <span class="ticker-pill" data-filter="AAPL">AAPL</span>
-          <span class="ticker-pill" data-filter="NVDA">NVDA</span>
-          <span class="ticker-pill" data-filter="MSFT">MSFT</span>
+        <div class="anomaly-summary" id="anomaly-summary">Total Anomalies: <span id="anom-total">7</span> · High Severity: <span id="anom-high">3</span> · Most Active: <span id="anom-active">AAPL (3)</span></div>
+        <div class="ticker-pills" id="anomaly-filters">
+          <span class="ticker-pill anomaly-filter-btn active" data-filter="All">All</span>
+          <span class="ticker-pill anomaly-filter-btn" data-filter="AAPL">AAPL</span>
+          <span class="ticker-pill anomaly-filter-btn" data-filter="NVDA">NVDA</span>
+          <span class="ticker-pill anomaly-filter-btn" data-filter="MSFT">MSFT</span>
         </div>
         <div class="anomaly-feed" id="anomaly-feed"></div>
       </section>
@@ -2873,8 +3182,8 @@ function hideComponentDetail() {
 
     document.querySelectorAll('.ticker-pill').forEach(function (el) {
       el.addEventListener('click', function () {
-        if (this.closest('#anomaly-tickers')) {
-          document.querySelectorAll('#anomaly-tickers .ticker-pill').forEach(function (p) { p.classList.remove('active'); });
+        if (this.closest('#anomaly-filters')) {
+          document.querySelectorAll('#anomaly-filters .ticker-pill').forEach(function (p) { p.classList.remove('active'); });
           this.classList.add('active');
           return;
         }
