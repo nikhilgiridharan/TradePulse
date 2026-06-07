@@ -1,3 +1,15 @@
+---
+title: TradePulse
+emoji: 📊
+colorFrom: purple
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+short_description: Real-time two-stream market data pipeline — Kafka, Faust, DynamoDB
+---
+
 # TradePulse
 [![CI](https://github.com/nikhilgiridharan/TradePulse/actions/workflows/ci.yml/badge.svg)](https://github.com/nikhilgiridharan/TradePulse/actions)
 [![Python](https://img.shields.io/badge/python-3.11-3776ab?logo=python&logoColor=white)](https://python.org)
@@ -15,6 +27,7 @@ A production-grade two-stream real-time data pipeline ingesting live equity trad
 | | |
 |---|---|
 | **Website** |https://tradepulse.nikhilgiridharan.com |
+| **Hugging Face Space** | https://huggingface.co/spaces/nikhilgiridharan/tradepulse |
 | **Medium** | https://medium.com/@nikhilgiridharan/building-tradepulse-a-production-grade-real-time-market-data-pipeline-2dbf5be6dc10 |
 **Video** | https://www.youtube.com/watch?v=BupQapP_J0k |
 
