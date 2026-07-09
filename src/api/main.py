@@ -20,7 +20,7 @@ from datetime import datetime, timezone, timedelta
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 try:
@@ -191,16 +191,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if os.path.exists(STATIC_DIR):
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
-@app.get("/", response_class=HTMLResponse)
+# Explicit root route returning the dashboard HTML
+@app.get("/")
 async def serve_dashboard():
-    try:
-        with open(os.path.join(STATIC_DIR, "index.html")) as f:
-            return f.read()
-    except FileNotFoundError:
-        return HTMLResponse("<h1>TradePulse</h1><p>Starting up...</p>")
+    """
+    Serves the TradePulse dashboard HTML file.
+
+    Explicit route required for Vercel deployment since
+    StaticFiles mount alone does not work reliably on
+    Vercel's Python serverless runtime.
+    """
+    # Try multiple possible paths for the HTML file
+    # Path differs between local development and Vercel runtime
+    possible_paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "index.html"),
+        os.path.join(os.getcwd(), "src", "api", "static", "index.html"),
+        "src/api/static/index.html",
+    ]
+
+    for path in possible_paths:
+        if os.path.exists(path):
+            return FileResponse(path, media_type="text/html")
+
+    return {"error": "Dashboard not found", "cwd": os.getcwd(), "tried": possible_paths}
+
+# Mount static files for CSS/JS/assets (keep existing mount if present)
+# Only mount if not already mounted
+static_dir = None
+for path in [
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"),
+    os.path.join(os.getcwd(), "src", "api", "static"),
+    "src/api/static",
+]:
+    if os.path.exists(path):
+        static_dir = path
+        break
+
+if static_dir:
+    app.mount("/static", StaticFiles(directory=static_dir), name="static-files")
 
 @app.get("/about", response_class=HTMLResponse)
 async def serve_about():

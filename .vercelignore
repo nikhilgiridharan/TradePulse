@@ -1,0 +1,36 @@
+# Git
+.git
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Virtual environments
+venv
+.venv
+env
+
+# Local dev files
+docker-compose.yml
+.dockerignore
+Makefile
+*.log
+
+# Tests
+tests/
+
+# CI
+.github/
+
+# Local data
+data/
+*.csv
+
+# IDE
+.vscode
+.idea
+.DS_Store
