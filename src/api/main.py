@@ -44,6 +44,38 @@ except Exception as e:
 
 DEMO_MODE = os.getenv('DEMO_MODE', 'true').lower() == 'true'
 
+try:
+    from faust import App
+except ImportError:
+    App = None
+
+try:
+    import kafka
+    from confluent_kafka import Producer
+except ImportError:
+    kafka = None
+    Producer = None
+
+try:
+    from sklearn.ensemble import IsolationForest
+except ImportError:
+    IsolationForest = None
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
+try:
+    import pyarrow as pa
+except ImportError:
+    pa = None
+
 # Finnhub /market-prices fallbacks — update manually when stale (Finnhub or network failure).
 FALLBACK_PRICES = {
     "AAPL": {"price": 207.94, "change_pct": -0.27, "previous_close": 208.50},
@@ -56,16 +88,46 @@ import time
 from typing import Any, Optional
 from fastapi import Request
 from pydantic import BaseModel
-import structlog
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 
-from src.processing.feature_store import FeatureStore
+try:
+    import structlog
+except ImportError:
+    structlog = None
+
+try:
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+except ImportError:
+    RateLimitExceeded = Exception
+
+    def get_remote_address(request):  # type: ignore[misc]
+        return "127.0.0.1"
+
+    class Limiter:  # type: ignore[no-redef]
+        def __init__(self, key_func):
+            pass
+
+        def limit(self, *args, **kwargs):
+            def decorator(func):
+                return func
+            return decorator
+
+    def _rate_limit_exceeded_handler(request, exc):  # type: ignore[misc]
+        pass
+
+try:
+    from src.processing.feature_store import FeatureStore
+except (ImportError, Exception):
+    FeatureStore = None
 
 import httpx
 
-logger = structlog.get_logger(__name__)
+if structlog:
+    logger = structlog.get_logger(__name__)
+else:
+    import logging
+    logger = logging.getLogger(__name__)
 
 
 # Real-time API metrics tracker
@@ -168,7 +230,12 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 def _get_writer():
     """Lazy init DynamoWriter so app starts even if boto3 has import issues."""
-    from src.storage.dynamo_writer import DynamoWriter
+    if DEMO_MODE:
+        raise HTTPException(status_code=503, detail="Storage unavailable in demo mode")
+    try:
+        from src.storage.dynamo_writer import DynamoWriter
+    except (ImportError, Exception) as e:
+        raise HTTPException(status_code=503, detail=f"Storage unavailable: {e}") from e
     if _get_writer._writer is None:
         _get_writer._writer = DynamoWriter()
     return _get_writer._writer
@@ -452,6 +519,8 @@ async def get_anomalies(request: Request, ticker: str, hours: int = 24) -> Anoma
 @limiter.limit("100/minute")
 async def get_features(request: Request, ticker: str) -> FeaturesResponse:
     """Current feature vector. Cached 1s."""
+    if FeatureStore is None:
+        raise HTTPException(status_code=503, detail="Feature store unavailable in demo mode")
     store = FeatureStore()
     vec = store.get_features(ticker.upper())
     if not vec:
